@@ -1,0 +1,244 @@
+<typeSystemDescription xmlns="http://uima.apache.org/resourceSpecifier">
+  <name>OBOTypes</name>
+  <description>Types for TEI annotations in the Old Bailey Online Corpus</description>
+  <version>1.0</version>
+  <vendor>Incite - Columbia University</vendor>
+  <import location="/home/jta/src/local/incite/incite-lector/src/main/resources/desc/type/InciteTypes.xml"/>
+  <types>
+    <typeDescription>
+      <name>edu.columbia.incite.uima.api.types.obo.OBOSpan</name>
+      <description>Base type for OBO span annotations</description>
+      <supertypeName>edu.columbia.incite.uima.api.types.Span</supertypeName>
+      <features>
+        <featureDescription>
+          <name>oboType</name>
+          <description>Entity type</description>
+          <rangeTypeName>uima.cas.String</rangeTypeName>
+        </featureDescription>
+        <featureDescription>
+          <name>xpath</name>
+          <description>XPath expression of source</description>
+          <rangeTypeName>uima.cas.String</rangeTypeName>
+        </featureDescription>
+      </features>
+    </typeDescription>
+    <typeDescription>
+      <name>edu.columbia.incite.uima.api.types.obo.OBOEntity</name>
+      <description>Base type for entity span annotations</description>
+      <supertypeName>edu.columbia.incite.uima.api.types.obo.OBOSpan</supertypeName>
+    </typeDescription>
+    <typeDescription>
+      <name>edu.columbia.incite.uima.api.types.obo.Date</name>
+      <description>Date</description>
+      <supertypeName>edu.columbia.incite.uima.api.types.obo.OBOEntity</supertypeName>
+    </typeDescription>
+    <typeDescription>
+      <name>edu.columbia.incite.uima.api.types.obo.Label</name>
+      <description>Entity label</description>
+      <supertypeName>edu.columbia.incite.uima.api.types.obo.OBOEntity</supertypeName>
+    </typeDescription>
+    <typeDescription>
+      <name>edu.columbia.incite.uima.api.types.obo.Named</name>
+      <description>Base type for named entities</description>
+      <supertypeName>edu.columbia.incite.uima.api.types.obo.OBOEntity</supertypeName>
+    </typeDescription>
+    <typeDescription>
+      <name>edu.columbia.incite.uima.api.types.obo.Person</name>
+      <description>Personal names</description>
+      <supertypeName>edu.columbia.incite.uima.api.types.obo.Named</supertypeName>
+      <features>
+        <featureDescription>
+          <name>given</name>
+          <description>Given name</description>
+          <rangeTypeName>uima.cas.String</rangeTypeName>
+        </featureDescription>
+        <featureDescription>
+          <name>surname</name>
+          <description>Surname</description>
+          <rangeTypeName>uima.cas.String</rangeTypeName>
+        </featureDescription>
+        <featureDescription>
+          <name>gender</name>
+          <description>Gender</description>
+          <rangeTypeName>uima.cas.String</rangeTypeName>
+        </featureDescription>
+        <featureDescription>
+          <name>age</name>
+          <description>Age</description>
+          <rangeTypeName>uima.cas.String</rangeTypeName>
+        </featureDescription>
+        <featureDescription>
+          <name>occupation</name>
+          <description>Occupation</description>
+          <rangeTypeName>uima.cas.String</rangeTypeName>
+        </featureDescription>
+      </features>
+    </typeDescription>
+    <typeDescription>
+      <name>edu.columbia.incite.uima.api.types.obo.Place</name>
+      <description>Place name</description>
+      <supertypeName>edu.columbia.incite.uima.api.types.obo.Named</supertypeName>
+      <features>
+        <featureDescription>
+          <name>placeName</name>
+          <description>Place name</description>
+          <rangeTypeName>uima.cas.String</rangeTypeName>
+        </featureDescription>
+        <featureDescription>
+          <name>placeType</name>
+          <description>Place type</description>
+          <rangeTypeName>uima.cas.String</rangeTypeName>
+        </featureDescription>
+      </features>
+    </typeDescription>
+    <typeDescription>
+      <name>edu.columbia.incite.uima.api.types.obo.Legal</name>
+      <description>Base type for legal entities</description>
+      <supertypeName>edu.columbia.incite.uima.api.types.obo.OBOEntity</supertypeName>
+      <features>
+        <featureDescription>
+          <name>category</name>
+          <description>Category</description>
+          <rangeTypeName>uima.cas.String</rangeTypeName>
+        </featureDescription>
+        <featureDescription>
+          <name>subcategory</name>
+          <description>Subcategory</description>
+          <rangeTypeName>uima.cas.String</rangeTypeName>
+        </featureDescription>
+      </features>
+    </typeDescription>
+    <typeDescription>
+      <name>edu.columbia.incite.uima.api.types.obo.Offence</name>
+      <description>Offence description</description>
+      <supertypeName>edu.columbia.incite.uima.api.types.obo.Legal</supertypeName>
+    </typeDescription>
+    <typeDescription>
+      <name>edu.columbia.incite.uima.api.types.obo.Verdict</name>
+      <description>Verdict description</description>
+      <supertypeName>edu.columbia.incite.uima.api.types.obo.Legal</supertypeName>
+    </typeDescription>
+    <typeDescription>
+      <name>edu.columbia.incite.uima.api.types.obo.Punishment</name>
+      <description>Punishment description</description>
+      <supertypeName>edu.columbia.incite.uima.api.types.obo.Legal</supertypeName>
+    </typeDescription>
+    <typeDescription>
+      <name>edu.columbia.incite.uima.api.types.obo.OBOSegment</name>
+      <description>Base type for segment span annotations</description>
+      <supertypeName>edu.columbia.incite.uima.api.types.obo.OBOSpan</supertypeName>
+      <features>
+        <featureDescription>
+          <name>oboType</name>
+          <description>Entity type</description>
+          <rangeTypeName>uima.cas.String</rangeTypeName>
+        </featureDescription>
+        <featureDescription>
+          <name>xpath</name>
+          <description>XPath expression of source</description>
+          <rangeTypeName>uima.cas.String</rangeTypeName>
+        </featureDescription>
+        <featureDescription>
+          <name>date</name>
+          <description>Session date</description>
+          <rangeTypeName>uima.cas.String</rangeTypeName>
+        </featureDescription>
+        <featureDescription>
+          <name>year</name>
+          <description>Session year</description>
+          <rangeTypeName>uima.cas.String</rangeTypeName>
+        </featureDescription>
+      </features>
+    </typeDescription>
+    <typeDescription>
+      <name>edu.columbia.incite.uima.api.types.obo.Session</name>
+      <description>Session metadata</description>
+      <supertypeName>edu.columbia.incite.uima.api.types.obo.OBOSegment</supertypeName>
+      <features>
+        <featureDescription>
+          <name>proc_dupes</name>
+          <description/>
+          <rangeTypeName>uima.cas.StringArray</rangeTypeName>
+        </featureDescription>
+        <featureDescription>
+          <name>proc_does</name>
+          <description/>
+          <rangeTypeName>uima.cas.StringArray</rangeTypeName>
+        </featureDescription>
+        <featureDescription>
+          <name>proc_dirs</name>
+          <description/>
+          <rangeTypeName>uima.cas.StringArray</rangeTypeName>
+        </featureDescription>
+      </features>
+    </typeDescription>
+    <typeDescription>
+      <name>edu.columbia.incite.uima.api.types.obo.Section</name>
+      <description>Base types for document sections</description>
+      <supertypeName>edu.columbia.incite.uima.api.types.obo.OBOSegment</supertypeName>
+      <features>
+        <featureDescription>
+          <name>oboType</name>
+          <description>Entity type</description>
+          <rangeTypeName>uima.cas.String</rangeTypeName>
+        </featureDescription>
+        <featureDescription>
+          <name>xpath</name>
+          <description>XPath expression of source</description>
+          <rangeTypeName>uima.cas.String</rangeTypeName>
+        </featureDescription>
+        <featureDescription>
+          <name>date</name>
+          <description>Session date</description>
+          <rangeTypeName>uima.cas.String</rangeTypeName>
+        </featureDescription>
+        <featureDescription>
+          <name>year</name>
+          <description>Session year</description>
+          <rangeTypeName>uima.cas.String</rangeTypeName>
+        </featureDescription>
+      </features>
+    </typeDescription>
+    <typeDescription>
+      <name>edu.columbia.incite.uima.api.types.obo.Charge</name>
+      <description>Criminal charge</description>
+      <supertypeName>uima.cas.AnnotationBase</supertypeName>
+      <features>
+        <featureDescription>
+          <name>chargeId</name>
+          <description>Criminal Charge Id</description>
+          <rangeTypeName>uima.cas.String</rangeTypeName>
+        </featureDescription>
+        <featureDescription>
+          <name>defendant</name>
+          <description>Defendant name</description>
+          <rangeTypeName>edu.columbia.incite.uima.api.types.obo.Person</rangeTypeName>
+        </featureDescription>
+        <featureDescription>
+          <name>offence</name>
+          <description>Offence description</description>
+          <rangeTypeName>edu.columbia.incite.uima.api.types.obo.Offence</rangeTypeName>
+        </featureDescription>
+        <featureDescription>
+          <name>verdict</name>
+          <description>Verdict description</description>
+          <rangeTypeName>edu.columbia.incite.uima.api.types.obo.Verdict</rangeTypeName>
+        </featureDescription>
+      </features>
+    </typeDescription>
+    <typeDescription>
+      <name>edu.columbia.incite.uima.api.types.obo.TrialAccount</name>
+      <description>Trial accounts</description>
+      <supertypeName>edu.columbia.incite.uima.api.types.obo.Section</supertypeName>
+      <features>
+        <featureDescription>
+          <name>charges</name>
+          <description>Charges in this trial</description>
+          <rangeTypeName>uima.cas.FSArray</rangeTypeName>
+          <elementType>edu.columbia.incite.uima.api.types.obo.Charge</elementType>
+          <multipleReferencesAllowed>true</multipleReferencesAllowed>
+        </featureDescription>
+      </features>
+    </typeDescription>
+  </types>
+</typeSystemDescription>
