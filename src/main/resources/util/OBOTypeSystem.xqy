@@ -11,9 +11,8 @@ declare variable $ns := $base || ".obo";
 
 declare variable $importPath := $root
 || "/incite/incite-lector/src/main/resources/desc/type/InciteTypes.xml";
-declare variable $filePath   := $root 
+declare variable $filePath   := $root
 || "/obo/obo-java/src/main/resources/desc/type/" || $name || ".xml";
-
 
 declare variable $spanBase   := $base || ".Span";
 declare variable $segmentBase := $base || ".Segment";
@@ -42,7 +41,7 @@ let $labelT := uima:type( $ns || ".Label", "Entity label" , uima:fsName( $entity
 let $genericEntities := ( $dateT, $labelT )
 
 (: Named entities :)
-let $namedT := uima:type( 
+let $namedT := uima:type(
   $ns || ".Named"
   , "Base type for named entities"
   , uima:fsName( $entityT )
@@ -76,8 +75,8 @@ let $subcatF := uima:feature( "subcategory", "Subcategory", $uima:String )
 
 let $legalT := uima:type( $ns || ".Legal", "Base type for legal entities" , uima:fsName( $entityT ), ( $catF, $subcatF ) )
 
-let $offenceT := uima:type( 
-  $ns || ".Offence", "Offence description", uima:fsName( $legalT ), () 
+let $offenceT := uima:type(
+  $ns || ".Offence", "Offence description", uima:fsName( $legalT ), ()
 )
 
 let $verdictT := uima:type(
@@ -116,7 +115,7 @@ let $sectionT := uima:type(
   , "Base types for document sections"
   , uima:fsName( $segmentT )
   (: TODO why are these defined again here? :)
-  , ( $typeF, $xpathF, $dateF, $yearF ) 
+  , ( $typeF, $xpathF, $dateF, $yearF )
 )
 let $segments := ( $segmentT, $sessionT, $sectionT )
 
@@ -128,9 +127,9 @@ let $chargeT := uima:type(
   $ns || ".Charge"
   , "Criminal charge"
   , $uima:AnnotationBase (: no indexing, access through trialAccounts :)
-  , ( 
+  , (
     uima:feature( "chargeId", "Criminal Charge Id", $uima:String )
-    , $chaDefF, $chaOffF, $chaVerF 
+    , $chaDefF, $chaOffF, $chaVerF
   )
 )
 

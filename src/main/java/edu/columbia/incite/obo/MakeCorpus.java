@@ -75,9 +75,14 @@ public class MakeCorpus {
 
     public static void main( String[] args ) throws IOException {
         Conf conf = new Conf();
-        conf.set( Conf.PARAM_TXT_FIELD, OBOTokenFields.FIELD_LEMMA_CONF );
-        conf.set( Conf.PARAM_SPLIT_FIELD, OBODocFields.OBO_YEAR_FIELD );        
+        
+        conf.set( Conf.PARAM_TXT_FIELD,    OBOTokenFields.FIELD_LEMMA_CONF );
+        conf.set( Conf.PARAM_SPLIT_FIELD,  OBODocFields.OBO_YEAR_FIELD );  
+        conf.set( Conf.PARAM_FILTER_FIELD, OBODocFields.OBO_TYPE_FIELD );
+        conf.set( Conf.PARAM_FILTER_TERM,  "trialAccount" );
+        
         Lector obo = new Lector( conf );
+        obo.dumpLexicon( obo.lexicon() );
         obo.mapField( conf.fieldSplit() );
 
         DocSet ds;

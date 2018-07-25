@@ -22,7 +22,7 @@ import edu.columbia.incite.obo.corpus.OBOTokenFields;
  *
  * @author José Tomás Atria <jtatria at gmail.com>
  */
-public class LexSizes {
+public class FieldLexiconSizes {
 
     public static void main( String[] args ) throws IOException {
         Lector obo = new Lector();
