@@ -19,9 +19,9 @@ import org.apache.lucene.index.Terms;
 import org.apache.lucene.index.TermsEnum;
 import org.apache.lucene.util.BytesRef;
 
-import edu.columbia.incite.obo.corpus.POBDocFields;
-import edu.columbia.incite.obo.corpus.POBTokenFields;
-import edu.columbia.incite.obo.corpus.Samples;
+import edu.columbia.incite.obo.corpus.OBODocFields;
+import edu.columbia.incite.obo.corpus.OBOTokenFields;
+import edu.columbia.incite.obo.corpus.OBOSamples;
 import edu.columbia.incite.corpus.DocSet;
 import edu.columbia.incite.util.DSVWriter;
 import edu.columbia.incite.util.FileUtils;
@@ -32,7 +32,7 @@ import edu.columbia.incite.util.FileUtils;
  */
 public class TrialFreqs {
 
-    public static final String TRIAL_IDS = POBDocFields.OBO_SECTION_FIELD;
+    public static final String TRIAL_IDS = OBODocFields.OBO_SECTION_FIELD;
     public static final String FILE = "/home/jta/desktop/obo/data/trial_freqs.dsv";
     
     
@@ -42,10 +42,10 @@ public class TrialFreqs {
         
         Map<String,Map<String,Long>> data = new HashMap<>();
         
-        getColumn( data, POBTokenFields.FIELD_RAW_FULL,   lr );
-        getColumn( data, POBTokenFields.FIELD_RAW_CONF,   lr );
-        getColumn( data, POBTokenFields.FIELD_LEMMA_FULL, lr );
-        getColumn( data, POBTokenFields.FIELD_LEMMA_CONF, lr );
+        getColumn(data, OBOTokenFields.FIELD_RAW_FULL,   lr );
+        getColumn(data, OBOTokenFields.FIELD_RAW_CONF,   lr );
+        getColumn(data, OBOTokenFields.FIELD_LEMMA_FULL, lr );
+        getColumn(data, OBOTokenFields.FIELD_LEMMA_CONF, lr );
         
         DSVWriter.write( FileUtils.getWriter( Paths.get( FILE ) ), data );
     }
@@ -65,7 +65,7 @@ public class TrialFreqs {
         TermsEnum divs = lr.terms( TRIAL_IDS ).iterator();
         BytesRef t = null;
         PostingsEnum pEnum = null;
-        DocSet sample = Samples.getSample( lr, Samples.TRIALS );
+        DocSet sample = OBOSamples.getSample(lr, OBOSamples.TRIALS );
         while( ( t = divs.next() ) != null ) {
             long trialTf = 0;
             pEnum = sample.filter( divs.postings( pEnum, PostingsEnum.ALL ) );

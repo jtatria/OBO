@@ -16,7 +16,7 @@ import org.apache.lucene.index.LeafReader;
 import org.apache.lucene.index.Terms;
 import org.apache.lucene.index.TermsEnum;
 
-import edu.columbia.incite.obo.corpus.POBTokenFields;
+import edu.columbia.incite.obo.corpus.OBOTokenFields;
 
 /**
  *
@@ -27,10 +27,10 @@ public class LexSizes {
     public static void main( String[] args ) throws IOException {
         Lector obo = new Lector();
         LeafReader ir = obo.indexReader();
-        getTopTerms(ir, POBTokenFields.FIELD_RAW_FULL );
-        getTopTerms(ir, POBTokenFields.FIELD_RAW_CONF );
-        getTopTerms(ir, POBTokenFields.FIELD_LEMMA_FULL );
-        getTopTerms(ir, POBTokenFields.FIELD_LEMMA_CONF );
+        getTopTerms(ir, OBOTokenFields.FIELD_RAW_FULL );
+        getTopTerms(ir, OBOTokenFields.FIELD_RAW_CONF );
+        getTopTerms(ir, OBOTokenFields.FIELD_LEMMA_FULL );
+        getTopTerms(ir, OBOTokenFields.FIELD_LEMMA_CONF );
     }
 
     static void getTopTerms( LeafReader ir, String field ) throws IOException {

@@ -34,8 +34,11 @@ import com.google.common.collect.ImmutableMap;
  */
 public class OBOModel {
     
+    public static final String DFLT_MARG_FILE = "marginals.txt";
+    public static final String DFLT_NGRAM_FILE = "ngramdata.txt";
+    
     static final String DIR = "/home/gorgonzola/data/ext/googlebooks-eng-gb-all-1gram-20120701/";
-    static final String TOTALS_F = "totals.txt";
+    static final String TOTALS_F = "marginals.txt";
     static final String NGRAMS_F = "ngramdata.tsv";
     static final fFormat FORMAT = fFormat.TSV;
     final int minLo = 1674;
@@ -44,11 +47,11 @@ public class OBOModel {
     final Map<String,int[]> frqMap;
     final int[] marginals;
     final Map<String,Double> cache = new ConcurrentHashMap<>();
-        
-    public OBOModel() {
+
+    public OBOModel( String dir, String margFile, String ngramFile ) {
         try {
-            frqMap = ImmutableMap.copyOf( loadFreqs( DIR, NGRAMS_F ) );
-            marginals = loadMarginals( DIR, TOTALS_F );
+            frqMap    = ImmutableMap.copyOf( loadFreqs( dir, ngramFile ) );
+            marginals = loadMarginals( dir, margFile );
         } catch ( IOException ex ) {
             throw new RuntimeException( ex );
         }
