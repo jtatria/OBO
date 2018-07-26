@@ -10,7 +10,7 @@ source( 'inc/obo_util.R',  chdir=TRUE, local=( if( exists( 'ut' ) ) ut else ( ut
 
 PROJ_NAME <- 'c2_lexstats'
 DATA_FILE <- file.path( ut$DIR_DATA_ROBJ, sprintf( "%s.RData", PROJ_NAME ) )
-DEVICE    <- 'internal'
+DEVICE    <- 'tikz'
 
 #' Freqs contains zeros for 1701 and 1705. They used to be replaced with adjacent values on load, 
 #' but I decided it is wiser not to fill in values, but to add zero columns in order to keep freq 

@@ -1,3 +1,9 @@
+/* 
+ * Copyright (c) 2018 José Tomás Atria <jtatria at gmail.com>.
+ * All rights reserved. This work is licensed under a Creative Commons
+ * Attribution-NonCommercial-NoDerivatives 4.0 International License.
+ */
+
 package edu.columbia.incite.obo;
 
 import edu.columbia.incite.Conf;

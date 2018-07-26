@@ -1,8 +1,9 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+/* 
+ * Copyright (c) 2018 José Tomás Atria <jtatria at gmail.com>.
+ * All rights reserved. This work is licensed under a Creative Commons
+ * Attribution-NonCommercial-NoDerivatives 4.0 International License.
  */
+
 package edu.columbia.incite.obo;
 
 import java.io.IOException;
