@@ -1,0 +1,187 @@
+\chapter{Data acquisition and pre-processing}
+\label{app:obo_proc}
+
+All primary data for the examples and results presented in this dissertation come from the electronic edition of the \emph{The Proceedings of the Old Bailey} (POB) as published by the \emph{Old Bailey Proceedings Online}\footnote{
+    \url{https://www.oldbaileyonline.org/}
+}. project (OBO) at the University of Sheffield, version 7.2 (January 2015).
+
+Data acquisition, normalisation and basic compilation was carried out using the \code{Lector} library described in \autoref{app:software}, but all of the specific configuration parameters and logic used in processing the OBO edition of the POB were defined in a module written as an extension to \code{Lector} and published as \code{OBO}\footnote{
+    Available at \url{http://src.nomoi.org/jtatria/OBO}.
+}.
+That module contains a set of executable classes at the root of its name-space that will carry out all analysis tasks.
+Please refer to \code{OBO}'s source code and documentation for further details.
+
+\section{Data acquisition}
+
+\subsection{XML elements}
+
+The electronic edition of the Proceedings of the Old Bailey produced by the Old Bailey Online project is made available as a collection of $2,163$ XML files containing the electronic transcription of the original sessions papers that have survived to the present, with additional metadata annotations encoded using a very small subset of the (now ancient) version 2.0 of the Text Encoding Initiative standard.
+This subset contains the following element types:
+
+\begin{itemize}
+    \item Proper annotations covering spans of text:
+    \begin{itemize}
+        \item Paragraph elements \code{p}, that are contained by sectioning elements and contain entity elements.
+        \emph{
+            Paragraphs are the main indexing unit used in the analyses discussed in this work and outside this context are always designated as \textbf{documents}
+        }.
+
+        \item Sectioning elements that contain text paragraphs:
+        \begin{description}
+            \item [\code{div0}]
+            Top-level container used exclusively for a complete issue of the POB.
+            There is one \code{div0} element per XML file, and this element contains all text and annotations found in each file.
+            \item [\code{div1}]
+            Container for logical sections of a sessions papers issue; most critically, trial accounts.
+            One would expect all div1 elements to appear as direct children of \code{div0} elements, but there are $783$ (out of $203,164$) \code{div1} elements that appear as children of other \code{div1} elements.
+            This evident error makes it necessary to introduce additional logic to disambiguate the correct section that should be associated to any given span of text in any of these $783$ misplaced div1 containers.
+        \end{description}
+
+        \item In-paragraph entity elements that are always contained by text paragraphs:
+        \begin{description}
+            \item [\code{persName}]
+            Container for personal names.
+            \item [\code{placeName}]
+            Container for place names.
+            \item [\code{rs}]
+            Container for all other entities, categorised by `type'.
+            Used to indicate offence descriptions, verdict descriptions, punishment descriptions and crime dates.
+            All \code{rs} elements are also categorised into a `category' and `subcategory' within each type.
+        \end{description}
+
+        \item Other annotations covering arbitrary spans of text that may either contain or be contained by paragraphs and are ignored:
+        \begin{description}
+            \item [\code{hi}]
+            Indicates rendering variations from source material formatting. Used inconsistently.
+            \item [\code{note}]
+            Indicates transcriber's notes for e.g. unreadable passages, etc. Used very rarely.
+        \end{description}
+    \end{itemize}
+    \item In-line marks not containing spans of text:
+    \begin{description}
+        \item [\code{interp}]
+        Interpretation instructions that associate arbitrary data to a span-covering annotation.
+        They always contain three attributes: a target, a parameter name and a value.
+        \item [\code{join}]
+        Entity association instructions that link different in-paragraph entities into a compound entity.
+        Most importantly, they are used to associate defendant names, offence descriptions and verdict descriptions to indicate criminal charges but also to create dyadic associations between personal names and labels or places, punishments and defendants, offences and crime dates, etc.
+        \item [\code{lb}]
+        Used inconsistently to indicate the point in the character stream at which a line break appears in the source material.
+        \item [\code{xptr}]
+        Used to indicate the point in the character stream at which a new physical page begins, indicating the file name for the image of the corresponding page.
+    \end{description}
+\end{itemize}
+
+Dealing with references in \code{interp} and \code{join} directives requires additional logic to the one contained in the default XML parser in \code{Lector}, and this is implemented as an extension to that component provided by the \code{OBOSaxHandler} class in \code{OBO}.
+
+\subsection{UIMA types}
+
+The XML elements used in the TEI encoding of the OBO edition of the POB are mapped to a set of custom UIMA types extending the default type system included in \code{Lector}.
+XML attributes and other data associated through the interpretation directives contained in \code{interp} elements are mapped to features defined in each type.
+User-facing types (i.e. excluding abstract types), include the following:
+
+\begin{description}
+    \item [Session]     Whole issues of the POB, mapped to \code{div0} elements.
+    \item [Section]     Non-trial sections, mapped to \code{div1} elements of type other than \code{trialAccount}.
+    \item [TrialAcount] Trial accounts, mapped to \code{div1} elements of type \code{trialAccount}.
+    \item [Person]      Personal names, mapped to \code{persName} elements.
+    \item [Place]       Place names, mapped to \code{placeName} elements.
+    \item [Date]        Crime dates, mapped to \code{rs} elements of type \code{crimeDate}.
+    \item [Label]       Personal labels, mapped to \code{rs} elements of type \code{occupation}.
+    \item [Offence]     Offence descriptions, mapped to \code{rs} elements of type \code{offenceDescription}.
+    \item [Verdict]     Verdict descriptions, mapped to \code{rs} elements of type \code{verdictDescription}.
+    \item [Punishment]  Punishment descriptions, mapped to \code{rs} elements of type \code{punishmentDescription}.
+    \item [Charge]      Criminal charges, created from \code{join} elements of type \code{criminalCharge}, having one Person, Offence and Verdict annotation as features and being themselves accessible only as features of TrialAccount annotations.
+    \item [Paragraph]   Basic segmentation unit, created either from \code{p} annotations in most of the text, but also around dangling orphan text nodes found outside \code{p} elements in the original XML stream.
+    The set of all \textbf{Paragraph} annotations constitute a proper segmentation of the corpus, as discussed in \autoref{chap:frame} and are used as primary indexing unit (see below).
+\end{description}
+
+The \code{OBOMappingProvider} class in \code{OBO} implements a mapping between XML elements and UIMA annotation types for the custom type system described above.
+
+\subsection{Text processing}
+
+Since the format used in the encoding of the OBO edition of the POB corresponds to so-called \emph{mixed content} XML in which element nodes may appear in between text nodes, the extraction of a consolidated and normalised character stream from the data contained inside the various text nodes in each file requires considerable logic in order to deal with correct white-space normalisation while at the same time ensuring that the character offset references used to associate UIMA annotations to spans in the character stream are valid.
+
+This is further complicated by the presence of empty ``in-line'' XML elements (i.e. elements not containing any text nodes) that split the character stream into different text nodes at arbitrary locations, which may or may not correspond to white-space.
+
+The most egregious example is the use of \code{lb} elements to indicate in-paragraph line breaks: sometimes the presence of an \code{lb} element also indicates a break between words (e.g. \code{some<\textbackslash{}lb>text}) and sometimes it does not (e.g. \code{pri<\textbackslash{}lb>soner}).
+
+Naive processing without taking this into account would yield `sometext' and `prisoner' in the output character stream for the examples above, introducing an erroneous word that would then propagate down the rest of the analysis pipeline.
+
+In order to deal with this problem, the default text filtering facilities in \code{Lector}'s I/O module allow for use of a shared resource that encapsulates whatever logic is necessary in order to decide whether a space should be inserted in between two consecutive non-white-space terminated text nodes (white-space seen as text node delimiters is always assumed to be valid and left in place, though white-space collisions are always reduced to one space).
+For the case of the OBO edition of the POB, the logic used to make this decision is as follows:
+
+Given two strings ${left}$ and ${right}$ corresponding to two consecutive, non-white-space delimited text nodes:
+\begin{itemize}
+    \item If ${left}$ ends in punctuation and ${right}$ begins with punctuation, \textbf{split} (e.g. [`some!', `(text'] yields ``some! (text'').
+    \item If ${left}$ ends in punctuation or ${right}$ begins with punctuation, check the corresponding leading or trailing punctuation against a list of known punctuation marks in order to determine whether a space should precede or follow the relevant mark (e.g. [`some (', `text'] yields ``some (text'', because the `(' found as trailing character in ${left}$ should not be followed by space as indicated in a hard-coded rule).
+    \item If the concatenation of ${left}$ and ${right}$ corresponds to a known ordinal number or money pattern, \textbf{don't split} (e.g. [`10', `l.'] yields ``10l.'' because ``10l.'' matches a known money amount pattern).
+    \item If ${left}$ ends in letters and ${right}$ begins with letters, treat as regular words and check against a model (see below).
+    \item If none of the preceding rules apply, assume the encoder's version and \textbf{don't split}.
+\end{itemize}
+
+Regular words are checked against a probabilistic model.
+This is built from the Google historical n-grams data set, such that the checks for splits for a sessions papers issue is performed against probabilities computed from the n-gram data corresponding to that issue's decade.
+More specifically, a probability of occurrence is computed for the letter-only trailing sub-string in ${left}$
+    (e.g. the `chunk' part in ` a chunk')
+, the letter only leading sub-string in ${right}$
+    (e.g. `of' in `of text.')
+and the concatenation of both
+    (e.g. `chunkof')
+, and a decision to split is made based on whether the co-occurrence of both sub-strings is more or less likely than their concatenation from usage patterns found in the Google books corpus at that point in time
+    (e.g. $P( \text{`chunk'} )P( \text{`of'} ) >>> P( \text{`chunkof'} ) \rightarrow \text{\textbf{split}}$)
+.
+
+Rule disambiguation is carried out in \code{OBO} by the \code{OBOSplitCheck} implementation of the \code{SplitCheck} interface in Lector and the n-gram model is encapsulated in the \code{OBOModel} class.
+The model's data is available in the \code{ext} directory inside the \code{data} directory included with \code{OBO}.
+
+\section{NLP pipeline}
+
+The linguistic pre-processing pipeline used for analysis of the OBO edition of the POB in this work is the standard segmentation/tokenisation, part of speech tagging and lemmatisation pipeline used as the basis of any computational linguistic data normalisation process.
+
+This analysis is carried out using the Stanford NLP components via the excellent DKPRo UIMA wrappers, with mostly standard parameter settings for all components, except for some additional rules passed to the segmenter to 1) restrict segmentation to Paragraph annotations, 2) include a few idiosyncratic punctuation marks as boundary tokens, 3) exclude boundary tokens from sentences (though sentence annotations are not used in this work) and 4) enforce strict paragraph zoning instead of the relaxed zoning used as default setting.
+
+\section{Indexing}
+
+The contract defined by the interface of the indexing module in \code{Lector} distinguishes between two types of fields: ``document fields'' that are used to contain document-level metadata that is not associated to specific locations in the token stream, and ``token fields'' that contain proper token postings that associate terms to specific locations in the token stream.
+
+\subsection{Document fields}
+
+Document fields are constructed by taking into account all features directly accessible from the annotations used as index documents, all annotations covering them and, optionally, some or all of the annotations contained by them.
+The type system defined for the OBO edition of the POB indicates Paragraph annotations as indexing documents.
+These are covered by Session annotations, from which the issue number is inherited, and by Section annotations, from which the section type and date are inherited, as well as an XPath expression pointing to the section's containing XML element's location in the source files.
+In addition to metadata inherited from covering annotations, the presence of any Offence, Verdict or Punishment annotation covered by any paragraph is taken into account as a Boolean field indicating that the document contains legal entities.
+Note that whether a document is covered by sections of type trial account and whether it contains any legal entities are the main features defining the different samples used for analysis in this work, as discussed in \autoref{chap:pob}.
+
+The \code{OBODocFields} class in \code{OBO} encapsulates the metadata extraction described above.
+
+\subsection{Token fields}
+
+Token stream fields are constructed from the sequence presented by the annotations covered by a document (Paragraph), in the standard UIMA sorting order\footnote{
+    By begin character offset in increasing order and by end character offset in decreasing order, such that parents precede their children.
+}.
+Token stream fields are defined by a set of rules that indicate how the different UIMA annotations are transformed back into a string representation used as each token's term, as well as additional posting-level metadata used to encode e.g. a token's part of speech.
+The token stream field specification for the OBO edition of the POB defines five fields:
+
+\begin{description}
+    \item [\code{full\_text}] Considers a token's raw covered text as term string, without any particular substitution or deletion.
+    \item [\code{full\_lemma}] Considers a token's lemmatised form as term string, without any particular substitution or deletion.
+    \item [\code{wrk\_text}] Considers a token's raw covered text as term string, with the standard substitutions and deletions.
+    \item [\code{wrk\_lemma}] Considers a token's lemmatised form as term string, with the standard substitutions and deletions.
+    \item [\code{ent\_legal}] Considers only legal entities with their entity id as token term.
+\end{description}
+
+All token-based fields incorporate the token's associated part of speech as posting metadata, the entity field considers the entity type as posting metadata.
+
+Standard substitutions used for construction of the terms in the \code{wrk\_*} fields consist of five term sets that will be used to replace the lemmas contained in each of them by their respective categorical label:
+\begin{description}
+    \item [\code{L\_ORD}]    For ordinal numbers (e.g. `1st', `123rd', etc.).
+    \item [\code{L\_MONEY}]  For money amounts (e.g. `10l.', `5s.', `20d.', etc.).
+    \item [\code{L\_WEIGHT}] For units of weight (e.g. `10lb.', `30oz.', etc.).
+    \item [\code{L\_LENGTH}] For units of length (e.g. `3ft.', `10in.', etc.).
+    \item [\code{L\_NUMBER}] For numbers, either as numerics or literals ( `153', `twenty one', `thirty-three', etc.).
+\end{description}
+
+This token field specification is contained in the the \code{OBOTokenFields} class in \code{OBO}.
+
+Once the index is built, further operations can be carried out from within \code{R} using the \code{Lector} back-end module in \code{wspaces} to extract information from the index as described in \autoref{app:software}.

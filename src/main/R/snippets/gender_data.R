@@ -24,7 +24,6 @@ make_data <- function() {
     ls <- lexical_sample( td$tf, !is.na( td$pos ) & td$pos == 'NN', theta=ut$SAMPLE_THETA )
     fs <- lexical_sample( td$tf, theta=gr$FEATURE_THETA )
     
-    
     # Compute PMI weights for fems and complement
     X_1 <- cooc_fems %>% cr$weight_sample( cr$data$cooc )
     X_2 <- ( cr$data$cooc - cooc_fems  ) %>% cr$weight_sample( cr$data$cooc )

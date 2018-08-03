@@ -140,9 +140,9 @@ termv <- function( g, v ) {
 }
 
 has_vattr <- function( g, atr ) {
-    return( !is.null( vattr( g, atr ) ) )
+    return( !is.null( ut$vattr( g, atr ) ) )
 }
 
 has_eattr <- function( g, atr ) {
-    return( !is.null( eattr( g, atr ) ) )
+    return( !is.null( ut$eattr( g, atr ) ) )
 }

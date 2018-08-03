@@ -2,10 +2,10 @@
 
 source( 'inc/obo_glove.R',  chdir=TRUE, local=( if( exists( 'gv' ) ) gv else ( gv <- new.env() ) ) )
 source( 'inc/obo_corpus.R', chdir=TRUE, local=( if( exists( 'cr' ) ) cr else ( cr <- new.env() ) ) )
-source( 'c3_global_data.R', local=( c3 <- new.env() ) )
+source( 'inc_c3_global_data.R', local=( c3 <- new.env() ) )
 
 PROJ_NAME <- 'c4_global'
-DEVICE    <- 'internal'
+DEVICE    <- 'tikz'
 
 # Load global model
 ws <- gv$load_glove( file.path( ut$DIR_DATA_GLOVE, 'global' ), td=cr$get_terms() )
@@ -20,7 +20,7 @@ k      <- with( c3$ppmi, K$membership[ ut$V( G )$term %in% td$term ] )
 size   <- with( c3$ppmi, graph_cluster_contribs( G, K$membership, mode='vc' )[ ut$V( G )$term %in% td$term ] )
 
 # tSNE global map
-ut$gr_setup( n=2, device=DEVICE, file=( fig <- sprintf( '%s_tsne', PROJ_NAME ) ) )
+ut$gr_setup( y=ut$GR_PLOT_Y * 2, device=DEVICE, file=( fig <- sprintf( '%s_tsne', PROJ_NAME ) ) )
 par( mar=c( 0,0,0,0 ) )
 plot( ws, inc=common, size=( size + .1 ), col=ut$color_mk_palette()( length( unique( k ) ) )[k], asp=1 )
 ut$gr_finish()
@@ -35,7 +35,7 @@ ut$gr_setup( device=DEVICE, file=sprintf( '%s_nns', PROJ_NAME ) )
 ut$gr_finish()
 
 # Gender-Status plane projection
-ut$gr_setup( n=2, device=DEVICE, file=sprintf( '%s_axes', PROJ_NAME ) )
+ut$gr_setup( y=ut$GR_PLOT_Y * 2, device=DEVICE, file=sprintf( '%s_axes', PROJ_NAME ) )
     v_lord <- ws['lord',]
     v_serv <- ws['servant',]
     v_male <- ws['man',]

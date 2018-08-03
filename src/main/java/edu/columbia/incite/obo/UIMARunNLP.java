@@ -36,13 +36,11 @@ public class UIMARunNLP {
             StanfordLemmatizer.class.getName()
         ) );
         props.setProperty( StanfordSegmenter.PARAM_ZONE_TYPES, Paragraph.class.getName() );
-        props.setProperty( StanfordSegmenter.PARAM_BOUNDARY_TOKEN_REGEX, "\\\\.|[!?]+|\\u2014" );
-        props.setProperty( StanfordSegmenter.PARAM_BOUNDARIES_TO_DISCARD, "\\\\n|\\\\*NL\\\\*|\\u2014" );
+        props.setProperty( StanfordSegmenter.PARAM_BOUNDARY_TOKEN_REGEX, "\\.|[!?]+|\u2014" );
+        props.setProperty( StanfordSegmenter.PARAM_BOUNDARIES_TO_DISCARD, "\\n|\\*NL\\*|\u2014" );
         props.setProperty( StanfordSegmenter.PARAM_STRICT_ZONING, "true" );
         props.setProperty( Conf.PARAM_UIMA_CONS, BinaryWriter.class.getName() );
-        
-        int i = 0;
-        
+                
         Conf conf = new Conf( Conf.DFLT_NS, props );
         CPERunner cper = new CPERunner( conf );
         cper.build();

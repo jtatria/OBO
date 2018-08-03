@@ -7,7 +7,7 @@ source( 'inc/obo_util.R',  chdir=TRUE, local=( if( exists( 'ut' ) ) ut else ( ut
 
 PROJ_NAME <- 'c2_testimony'
 DATA_FILE <- file.path( ut$DIR_DATA_ROBJ, sprintf( "%s.RData", PROJ_NAME ) )
-DEVICE    <- 'internal'
+DEVICE    <- 'tikz'
 
 make_data <- function() {
     source( 'inc/obo_corpus.R', chdir=TRUE, local=( if( exists( 'cr' ) ) cr else ( cr <- new.env() ) ) )
@@ -93,16 +93,16 @@ for( i in 1:length( imgs ) ) {
     ut$gr_finish()
 }
 ut$gr_setup( fig <- sprintf( '%s_fig2', PROJ_NAME ), n=1, device=DEVICE )
-cex <- par()$cex; layout( matrix( 1:length( imgs ), ncol=length( imgs ) ), respect=TRUE )
-par( mar=c( 2.1,2.1,2.1,2.1 ), oma=c( 0,1,0,1 ), cex=cex )
-for( i in 1:length( imgs ) ) {
-    plot( NA, type='n', xlim=c( 1674, 1913 ), ylim=c( 1674, 1913 ), pty='s', xlab=NA, ylab=NA, axes=FALSE )
-    ut$gr_add_raster( rasters[[i]] )
-    mtext(  side=3, line=0, text=titles[i], cex=.8 )
-    axis( 1 )
-    ut$period_lines( lbls=FALSE )
-    box()
-}
+    cex <- par()$cex; layout( matrix( 1:length( imgs ), ncol=length( imgs ) ), respect=TRUE )
+    par( mar=c( 2.1,2.1,2.1,2.1 ), oma=c( 0,1,0,1 ), cex=cex )
+    for( i in 1:length( imgs ) ) {
+        plot( NA, type='n', xlim=c( 1674, 1913 ), ylim=c( 1674, 1913 ), pty='s', xlab=NA, ylab=NA, axes=FALSE )
+        ut$gr_add_raster( rasters[[i]] )
+        mtext(  side=3, line=0, text=titles[i], cex=.8 )
+        axis( 1 )
+        ut$period_lines( lbls=FALSE )
+        box()
+    }
 ut$gr_finish()
 
 # ugly hack to work around tikzDevice bug

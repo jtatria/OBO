@@ -1,12 +1,11 @@
 #!/usr/bin/Rscript
 
-source( 'c4_epochs_data.R' )
 require( euclid )
 
 PROJ_NAME <- 'c4_epochs'
 AXIS1     <- c( 'lord', 'servant' )
 AXIS2     <- c( 'man', 'woman' )
-DEVICE    <- 'internal'
+DEVICE    <- 'tikz'
 
 onto_plane <- function( model, a1, a2, filter=rep( TRUE, nrow( model ) ) ) {
     if( is.character( a1 ) && length( a1 ) != 2 ) stop( 'invalid value for a1' )
@@ -32,6 +31,8 @@ onto_plane <- function( model, a1, a2, filter=rep( TRUE, nrow( model ) ) ) {
     return( pos )
 }
 
+source( sprintf( 'inc_%s_data.R', PROJ_NAME ) )
+
 S95_n  <- lexical_sample( td$tf.x, filter=( !is.na( td$pos ) & td$pos == 'NN' ), theta=ut$SAMPLE_THETA )
 S95_n_terms <- td$term[ S95_n ]
 
@@ -39,7 +40,7 @@ epos <- lapply( epochs, function( e ) { onto_plane( e, AXIS1, AXIS2, filter=S95_
 gpos <- onto_plane( global, AXIS1, AXIS2, filter=S95_n_terms  )
 ecs  <- vapply( 1:length( epos ), function( i ) C( epos[[i]] ), c(0,0) ) %>% t()
 
-ut$gr_setup( n=2, device=DEVICE, file=sprintf( '%s_endo', PROJ_NAME ) )
+ut$gr_setup( y=ut$GR_PLOT_Y * 2, device=DEVICE, file=sprintf( '%s_endo', PROJ_NAME ) )
     chart( ecs, C( gpos ), scale=FALSE )
     arrows( ecs[1:19,1], ecs[1:19,2], ecs[2:20,1], ecs[2:20,2], length=.1 )
     points( ecs[c( 1, 15, 20 ), ], pch=19 )
@@ -51,4 +52,3 @@ ut$gr_setup( n=2, device=DEVICE, file=sprintf( '%s_endo', PROJ_NAME ) )
     mtext( '$v_{woman} \\rightarrow v_{man}$', side=1, las=0 )
     mtext( '$v_{servant} \\rightarrow v_{lord}$', side=2, las=0 )
 ut$gr_finish()
-    

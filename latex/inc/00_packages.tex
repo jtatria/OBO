@@ -1,0 +1,67 @@
+\documentclass[
+    letterpaper, % paper size
+    10pt,        % text body font size
+    oneside,     % ``one-sided'' printingç i.e. no odd-even pages.
+    openany,     % no recto-verso pages: open chapters on any page
+    extrafontsizes,
+]{memoir}
+
+% I can't remember what this does.
+% \let\ordinal\relax
+% \usepackage[yyyymmdd,hhmmss]{datetime2}
+
+% CC licensing macros
+\usepackage[
+    type={CC},
+    modifier={by-nc-nd},
+    version={4.0},
+]{doclicense}
+\usepackage{textcomp}
+
+% source code text encoding
+% \usepackage[utf8]{inputenc} % UTF8. 2017, people. % UPDATE: use a native utf8 engine.
+
+% Hyphenation, microtypes
+\usepackage[english]{babel} % English please
+\usepackage[final]{microtype} % Less badboxes
+
+% Math
+\usepackage{amsmath,amssymb,mathtools} % Math
+\DeclareMathOperator*{\argmin}{arg\,min} % argmin operator
+
+% Figures
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.14}
+\usepgfplotslibrary{external}
+\tikzexternalize[prefix=tikz_ext/]
+
+% We replace pfgimage with includegraphics because tikzDevice uses pgfimage for references, but pgfimage can't find relative paths.
+\renewcommand{\pgfimage}{\includegraphics}
+\graphicspath{{figures/}}
+
+% Bibliography and references
+\usepackage[
+    citestyle=authoryear-comp,
+    natbib=true,
+    backend=biber,
+    url=false,
+    doi=false,
+    isbn=false,
+    hyperref=true,
+    maxnames=2,
+    maxbibnames=99,
+    backref=true,
+    sortcites=false,
+]{biblatex}
+
+% internal references and hyperlinks
+\usepackage{hyperref}
+\usepackage{footnotebackref}
+\makeatletter
+    \renewcommand\@makefntext[1]{%
+        \let\BHFN@thefnmark\@thefnmark
+        \renewcommand\@thefnmark{\hyperref[\BackrefFootnoteTag]{\BHFN@thefnmark}}%
+        \BHFN@OldMakefntext{#1}}%
+\makeatother
+
+\usepackage{geometry}

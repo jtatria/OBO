@@ -1,0 +1,83 @@
+\chapter{Weight functions}
+\label{app:weighting}
+
+There are two contexts in which weighting is necessary to moderate the impact of the heavily skewed distribution found in lexical samples: in the context of a document or other corpus segments, and in the context of other words.
+This corresponds to the two notions of context discussed in chapter \ref{chap:frame}, which we sometimes called indexing and co-occurrence contexts.
+
+\section{In-document weighting}
+
+With regards to indexing contexts, the purpose of weighting is to construct a measure of the amount of information associated to the occurrence of a token in a document or an aggregation of documents, by taking into account the relative frequency of the term across the entire corpus: terms that appear in every document will not provide much information for the characterisation of any given document, more or less independently of how many times the term appears in the specific document.
+This is typically the case with very common functional words, like \term{the}, other articles, etc.
+
+This weighting strategy is generally known as TF/IDF weighting, and consists on the combination of a monotonic function of the term's frequency \emph{in the document} (the TF part) and a monotonic function of the inverse of the term's document frequency \emph{across the entire corpus} (the IDF part).
+
+Both functions are independent, in the sense that different specifications can be combined with monotonicity and inverse monotonicity being the only requirements.
+
+Considering a term $w$ from a corpus with $D$ total documents and $W$ lexical set, appearing in $df_{w}$ documents, with a raw term frequency count $tf_{w,d}$ in a document $d$ of total word length $L$, the $TF$ part $TF_{w,d}$ can be computed as a simple Boolean,
+    $$
+    TF_{w,d} = \begin{cases}
+        1 & \text{if}\ tf_{w,d} > 0\\
+        0 & \text{otherwise}
+    \end{cases}
+    $$
+the raw value,
+    $$ TF_{w,d} = tf_{w,d} $$
+a normalised value,
+    $$ TF_{w,d} = \frac{tf_{w,d}}{L} $$
+a log-normalised value,
+    $$ TF_{w,d} = \log \left( 1 + \frac{tf_{w,d}}{L} \right)$$
+or a k-normalised value,
+    $$ TF_{w,d} = K + ( 1 - K ) \frac{tf_{w,d}}{\max tf_{d}} $$
+with $.5$ being a typical value for $K$.
+
+The IDF part $IDF_{w}$ can be computed as a simple unary indicator,
+    $$ IDF_{w} = 1 $$
+the plain inverse document frequency,
+    $$ IDF_{w} = \log \left( \frac{D}{df_{w}} \right) = - \log \left( \frac{df_{w}}{D} \right) $$
+the smoothed inverse document frequency,
+    $$ IDF_{w} = \log \left( 1 + \frac{D}{df_{w}} \right) $$
+the maximum-normalised inverse document frequency,
+    $$ IDF_{w} = \log \left( \frac{\max_{df_{w' \in W}}}{1 + df_w} \right) $$
+or the probabilistic inverse document frequency
+    $$ IDF_{w} = \log \left( \frac{D - df_{w}}{df_w} \right) $$
+Then the final $TFIDF_{w,d}$ value will be equal to the product of the $TF$ and $IDF$ parts: $TFIDF_{w,d} = TF_{w,d} * IDF_{w}$.
+
+In-document weighting is implemented in the \code{wspaces} software package produced for this dissertation through the \code{weight\_tf} function implementing all $TF$ variants discussed above, the \code{weight\_idf} function implementing all $IDF$ variants discussed above and the \code{tfidf} function that supports any combination of the previous two.
+
+\section{For-term weighting}
+
+With regards to the significance of a term as a member of another term's context, the purpose of weighting is to produce a scale-free measure of association between the two terms or, similarly, the amount of information that will be obtained about one of the terms by the occurrence of the other, usually taking into account some ratio of the observed frequency of co-occurrence between the two terms and the expected frequency of co-occurrence between the two terms under an assumption of independence or some approximation thereof.
+In other words, any of the many measures of categorical association may be used for this purpose.
+
+Given the extreme skewness of lexical distributions, values of a distributional matrix $X$ almost never consist of raw frequency counts, but to the value of one of these weighting functions.
+
+Considering a focal term $w$ with total term frequency $tf_{w}$ and a context term $c$ with total term frequency $tf_{c}$, in a corpus with a token stream of total length $N$ such that the probability of observing $w$ is $P( w ) = tf_{w} / N$, the probability of observing $c$ is $P( c ) = tf_{c} / N$ with joint term frequency $tf_{w,c}$ and probability of joint co-occurrence $P( c, w ) = tf_{w,c} / N$, the significance of $c$ as a characteristic feature of $w$, i.e. the value of $X_{w,c}$, can be computed as a simple type weight,
+    $$ X_{w,c} = \begin{cases}
+        1 & \text{if}\ P( c | w ) > 1 \\
+        0 & \text{otherwise}
+    \end{cases}
+    $$
+that discards frequency information or a token weight that incorporates it,
+    $$ X_{w,c} = P( c | w ) $$
+.
+However, in virtually all applications the measure used is the point-wise mutual information between $w$ and $c$, $PMI_{w,c}$,
+    $$ X_{w,c} = PMI_{w,c} = \log \frac{ P( c, w ) }{ P( c )P( w ) } $$
+but there are many variations of the basic PMI measure .
+Alternative measures may be constructed, e.g. based in the t-Test,
+    $$ X_{w,c} = P( c, w ) - \frac{P( c )P( w )}{\sqrt{ \frac{P( c, w )}{N} } } $$
+the z-Test,
+    $$ X_{w,c} = P( c, w ) - \frac{P( c )P( w )}{\sqrt{ \frac{P( c )P( w )}{N} } } $$
+or as an approximation of the log-likelihood,
+    $$
+    X_{w,c} = -2 \left(
+        \log \left( \mathcal{L} \left( tf_{w,c}, tf_{w}, \frac{tf_{c}}{N} \right) \right)
+        -
+        \log \left( \mathcal{L} \left( tf_{w,c}, tf_{w}, \frac{tf_{w,c}}{tf_{w}} \right) \right)
+    \right)
+    $$
+where the likelihood function $\mathcal{L}$ is equal to
+    $$ \mathcal{L}(k,n,x) = (x)^{k} ( 1- x )^{n-k} $$
+.
+
+For-term weighting is implemented in the \code{wspaces} software package produced for this dissertation through the \code{weight\_cooc} and \code{weight\_sample} functions that support all the weighting variants discussed above.
+A specific function for parameterised $PMI$ variants is also provided as \code{weight\_pmi}.

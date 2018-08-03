@@ -1,0 +1,738 @@
+\chapter{Background; Theory; Method}
+\label{chap:frame}
+
+Not every application of computational tools for textual analysis is equally interesting for the purposes of the approach presented in this dissertation.
+More concretely, we are interested in the application of computational text analysis for the study of \emph{material} historical processes, by which I mean processes that are actualized by a component of social facts that is more or less independent of its symbolic interpretation on the part of first-hand participants\footnote{
+    This is of course problematic, to the extent that the social facts that I refer to as material do incorporate to a large extent the \emph{prior} processes of symbolic interpretation by participants in the social world that constitute their symbolic side, as clarified in the working definition provided in the opening sentence of this dissertation.
+    This apparent contradiction can be resolved by going back to the classics, and bringing back Durkehim's definition of social facts and the centrality it imposes on constraint, and Weber's notion of social action, per opposition to the idea of structure, to put this in terms of one of the more or less confusing, perennial and at this point sterile discussions in sociological theory.
+    In order to ``kick it to the corner'', and independently of its further implications in terms of the deep structure-and-agency debate, we can ``step on it'' and assert that, at their point of occurrence, social facts have an element of Durkheimian constraint and an element of Weberian agency and that \emph{prior} social facts with their respective constraint and agency components are a part of the \emph{current} social fact's constraint component, over which agency can operate.
+    ``Material'' social facts refers to those prior social facts, while the symbolic component of social facts at their point of occurrence refer primarily to the symbolic interpretation processes that are actualised in the intended meaning of action.
+    I use the term material and symbolic instead of the more common structure and agency because I want to emphasise their relationship to semantics, on the one hand, and because I don't want to bring attention to the structure-and-agency problem (about which I will plainly assert that it is a problem of levels of analysis. I.e. ``take it meta'' and the problem disappears, but this is not a discussion I intend to participate in at this point).
+}.
+This implies that our interest in text as a primary data source is radically distinct from its usual consideration in most applications of text analyses, computational or not, since we are not interested in its discursive content, but in the way in which text is capable of encoding the (material) social context in which it is produced.
+
+Using the pictorial metaphor again, if we think of some text as if it were a photograph, an interest in \emph{material} social facts means that we are more interested in the blurry, usually out of focus \emph{background} of the photograph, per opposition to its crisp and fully focused subject.
+This is because the choice of subject and the way in which it is captured in the photograph is dependent on the artistic sense of the photographer, rather than on the material context in which the photograph is taken, and we are more interested in the material basis than on the symbolic exercise that actualises the photographer's (i.e. the social actor's) intended meaning.
+
+On the other hand, this dissertation is arguing that computational text analysis provides new solutions to some very old problems in \emph{historical} sociology, by which I refer to a sociology of social facts in which time plays a central role\footnote{
+    See \autoref{foot:histsoc} in the introduction.
+}
+However, the proposed solution revolves around dispensing with narrative in the production of historical data, and this implies reducing the theoretical centrality of time in the representations used to carry out the analysis, in stark departure to most work in this area \citep{abbott1990,abbott1992}\footnote{
+    \label{foot:abbott}
+    Though this idea has already been formulated, somehow \citep{abbott2007}.
+}.
+This suggests that the methodological approach proposed in this work for the solution of problems in historical sociology may have a broader application to questions in general sociology, as the clean separation between data and theory it proposes as a solution to the problems derived from the uses of narrative knowledge have broader application; the techniques discussed in this work treat time merely as an additional dimension of comparison from whatever information is available about the provenance of different regions in a text corpus, as discussed at length in the following chapter.
+
+This chapter first presents a brief statement of my disagreement with the usual understanding of the status of textual sources in its applications in the social sciences centred on the role of discourse, and then proceeds to formulate a very thin theoretical justification for the way in which I'm proposing that text should be treated for the analysis of what I call material social facts.
+This requires the formulation of some basic elements to anchor a relationship between social facts in general and language, and the formulation of how textual data should be treated if it is not to be considered as a form of discourse.
+This discussion serves only to formulate the general requirements that we demand of any strategy for semantic modelling, related to their capacity to account for non-discursive phenomena, beyond the usual questions of topicality.
+The bulk of the chapter, however, is devoted to an exposition of how I understand most computational text analysis techniques to be organised around a series of concrete analytical tasks that are mostly independent of each other.
+It is from this understanding of computational text analysis that I claim to be providing a \emph{methodology} for the application of computational text analysis techniques to the study of (historical) sociological problems, rather than merely a catalogue of useful tricks with words.
+Independently of how convincing I may be with regards to this claim, a systematic understanding of the many different techniques currently available for the computational analysis of text makes it possible to overcome the generalised confusion that seems to reign in this field, that prevents a clear distinction between the more profound aspects that determine both its potential and their ultimate limits and the minute implementation details that are usually thrown under the rug in most discussions of work in this area.
+I expect this presentation will provide a useful framework for practitioners in sociology to take advantage of the impressive technical achievements that have been recently produced in computational linguistics.
+
+\section{Background}
+\label{sec:background}
+
+My particular view of the possibilities presented by contemporary computational text analysis techniques may be more or less original (though it is already suggested in some work, like \citet{rule2015}), but there already are many applications of computational text analysis to sociologically informed work, in at least two distinct fields:
+A small cottage industry of media studies around topic models and sentiment analysis % TODO citations needed
+, and in ``quantitative narrative analysis'' like the one carried out by hand by \citet{griffin1992,griffin1993} and championed as a general framework by \citet{franzosi2004} (but see also \citet{franzosi1987,franzosi1989}), mostly based on named entity extraction techniques.
+On the other hand, there is an additional possible connection to prior sociological work, to the extent that contemporary computational text analysis techniques are analytically very similar to the principal component extraction and correspondence analyses that feature prominently in field theory \citep{martin2003}, at least in its bourdieurean version \citep{bourdieu1984}\footnote{
+    Though this has not been formulated in these terms, that I'm aware of.
+}.
+
+In this last sense, the approach presented here is very similar to the correspondence analysis techniques that are used pervasively for modelling different social fields from the locations of their associated markers in field theory research.
+From this point of view, the method discussed below can be thought of as the modelling of a ``semantic'' field through the locations acquired by words along the dimensions induced from their distributional patterns, in a very similar way to how different social fields are modelled by the location that their associated distinctive markers acquire in the dimensions induced through principal component extraction\footnote{
+    More specifically, we are modelling words from their co-occurrence with other words in some context, just like in the correspondence analysis of fields, social markers of distinction are modelled from their co-occurrence with other social markers of distinction in (the context of) some individuals.
+    This is touched upon in slightly more detail in \autoref{chap:wspaces} % TODO: check ref
+}.
+
+\citet{evans2016} provide a thorough recent review of the state of the art in the application of computational text analysis in sociological research, with the usual grandiose claims that this dissertation evidently also suffers from.
+In their review, \citeauthor{evans2016} place the different applications of computational text analysis in sociological work in the context of the extent to which they approximate what they consider to be the central phenomenon of interest in social facts: that they are basically games played by actors located in structurally defined positions that determine their strategic interests.
+I consider this view of the social world insufficient, because (1) it views text as nothing more than a form of discourse, which means that it is fundamentally treated as a record of rhetorical exercises and (2) because it implies a strong position on the question of exchange that I find simplistic and, if I may, morally aberrant
+% \footnote{
+    % TODO: exchange teory and the problem of coercion.
+% }.
+
+The argument I'm making in this work, is that computational text analysis may walk a line between the Manichean view of social facts as strategic games that treats text as mere samples of rhetorical, discursive, interested action (the subject of the photograph in the metaphor above) and the rather sterile attempts\footnote{
+    So far, at least. Even though \citeauthor{franzosi2004}'s original proposal is extremely interesting, and when it was first proposed almost revolutionary, its general promise of providing a method for the direct compilation of information on large collections of factual occurrences from unstructured information has in general not been delivered yet.
+    This is mostly due to the inherent limitations of contemporary solutions to the problem of named entity extraction, though recent work in the application of artificial intelligence to this task looks extremely promising.
+    See \citet{huang2015,strubell2017} for the current state of the art in NER.
+    Since difficulties in NER are partly given by the lack of annotated domain-specific data, a lot of work on this area is predicated on transfer learning, the ``secret sauce'' of modern AI techniques \citep{luong2013}, see \autoref{foot:sauce}.
+} at extracting factual data from literal sources that treats text as the mere first-hand account of (plain) facts.
+This is theoretically possible if one adopts a slightly more sophisticated view of the relationship between linguistic facts and social facts and between text and the social world within which it is produced.
+It is this more nuanced relationship between language, social facts and text that makes it possible to think about computational text analysis as a mechanism for producing pictures of the state of affairs of the social world that I claim to provide an avenue for solution to the problems associated to the uses of narrative knowledge in (historical) sociology, as discussed in the introduction.
+
+This means that, beyond the basic connection between prior work and this dissertation given by their common reliance on the same technical infrastructure, most work in the field is of little theoretical interest for my purposes, because a lot of it is oriented towards providing solutions to a different problem, that bears little relation to the problems I'm interested in
+\footnote{
+    \label{foot:stats}
+    I also happen to have a general distaste for statistical procedures in general, so I do find probabilistic inverse-sampling procedures like LDA rather inelegant, but this is a mostly aesthetical preference.
+}.
+In the end, the theoretical differences between the approach I'm proposing and the accepted understanding of the state of the art in the field is given by the fact that I have different research objectives to those pursued by most work in this field.
+
+These different objectives are rooted in a different understanding of text, which we take to contain not merely communication between strategically motivated actors playing a game, but an artefact that results from the technical development of a solution to the problem of co-presence in social action, as a consequence of which text encodes within it a big chunk of the social context in which it is produced \emph{more or less independently of the motivated strategic choices of its author}.
+
+\subsection{Caveat}
+
+Before proceeding any further, there is a rather important clarification and qualification that needs to be explicated in order to counter a particularly serious possible criticism of the approach I am advancing in this work.
+
+In brief, a harsh critic could very well accuse me of a form of logical positivism and a veiled attempt to return to a naive, inductivist view of (social) scientific practice, as follows:
+The effective elimination of interpretation as a mechanism for the production of narrative explanations implies a rejection of the validity of ideographic knowledge.
+This rejection in turn implies that the effective epistemology that sustains the proposed approach relies on a form of inductivism, as the only avenue that is left available for the construction of explanations is a generalisation from 1) partial sources of evidence that can be recovered from a small set of finite sets of texts (i.e. a finite number of finite text corpora) that may contain descriptions of some social practices in some social context to 2) all social practices across all social contexts.
+The illogical nature of this exercise of generalisation merely pushes down the problem that the proposed methodology seeks to address:
+What was originally identified as a limitation of the uses of narrative accounts (their non-uniqueness and ultimate arbitrariness) is moved to the exercise of selection of textual sources.
+Independently of how these are chosen they will fail to cover the relevant social practices across all relevant contexts.
+Hence, any attempt at using some textual source to produce explanatory knowledge about anything that would not be available to a human interpreter of that specific source will ultimately rely on an exercise of generalisation that falls prey to the problem of induction and is valid only from the point of view of hard-line logical positivism (which is thus smuggled in as an implicit epistemology of the social world).
+
+There are several independent counterarguments that can be formulated as a protection against this line of critique.
+
+The first and simplest of them is an idea that was formulated in general terms in passing in the introduction\footnote{
+    See \autoref{foot:interp1}, supra.
+} and that I will return to again in \autoref{sec:concept_maps} in \autoref{chap:semnet}:
+My rejection of narrative \emph{accounts} and the associated elimination of interpretation as fundamental exercise for the construction of historical \emph{data} does not imply a wholesale rejection of narrative \emph{explanations} nor an elimination of interpretation as the fundamental exercise in the construction of \emph{theories}, historical or otherwise.
+Hence, I'm not rejecting interpretative explanations in a way that would leave no alternative to a nomothetic science open to charges of inductivism.
+To put it in simpler terms, both the problems I identified in historical research and the solutions I proposed to them operate at a lower level than that at which the harsh criticism operates:
+I am not claiming that narrative and interpretation should be allowed no part in the scientific study of historical societies.
+This would be equivalent to requiring all historical knowledge to be based on formal theories backed or rejected by hard empirical tests from data produced automatically via computational analysis of some exhaustive textual record of all social practices across all contexts.
+Instead, I am claiming merely that it is possible to substitute the data that is traditionally produced by manual interpretation of sequences of events arranged in narrative accounts with formalised data structures produced automatically by a machine via the aggregated analysis of more sources than any human could conceivably read and much less interpret.
+Just as the narrative accounts prevalent in the traditional approach can be arranged to produce historical knowledge (that in sociology consists of theories), the formal data structures that are typical of the approach presented here still need to be analysed and \emph{measured} in order to serve as a basis for historical knowledge or sociological theories.
+In brief: My critique of the interpretative approach and the framework I am proposing as a solution to the problems it can not solve is not so much epistemological but \emph{observational}; this work is methodological in nature, not meta-theoretical.
+
+A second defence is related to this last point, but from an even more practical point of view:
+Independently of how we call them in the context of a controversy within the analytical philosophy of history, the problems that this dissertation seeks to address have their origin in the actual research practices of the field with which it should be put in discussion: comparative historical sociology\footnote{
+    Which I already identified as the contemporary niche of what students of our discipline call ``classical'' theory.
+    See \autoref{foot:histsoc}.
+}.
+The defence sketched above refers to the general form of my argument: interpretation shall be eliminated from the production of data and this has no implication for the way in which theories are constructed.
+The one advanced here applies more concretely to the specific field for which this methodology is being proposed: Interpretation shall be eliminated specifically at the point at which historical cases are constructed and compared but this should not be taken as a call for a return to ``general theory'' \citep{kiser1991}.
+
+A third counterargument concedes less to the original criticism though its scope is somewhat more restricted than the ideas presented above.
+The first and second defences were aimed at the epistemological implication that rejecting interpretation would imply acceptance of the Baconian model, to which both replied by explicating different ways in which the proposed methodology merely replaces practical aspects of current social scientific research without embracing any further epistemological consequences.
+However, they conceded the point that generalisation from some textual sources to all social contexts was in fact a form of induction.
+This is not necessarily the case.
+It is entirely possible to think of research problems for which the relevant social practices would be captured by textual sources in a more or less invariant way across all of them, to the extent that those social practices are general enough as to be a necessary part of virtually all (and most importantly, any) texts.
+This is the case because the social processes that are relevant at the point of production, selection and preservation of social textual sources are not necessarily the same processes that one would like to study making use of those sources.
+This will be expanded in the next section, but it is also related to the notion of narrative horizon discussed at length in \autoref{sec:narhorizons}.
+
+Finally, one could deflect the impact of the criticism by pointing to its anachronism.
+Both the critique of induction as a general method for generalisation and the critique of positivism as a strategy for the construction of theories out of formalised data were formulated in a context in which observation was a costly affair.
+This meant that the amount of error that one would expect to come out of unwarranted generalisation was rather large, as claims were typically broad and profound, while evidence few and far between.
+But this situation has changed dramatically in recent years, in at least two directions:
+On the one hand, we now face the opposite problem with regards to data; information and dimensionality reduction have become more important topics than estimation.
+On the other, the epistemological stance in our discipline has deviated even more than before from mainstream notions of causality, to the extent that a complete description of an operating mechanism appears as sufficient in lieu of an explanation.
+When taken together, both developments suggest that it is no longer necessary to choose between the thorough interpretation of the few and the shallow description of the many in between which the controversy about the scientific status of our discipline festered.
+I suspect these changes to have moved the coordinates of the central epistemological problems in our discipline, but I have not studied this issue enough as to offer a definitive argument.
+\emph{Caveat emptor}.
+
+\section[Theory]{Theory\footnote{
+    \label{foot:netglow}
+    An early version of the ideas contained in this section was presented at the NetGlow conference in Saint Petersburg in July 2016 and at the regular session of the Methodology Section of the ASA at their 2016 meeting in Seattle, Washington in August of the same year.
+    I'm grateful to Ronald Breiger, Charles Ragin and other participants in both events for their useful and encouraging feedback.
+}}
+\label{sec:theory}
+
+Traditional approaches to text analysis are interested in recovering the subject in the picture: what the text is saying, how it is combining different topics to make a point and communicate some sentiment about it, mostly because they are interested in accessing the intended meaning behind the social action of producing the text.
+We are interested in the background, the extra details that the picture captures almost by accident in its attempt to present the central subject.
+
+Pragmatists may argue that this distinction is of no consequence, but it does matter to the extent that it is from this perspective that we judge the pertinence and utility of a given technique.
+That is the reason for my lack of interest in topic modelling and sentiment analysis, and why I go to great lengths to show alternative uses for semantic networks.
+
+In order to provide a theoretical foundation for this use of text as primary data about social facts, we need to clarify the relationship between social facts and language, on the one hand, and the manner in which the linguistic components of social facts are captured by text on the other.
+In this effort, I will use the central concepts and categories of two general theories of the social world, in a rather eclectic manner. Eclectic, because I'm borrowing some elements from these perspectives that are useful for my theoretical needs without necessarily accepting all of their implications and consequences\footnote{
+    \label{foot:eclecticism}
+    To the extent that both Habermas' and Searle's theoretical perspectives have pretensions of generality, their central concepts about the role of language and communication in the make up of the social world are associated to respective philosophies of history and the ethical implications of social interaction (however implicitly).
+    These are acknowledge to be mostly incompatible: [explain], but since I'm only interested in the ontology of social facts and the relationship they have to linguistic phenomena, I will not attempt to reconcile both perspectives.
+    This borrowing of elements from different theoretical systems without much concern for the full compatibility of their prior assumptions or subsequent implications is what I mean by theoretical eclecticism.
+}.
+
+\subsection{Communicative rationality}
+\label{subsec:commact}
+
+The basic view of social facts that sits at the background of this dissertation revolves around a distinction between their material and their symbolic components.
+The more ambitious and systematic exploration of a general theory of the social based on such a distinction is given by Habermas's theory of communicative action, and the centrality it places on the distinction between facts and norms.
+In brief, ``facts'' refer to the material basis of the social, that are brought to bear on the context of social interaction via judgements of facticity, propositions about how the world \emph{is}, that are accepted or rejected on the basis of their truth content, while ``norms'' refer to what I have called the symbolic component of the social, and which are not available for adjudication on the basis of their truth content about the state of the world, but on the basis of the validity the lend to factual accounts to operate as ethical orientations for action.
+
+A beautiful example of the way in which these abstract categories operate can be constructed from Gould's work on the relationship between social status and violence \citep{gould2003a}.
+The Gouldian thesis about the breakout of interpersonal violence consists on the idea that a large part of interpersonal violence can be explained by ambiguity about social rank, as this would motivate an escalation of conflict between parties trying to ascertain their otherwise undetermined dominance over each other.
+This escalation eventually exhausts the normative mechanisms that prevent social interaction from devolving into naked coercion, resulting in interpersonal violence.
+This process can be seen, in light of the above discussion, as an unresolved dispute in the determination of which party to the conflict has standing to impose a given factual account of the social situation as the basis over which norms will be applied.
+From a Habermasian point of view, the breakdown of communicative rationality that is signalled by violence is interpreted as an incapacity by actors in a situation of ambiguity about their relative standing to agree on a suitable normative interpretation of the social situation in which they find themselves.
+Gould's example of the narrow road and the Sicilian cart drivers does not revolve around a factual disagreement about the width of the road or the sizes of the carts, but about how the (agreed upon) factual narrowness of the road is translated into normatively binding categories that are necessary for actors to agree about the obligations towards each other that the factual situation requires of each.
+Failure to obtain agreement about which party has standing to impose a given normative interpretation (who has the right of way) and the absence of an impartial third eliminates the possibility of a communicative resolution of the \emph{impasse}, and forces an escalation in conflict that degenerates into an attempt to \emph{impose} a different factual situation by the application of physical force in the form of coercion, i.e. violence.
+
+For my purposes, the relevant aspect of Habermas's theory of communicative action is the basic distinction he takes as starting point, which is the same distinction I'm placing at the centre of my view of social facts: they combine a material basis with a set of symbolic interpretations that \emph{translate} facticity into normativity.
+In Habermas's view, this distinction carries an ethical component, in as much as communication, the mutual recognition of the other as a valid part in interaction, can only occur on symbolic bases, while the factual component is always the sphere of naked coercion (i.e. ``technical rationality''), the imposition of a factual situation with complete disregard for any eventual symbolic aspect.
+Since Weberian times we call this \emph{Power}, and distinguish precisely on this basis from \emph{Authority}.
+
+It has to be noted, however, that the view of social facts that can be constructed from Habermas' theory has a scope that is restricted to social \emph{interaction}: it is only in the context of interactions (or even the more stable relationships that are built over recurrent interactions across time) that the distinction between facts and norms plays a role, because in Habermas's theoretical system, the central problem is communicative action, such that the elements of the distinction are fundamentally related to the modes of justification that are invoked in communication and that make mutual recognition (i.e. ``communicative rationality'') possible.
+In other words, the theoretical objective of Habermas's theory of communicative action is to provide a solution to the problem of exchange, the question about whether there is a generally valid distinction between coercive and non-coercive social interactions.
+In Habermas's view, \emph{sociality} is distinct from \emph{materiality} because the latter includes a notion of validity that is not given by (and is mostly independent of) facticity.
+
+Habermas's theory thus contains a distinction that may provide an ontology of social facts that (1) is easily connected to linguistic processes as it is rooted in communication, and (2) goes well beyond the naif view of the social as ``series of games'', as it allows for non-strategic behaviour.
+However, from a practical point of view, his distinction is mostly restricted to situations of interaction, and this would imply that in order to recover information about Habermasian social facts from textual sources, the sources themselves would have to be limited to accounts of interactions as their main content.
+
+\subsection{The linguistic construction of social reality}
+\label{subsec:xyc}
+
+An alternative theoretical framework that also provides a linguistically based ontology of social facts and is not generally restricted to situations of interaction, is given by Searle's theory of the linguistic construction of social reality. % TODO: citation needed.
+For Searle, social facts are always combinations of a ``brute'' fact with an agentive function, under the formula ``$X$ counts as $Y$ in context $C$'', where $X$ is a brute fact, $Y$ is an agentive function that is associated to the brute fact and $C$ is the context in which the association between $X$ and $Y$ holds, and is basically a residual category that encapsulates prior social facts that are necessary for $X \rightarrow Y$, but are left outside the scope of analysis.
+
+Searle's distinction between $X$ and $Y$ is harder than the distinction between facts and norms, because it operates at a ``lower level'', before the emergence of the entities that make up the social world e.g. norms.
+It has a more general scope, as it is not an attempt at ``merely'' solving the problem of exchange, but at providing a specification of the Durkheimian question about the ontology of social facts, i.e. what they actually \emph{are}.
+
+For Searle, the distinction between $X$ and $Y$ appears before interaction, as it is a constitutive part of the elementary entities that make up the social world.
+His example of the line of rocks that signal the existence of a frontier
+% TODO: citation needed
+is illustrative of this:
+For Searle, the relationship between the physical arrangement of rocks on the ground and their signalling of a frontier between different socially relevant geographic regions occurs before or outside the situations in which some actors will refer to either the fact of rocks on the ground or their role as sign for a frontier in the context of an interaction.
+
+Searle's view of social facts is particularly useful for the purposes of justifying non-discursive text analysis, because in his view the constitution of social facts is eminently linguistic, associated to the application of the $X \rightarrow Y | C$ formula for the theoretical definition of what I call material social facts.
+This specific aspect (rather than, say, its ethical implications for the problem of exchange or for the space of normative orientations in our interpretation and transformation of the social world\footnote{
+    I.e. the \emph{locus} of the fundamental incompatibility between Searle's and Habermas's theories.
+}) makes this particular view useful for our purposes, because it allows a direct mapping between linguistic features of textual data with social facts, independently of the text's content.
+
+Accepting Searle's view allows us to formulate a non-discursive use of textual data irrestrictive of a text's content and without further complication:
+Instead of looking at the lexicality of words (i.e. their topical associations, given by what the text ``is about''), we should look at the way in which they actualise functional relationships between brute facts and agentive functions, which is the same as saying that instead of looking at syntagmatic relationships of similarity induced from direct collocation, we should look at paradigmatic relationships of similarity induced by complementarity or substitutability\footnote{
+    \blockquote[{\citet[p. 60]{sahlgren2006}}]{Syntagmatic relations concern positioning, and relate entities that co-occur in the text; it is a relation \emph{in praesentia}. [...]
+    Paradigmatic relations, on the other hand, concern substitution, and relates entities that do not co-occur in the text; it is a
+    relation \emph{in absentia}.}
+    Consider the sentence \blockquote{
+        Arthur Crouch was indicted for feloniously wounding Mary Crouch
+    }, and the sentence \blockquote{
+        James Ragan was indicted for feloniously stealing, on the 26th of July, a watch, value 3\pounds
+    }.
+    A syntagmatic relationship exists between ``Arthur Crouch'', ``wounding'' and ``Mary Crouch'' from the first one and between ``James Ragan'', ``stealing'' and ``watch'' from the second.
+    Paradigmatic relationships exist between ``James Ragan'' and ``Arthur Crouch'', ``wounding'' and ``stealing'', ``Mary Crouch'' and ``watch'', not because of their direct co-occurrence, but because of their ``higher order co-occurrence''; the fact that they appear not \emph{in the same context}, but in contexts that are \emph{similar}.
+}.
+
+In other words, the analysis of a social process ---defined in the introduction as social facts across time--- from linguistic data from a Searlean perspective can proceed by merely looking at the way in which different semantic units appear in different functional associations at different points in time and space, in order to look at the substitution of terms occupying the $X$ and $Y$ role in the imputation of agentive functions to brute facts.
+In this view, this corresponds to looking directly at ``change'' in social facts.
+Concretely, this means looking synchronically at the way in which words relate to each other paradigmatically, instead of the diachronic perspective in which we observe syntagmatic relationships between them, to put it in the usual terms of classical structural linguistics \citep{desaussure2011}.
+
+This is best explained with an example: say we are interested in \emph{the social fact of group affiliation}.
+This social fact is actualised e.g. in the social practices of identification of individuals as parts of social categories, and the association of these categories to groups of people.
+The existence of an individual (say. `John') is a material fact.
+The identification of an individual as a member of a social category (e.g. subject of the English monarch) is an agentive function.
+\emph{The social fact of group affiliation} is thus obtained as a result of the formula ``John counts as a subject of the English monarch [in some context]'', and this social fact is actualised to the extent that John is actually counted as a subject of the English monarch through the social practices in which he participates.
+A change in this social fact can be observed if in the social practices that actualise it, we observe a substitution in any of the terms in this formula, such that e.g. ``John counts as Englishman [in some context]''.
+If this substitution occurs in the context of the same social practices, we are in the presence of the process by which \emph{the social fact of group affiliation} has been \emph{transformed}, from personal allegiance (to the English monarch), to his abstract affiliation to an imagined community (England) \citep{anderson1991}.
+
+% TODO
+% \subsection{Text as a material artefact}
+% \label{subsec:matart}
+%
+% Text is not discourse but a material remain corresponding to the product of the technological development of writing, the process by which information is expressed as an arrangement of symbols that exist independently of its author and from which information can be recovered via the process of reading.
+%
+% It's a solution to copresence.
+%
+% As a solution to copresnece, it necesarilly captures within it a lot of information about the context that makes the information contained in it intelligible to a reader.
+%
+% This feature of language as it is captured in text via writing can be exploited to recover information about the context in which the text was produced, per opposition of an attemtp at recovering the meanings that are primarilly encoded in it by an intended author.
+%
+% file format not instance.
+%
+% processual archeology.
+
+\section{Method: a unified framework for computational text analysis}
+\label{sec:method}
+
+There is a lot of confusion and variation in the ways in which different styles of computational text analysis produce their results.
+This confusion is mostly caused by the practical origin of most of the models used in the field.
+The vast majority of the techniques that facilitate this style of analysis have been developed specifically for solving concrete linguistic challenges\footnote{
+    \label{foot:semeval}
+    The SenseEval/SemEval task list maintained by the Association for Computational Linguistics, together with some standardised, publicly available data-sets (e.g. the Google News Corpus or dumps of different language editions of Wikipedia) have become the standard suite of tests for the validation of computational linguistics models. See \citet{zotero-2731} for the current tasks, and \citet{resnik2012} for the discussion leading to its standardisation.
+}, allowing for an evaluation strategy that is mostly independent of any theory of meaning \citep[pp. 54]{sahlgren2006} beyond the very general principle of the distributional hypothesis: ``You shall know a word by the company it keeps'' \autocite{firth1957}.
+Practically, the theoretical independence facilitated by the availability of concrete performance measures means that models are generally developed and tuned empirically: try out different functional specifications and parameterization, test them against some concrete task and retain what works and drop what doesn't.
+
+The empirical origins of most available models presents a complication for the application of these models for sociological analysis\footnote{
+    \label{foot:opacity}
+    Or for any purpose that builds on the lower-order semantic capabilities of available models for higher-order cognitive tasks; applications in the social sciences have already been recognised as one field of potential application, for which the opacity of most models has been identified as a major obstacle.
+    See \citet{ramage2009} for a discussion of this issue in the context of topic modelling.
+}:
+First, because sociologists are generally not in the business of developing new computational linguistics models, they tend to apply the available ones wholesale without looking at the implementation details that produce a given model or sustain a particular result, putting most of the details of the process that goes from unstructured text to formalised mathematical structures inside a black box that hides its details.\footnote{
+    \label{foot:impl}
+    Most of the time invested in the completion of this work was taken up by the process of implementing the different models available in the relevant literature.
+    In the vast majority of cases, this is an exercise in futility because there are many details that severely impact a model's performance that are simply too minute to explicate in full in the context of a scientific paper (even in ``supplementary information'' addenda).
+    In most cases, the only available avenue to understand what is going on behind the pretty pictures is to look at the source code used to produce a given analysis.
+    The specific content of stop-word lists or the specific patterns used in any regular expressions task are the most egregious examples of the kind of information that seems too uninteresting to an academic audience to be published, but are critical to any attempt at reproducing the published results.
+    Trying to translate function specifications from their symbolic representations to concrete algorithms for their computation is another.
+    The usual software design choices of academic programmers does not facilitate this effort.
+}
+The black-boxing of models and algorithms makes it very hard to reproduce or compare results, but beyond these practical limitations, it makes it very hard to map the results produced in one model to those produced from another model, even over the same corpus.\footnote{
+    \label{foot:sauce}
+    The association of features in different representations is further discussed below in the restricted context of what I call the ``mapping'' and ``alignment'' problems, but this is a more general topic that shows up recurrently in artificial intelligence and related areas, solutions to which are known as ``transfer learning''.
+    To a large extent, the success of ``deep learning'' as a general artificial intelligence strategy in recent years has been predicated on this ``secret sauce'' \citep{luong2013}.
+}
+
+Second, since the practical tasks we sociologists usually demand from computational text analysis models are not easily expressed in concrete performance measures, the strategy used to select a specific functional expression or concrete parameterization is usually not available to practitioners in our discipline, and even if it were, forcing a complete exploration of the full configuration space of the different models is prohibitively expensive and very suspicious.\footnote{
+    \label{foot:sorensen}
+    This is not entirely unlike Sørensen's complaint about the pernicious effect of increased computational power on the theoretical support of contemporary statistical analyses \citep{sorensen1998}.
+    In brief, ``throw everything on the wall and see what sticks'' is not the most convincing validation strategy (and, according to Sørensen, the main cause behind the relatively poor state of theoretical development in quantitative social sciences).
+}
+
+I believe that the best available solution to this problem is to pry open the black boxes of popular computational text analysis models, identify the elements that are common to most (if not all) of them and explicate the specific problems that are solved by each of them, the points at which a researcher is required to make decisions and the consequences that the different options available for each of these decisions will have for the computational costs of the analyses and the relationship between the produced results and the original textual source.
+
+In other words, instead of choosing wholesale between different available analysis pipelines, we can decompose all of the relevant options into a series of successive steps that \emph{are mostly independent of each other}.
+This also solves (or at least minimises) an additional problem that is seldom noted in applications of computational text analysis: most of the required tasks can be carried out at different points in the pipeline, such that wholesale application of an analysis strategy may at best duplicate efforts and at worst produce an effect similar to statistical ``double dipping'' \citep{kriegeskorte2009}, as the same analytical task is carried out repeatedly by different means, often by accident.
+% FWDREF
+I will come back on this point below.
+
+The framework I'm proposing to carry out this decomposition of models is based on a claim first advanced by \citet{levy2014} in their efforts to understand the alchemy behind the work of \citet{mikolov2013,mikolov2013a}, and then demonstrated empirically at the Stamford NLP group by \citet{pennington2014}:
+Most if not all of the relevant semantic information contained in text is captured in some way in the distributional patterns of words with respect to each other, and most if not all of the computational text analysis models currently available are (however implicitly or indirectly) projections (in the broadest mathematical sense of the word) of a matrix built from the occurrence of words in the context of other words into some higher-level mathematical structure (most notably for our purposes, \emph{graphs} when we treat this object as an adjacency matrix or \emph{vector spaces} when we treat it as a list of pair-wise distances that describe a metric space, as we will see in the following chapters).
+
+This is, in some sense, a more concrete specification of an idea that \citeauthor{sahlgren2006} claims to be the other theoretical pillar for vectorial semantics, together with the distributional hypothesis: the ``geometric metaphor of meaning'', which states that the manner in which human languages encode meaning can be approximated by a semantic space with defined, finite dimensions, in which distances between points in this space encode some notion of semantic relatedness between words.
+
+The geometric metaphor (which enjoys considerable support in general from the results of vectorial semantics, and in the concrete version mentioned above from the experiments carried out by \citeauthor{levy2014} and by the very hard fact that \citeauthor{pennington2014}'s GloVe model is capable of replicating \citeauthor{mikolov2013}'s results, as I will explain in \autoref{chap:wspaces}) implies that we can treat a computational text analysis pipeline as a process that seeks to approximate a theoretical ``semantic'' topological space that we will call $S$ via the extraction of distributional features into a co-occurrence matrix (or some point-wise function of it) that we will call $X$ and its projection onto some mathematical structure taken to present a  suitable approximation of $S$.
+
+The actual choice of mathematical structure onto which to project the information contained in the co-occurrence matrix $X$ is dictated by hard tests of performance against semantic tasks when pursuing computational-linguistical objectives, but on the much softer test of \emph{their suitability to represent theoretically relevant entities} when applied to the pursuit of sociological research objectives.
+The capacity of a mathematical representation of $S$ to express sociologically relevant entities will be determined by its capacity to provide a solution to two practical problems:
+(1) How theoretically relevant entities are \emph{mapped} in the features of the chosen mathematical representation of $S$ and
+(2) how mathematical structures containing the representations of $S$ corresponding to its different regions can be \emph{aligned} in order to trace the mappings of theoretically relevant entities across different corpora or different regions of the same corpus.
+
+\emph{
+    ``Mapping'' is the way in which computational text analysis provides a mechanism for constructing pictures of states of affairs.
+    ``Alignment'' is the way in which it provides the means to measure the similarity or dissimilarity of different states of affairs.
+}
+
+The practical problems associated to these two abstract exercises will dominate the discussion in the following chapters.
+
+In terms that will be more familiar to researchers in historical sociology, this view of computational text analysis interprets it in analytically similar terms to those that are relevant in sequence analysis and related techniques: transform data into a normalised sequence, identify the unique elements that appear in this sequence, collect patterns that put these unique elements in relationship to each other from their occurrence in the sequence, and then analyses these patterns through some distance or similarity function.
+We are merely changing the data from which the sequence is derived and the class of elements that are contained in it.
+
+In more concrete terms, this approach determines a series of tasks that any useful analysis pipeline needs to carry out in order to serve as tools in the pursuit of our objectives:
+\begin{enumerate}
+    \item Tokenisation of the character stream and compilation of a \emph{lexicon}, a fixed set of words (terms, types)
+    \item Context definition and indexing of the elements in the lexicon across the different contexts presented by a corpus
+    \item Computation of co-occurrence counts and similarity measures from the distributional patterns contained in the index
+    \item Projection of the matrix containing the computed measures of co-occurrence and similarity into other mathematical structures.
+%     \item ???
+%     \item Profit.
+\end{enumerate}
+
+In more general terms, the above steps correspond to
+(1) defining a population of observations,
+(2) constructing feature vectors from corpus data for each of the observations in the population,
+(3) computing measures of relatedness between the observations from their feature vectors and
+(4) projecting the information contained in the relatedness measures into some useful mathematical representation.
+
+These tasks are usually not properly distinguished and/or isolated from each other, such that decisions made in the context of one of them usually ``leak'' to the others.
+E.g. stop words are used for tokenisation and lexical normalisation, but this summarily removes some contexts from indexing and/or co-occurrence collection, instead of limiting the use of stop words only for lexical sampling \emph{after} normalisation and indexing\footnote{
+    More formally: the elimination of words at the point of tokenisation and normalisation not only eliminates members from the lexicon set (i.e. ``observations''), but also eliminates them as candidates for relevant contexts (i.e. ``features'').
+    % TODO See \autoref{foot:ddipping}, supra.
+}.
+This problem arises because the different concrete \emph{analytical} tasks that we demand from a computational text analysis pipeline can be performed by different concrete operations.
+
+% TODO examples of duplication: pado and lapata, dependencies as points in vector spaces, pair-pattern indexing, synonim and correference reslution, etc.
+
+Lacking a unified methodological framework and a consistent terminology, in which we can clearly differentiate the tasks of defining primary units of analysis, collecting distributional patterns, transformation of distributional patterns and construction of higher order units of analysis dooms us to generalised confusion.
+Hence the exercise in this section.
+
+In consequence, the rest of this chapter will discuss each of these tasks in detail.
+
+It must be noted that the tasks discussed below require a stable, fixed character stream produced from primary textual sources.
+This is more a matter of data acquisition than textual analysis proper, meaning that the practical and computational problems that must be dealt with in its context belong to a different family, related to character stream processing rather than the functional transformation of sequences that are typical of the tasks discussed below.
+\autoref{app:obo_proc} discusses some of the gory details of this prior task; the discussion below assumes that the underlying character stream has already been cleaned and normalised into a \emph{fixed and stable} representation.\footnote{
+    \label{foot:charoffsets}
+    This can be formulated as the concrete requirement that it must always be possible to unambiguously define references to locations in the source materials in terms of character offsets into the text source's character stream, which implies that there may be no further operations that modify the extension of the character stream.
+    This is a small implementation detail, but lack of care at this point can introduce a particularly nasty (and very hard to detect) type of error.
+    % TODO: reference discussion about the OBC
+}
+
+\subsection{Tokenisation and lexical normalisation}
+\label{subsec:tokens}
+
+The first step is the transformation of the unstructured, noisy and erroneous stream of arbitrary symbols contained in source text materials into a normalised sequence of observations that we call ``tokens'', each of which ``points to'' a member of a finite, controlled set of fundamental units of meaning which linguists call ``types'', but we will in general call ``words'' or ``terms''\footnote{
+    \label{foot:tokentype}
+    ``Type'' is the preferred expression in the context of the token-type problem in linguistics, logic, etc.
+    I will use this expression when discussing this problem in abstract.
+    ``Term'' is the preferred expression to refer to primary indexing units.
+    I will use this expression when discussing them as units for the compilation of distributional information (which happens to be most uses in this work).
+    ``Word'' is the preferred expression from normal language use, but since terms don't always point to words (e.g. they could be phrases, etc.), its use is misleading.
+    I will try to use it only if it does not introduce ambiguity.
+}.
+All tokens have two fundamental properties: the type they point to and the position in the text sequence at which they occur.
+The concrete set of distinct types pointed to by all the tokens contained in a corpus determines the corpus' \emph{lexicon}, which we will normally call $L$.
+
+\emph{
+    The elements of the lexicon determine the rows of the matrices that constitute the primary data structures that are manipulated in the techniques discussed in this work.
+}
+
+The computational implications of the association between elements in the lexicon and the structure of the matrices implies that one would like the lexicon set to be as small as possible (as the computational costs of any analyses will increase at least linearly and usually exponentially with the number of words in it\footnote{
+    But see [ref needed] for additional implications.
+}) while at the same time (1) covering as much of the corpus as possible and (2) being expressive enough to preserve the relevant semantic information contained in the token stream.
+
+An informal, quick and dirty test for the suitability of a given lexicon to account for a given corpus, is to see if the version of some corpus segment that results from the substitution of all its tokens with their associated lexicon terms ``makes sense'' to a human reader\footnote{
+    E.g. under the lemma rule, that sentence is rendered as [\term{a informal quick and dirty test for the suitable of a give lexicon to account for a give corpus be to see if the version of some corpus segment that result from the substitution of all it s token with they s associate lexicon term make sense to a human read}], which seems like a sufficiently close approximation of the original.
+}.
+
+This part of the analysis usually involves the deployment of a natural language processing (NLP) pipeline, that carries out at least three specific operations: Tokenisation/Segmentation, Part-of-speech (POS) tagging and Lemmatisation.
+Tokenisation refers to the splitting of the unstructured, undifferentiated character stream from the primary source into discrete tokens. A naive strategy for this would be to e.g. simply split on white space, but modern tokenised are smart enough to deal properly with punctuation marks, hyphenation, etc.
+Segmentation is a similar exercise but for sentences and, more typically, paragraphs.
+As is the case with tokenisation, segmentation could be as naive as e.g. splitting on periods or newlines, but the tools currently available usually incorporate additional heuristics to deal with abbreviations and other punctuation in order to properly identify sentence boundaries\footnote{
+    \label{foot:sentences}
+    Though these are in general not reliable enough for the analysis of long-duration historical corpora, given changing usage, style and editing choices.
+    The modern convention of using periods to separate sentences and newlines to separate paragraphs was not settled during the time covered by the corpus used in this work: e.g. the POB primarily uses em-dashes (---) as sentence separator (but not \emph{always}), particularly in its rendering of verbatim witness testimony.
+    Note that most segmenters will not consider em-dashes as sentence delimiters without additional configuration.
+    This discussion does not even begin to cover the issue of abbreviations, etc.
+}.
+POS tagging refers to the association of each token to a basic syntactic role (i.e. noun, verb, adjective, etc.), usually carried out probabilistically through the use of Markov chains.
+Finally, lemmatisation refers to the reduction of the words in natural usage to their ``lemma'', their dictionary form rid of all grammatical inflections for number, mode or time, etc.
+In general, most lemmatisers distinguish between simple stemming and proper lemmatisation\footnote{
+    A word's stem is the part of the word that \emph{never} changes under morphological inflection.
+    A word's lemma is its base form.
+    E.g. the word ``producing'' corresponds to the lemma ``produce'', but it's stem is ``produc--''.
+    The lemma and the stem \emph{sometimes} coincide, but not always; this is usually exploited by lemmatisers as an optimisation, and this is decided taking the POS into consideration.
+}.
+
+There is typically a relationship of dependency between the information produced by each of these operations, such that tokenisation and segmentation results are necessary as input for POS-tagging, and POS tags are necessary for proper lemmatisation.
+It is due to this dependency that these operations are normally encapsulated in the ``NLP pipeline''.
+Also because of this, it is generally advise able to deploy an NLP pipeline built from components that have been designed more or less specifically to work with each other\footnote{
+    Though different implementations may allow for some flexibility in choosing the different components of an NLP pipeline.
+    The technical aspects of deploying an NLP pipeline are discussed in \autoref{app:obo_proc}.
+}.
+
+There are additional NLP tasks that could be carried out at this stage by a more sophisticated pipeline, like chunking, named entity recognition, co-reference resolution, full dependency and constituency parsing, etc.
+These may be useful sometimes to the extent that they enable the production of additional first-order observation units, but is in general very computationally expensive\footnote{
+    In the case of the POB corpus used as primary data for this work, the NLP pipeline is by far the costliest operation and the less amenable to optimisation.
+}, and the results produced by these tools are not always so useful for the style of analysis discussed in this work\footnote{
+    Modern NLP tools have generally achieved decent error rates, but the dependencies implicated in the production of their results implies that errors tend to accumulate as they propagate down the pipeline; thus, using more sophisticated NLP tools is not always worth it.
+    Some operations are simpler than others, though, and their results may prove invaluable for some analysis tasks.
+    Cfr. \cite{rule2015} for a use of regular chunking to define multi-word terms from noun phrases.
+}, in part because we are confident that the same results can be more consistently derived at subsequent steps in the full analysis\footnote{
+    This is related to a current disciplinary transition in computational linguistics.
+    Traditionally, the tasks we now associate to ``NLP'' were carried out through functional transformations of annotation sequences, informed by probabilistic models to implement the necessary classifiers that would create new annotations for different linguistic entities.
+    This may be interpreted as the application of statistical tools to solve problems traditionally associated to structural linguistics (parsing being the prime example, either from a dependency or constituency view of grammatical units).
+    The development of distributional semantics can be seen as the final departure of corpus linguistics from structural linguistics.
+    % TODO See [citation needed] for a more thorough discussion of the current state of the field from the point of view of the relationship between structural linguistics, corpus linguistics and distributional semantics.
+}.
+In any case, the results of additional NLP tasks may either modify the lexicon set (e.g. by adding multi-word terms from noun phrases extracted by a chunker) or associate additional information to the corpus tokens which may be incorporated in the definition of its context (e.g. its participation in constituencies or dependencies produced by a corresponding parser), but in this work we will deal exclusively with the basic tasks discussed above.
+More generally, the comment above implies that there is a clear and definitive restriction to the part played by results from an NLP pipeline: they are only considered if and only if and to the extent they add entries in the lexicon or contribute to context definition.
+This is further explained below. % FWDREF
+
+The main decision that needs to be taken at this step is the token-type association rule: how the information associated with each token by an NLP pipeline will be taken into account to define its associated type, i.e. the ``identity'' function for elements in the lexicon set.
+Using a basic NLP pipeline yields basically three options:
+\begin{itemize}
+    \item Raw text: forget about POS tags and lemmatised forms and use the raw version of each token to determine their type. \term{dog}, \term{dogs}, \term{dogie}, \term{dogged} will all point to different types.
+    \item Lemma: use the lemmatised form to determine a token's type. \term{dog}, \term{dogs}, \term{dogie}, \term{dogged} will all point to the same type.
+    \item Lemma and POS: use the lemma, but associate each lemma-POS combination to different types. \term{dogie} will point to [\term{dog} (NN)], \term{dogged} will point to [\term{dog} (V)], \term{dog} and \term{dogs} will point to [\term{dog} (V)] when associated to the verb tag (V) and [\term{dog} (NN)] when associated to the noun tag (NN).
+\end{itemize}
+
+This decision, as well as the lexical sample problem I've mentioned above and that I will discuss in more detail below are primarily dominated by Zipf's Law: an empirically derived ``law'' that states that word frequencies in natural language usage follow a kind of power-law pseudo-distribution such that the frequency of any word will be inversely proportional to its rank in a frequency table sorted in descending order.
+In brief, the law predicts that the most common word in a corpus will appear roughly two times as often as the second more common word, three times as often as the third, and so on\footnote{
+    More formally, Zipf's law states that the frequencies of occurrence of many empirical phenomena follow the harmonic series such that the frequency of an outcome $x$, $p(x)$ will be more or less proportional to a function of the multiplicative inverse of its statistical rank $r$ and the population size: $p(x) ~ 1 / r_x ln(sN)$, where $N$ is the total number of occurrences (distinct words) and $s$ is an empirical scaling factor usually found to be equal to $~1.78$ \citep{weisstein2016}.
+    Since the harmonic series is divergent, this distribution is not a proper probability distribution, and Zipf's law tends to break around the 1000th observation; this is why we call it a ``pseudo-distribution''.
+    Since we are not using it as a proper probability function (i.e. we don't need to integrate over it), for practical purposes we can think of it in the same terms as we do when dealing with exponential, scale-free distributions.
+}.
+There are two critical implications from Zipf's Law for lexical analysis (including the construction of a lexicon and the choice of a token-type association rule):
+First, a relatively small number of frequent words will account for a relatively huge proportion of all tokens in a corpus{
+    The 135 most common words in the Brown corpus account for over half of its entire token stream, while the 33 highest frequency lemmas in the POB corpus account for half of its token stream under the lemma rule.
+} and second, different choices for a token-type association rule will tend to concentrate their impact on the long tail of low-frequency words, vastly altering the final size of the lexicon without necessarily improving the lexicon coverage over the token stream in any significant way, as shown in the next chapter.
+
+More practically, choosing the first option listed above will produce lexicons of unmanageable size, while the third one suffers from the problem of propagating any errors in the POS identification creating many very low frequency entries from unusual (i.e. erroneous) combinations of parts of speech with lemmas, partly from the incorporation of syntactical information in what is primarily a morphological issue of lexical normalisation.
+
+As will be explained in further detail in \autoref{chap:pob}, the analysis of the POB corpus in the rest of this work follows the second option above: using lemmas as the rule for identifying a token's type (though POS counts are retained for other purposes).
+
+In any case, it is worth remembering the main results of this part of the analysis: the definition of a lexicon, an exhaustive population of first-order units of analysis and the normalisation of the token stream to associate each of its positions to elements in this set.
+
+Formally, the lexicon is a set $L$ that contains all words $w_1, w_2, ..., w_n$ and the normalised stream of tokens is an ordered set $T$ of tokens $t_w$ such that each token's position $pos( t_w )$ associates a token's type $w$ to a specific location in $T$.
+
+% TODO: figure showing the transformation of the character stream into the token stream, lexicon induction and token payloads.
+
+\subsection{Context definition and indexing}
+\label{subsec:index}
+
+The second step in the analysis is the collection of distributional information for each term in the lexicon from the locations at which its associated tokens appear in the token stream of the corpus.
+This requires defining a notion of ``context'', such that each token can be interpreted as an observation that associates its term with the context defined by its location in the corpus' token stream.
+I will refer to the compilation of all the distributional information in a corpus for all elements in the lexicon as ``indexing''.
+
+\emph{
+    The contexts defined for the compilation of distributional information or some aggregation of them define the columns of the matrices that constitute the primary data structures that are manipulated in the techniques discussed in this work.
+}
+
+Of course, the intrinsic ambiguity of the word context in conventional usage is indicative of the slipperiness of the concept; together with the lack of theoretical support for distributional semantics, it is to be expected that there is no universally valid operational definition of context.
+In principle, how to define context will depend on the purposes for which distributional information is collected, and owing to the diverse disciplinary origins of the techniques discussed in this work this is also a source of great confusion in the literature for non-specialist audiences\footnote{
+    This issue is discussed at length in \autoref{chap:wspaces}.
+}.
+Hence, this section requires particular precision, at the cost of appearing to discuss the obvious.
+
+There are fundamentally two generally useful definitions of context for the different purposes of the proposed analysis: (1) as some fixed region of the corpus induced by a continuous, non-overlapping \emph{segmentation} of the token stream and (2) as a possibly non-continuous region defined by some higher-order linguistic property that may or may not overlap with other similarly defined regions.
+
+By ``region'' here I mean a set of positions $C$ from the positions in the entire token stream $T$ such that $C \subset T$ and that every token $t_w$ will associate its type $w$ to $C$ if its position $pos( t_w ) \in C$.
+By ``segmentation'' I mean a set of such regions $C_1, C_2, ... C_k$ that is exhaustive ($\bigcup_{i=1}^k C_{i} = T$) and disjoint ($ C_i \cap C_j = \emptyset\ \forall i,j : i \neq j$).
+From a practical point of view, the question about context definition revolves around the issue of determining the identity of $C$ from the positions in $T$ that are contained in it.
+
+Note that the lack of a theoretically mandated correct definition of context implies that it is possible to use the distributional hypothesis from either of these representations of context and their associated distributional information to model semantic information.
+For example, as will be discussed further in \autoref{sec:wshist}, this was the specific difference between the first two viable vectorial semantic models: \citeauthor{landauer1997}'s \emph{LSA} using a fixed-region context and \citeauthor{lund1996}'s \emph{HAL} using a co-occurrence context (see below).
+Early discussion on distributional semantics was somewhat dominated by the question of how different definitions of context would correspond to different notions of semantic relatedness between words: \citeauthor{sahlgren2006}'s otherwise illuminating early review of the field is exemplary of this understanding, linking fixed-region contexts with syntagmatic similarity and co-occurrence contexts with paradigmatic similarity.
+\citet{turney2010} also takes on this point in his general review, including other context definitions that leverage higher-order linguistic features, like dependency trees, etc.
+
+Given the emphasis I placed in section \ref{sec:theory} on the connection between different forms of semantic relatedness and the linguistic components of social facts, it would seem like the question about a suitable context definition should be approached from this point of view.
+However, it turns out that (1) different similarity measures can be constructed from the distributional information collected with either understanding of context (as I'll discuss in the next section) and that (2) the practical implications of choosing one or the other tend to dominate the decision, since they have dire consequences from a computational costs perspective.
+
+The practical consequences of choosing different context definitions is given by the point emphasised at the beginning of this section: different context choices will determine the shape of the corresponding distributional matrix.
+
+\label{pp:infret}
+In the case of fixed-region contexts, and owing to the disciplinary origins of distributional semantic models in information retrieval, each region is considered a ``document'' and the resulting matrix is known as a ``term-document'' matrix, in which each term is associated with a vector of dimensionality equal to the total number of documents in the corpus, $D$.
+This is useful for the basic tasks typically associated with the problem of information retrieval: given an information need formulated as some combination of terms that we call a ``query'', return a set of documents that are relevant for satisfying this information need.
+Though it is possible to use the distributional information in a word's document-vector to model its semantic information, this notion of context is specifically designed to accomplish the opposite exercise: characterise a \emph{document} from the distributional information contained in its term-vector\footnote{
+    Which yields one of the most successful models for information retrieval: the vector-space scoring model \citep[ch. 6]{manning2008}.
+    The prominent role of ``term-vectors'' in this model, the relationship of early semantic vector models to developments in this field and the current computational reliance on document-oriented indices as primary data source for the computation of other matrices (see \autoref{app:software}) explains in large part the confusion prevalent in the relevant literature, as ``vectors''
+    are pervasively discussed without further qualification.
+} (i.e. the elements in the column-space of the term-document matrix, of dimensionality equal to the cardinality of $L$).
+
+The main practical limitation of the term-document matrix is given by its direct association between the number of documents $D$ and the dimensionality of the term-vectors.
+First, for any reasonably sized corpus, the magnitude of $D$ is simply too big, easily reaching the order of $10^7$, making any linear manipulation of the ``document-space'' computationally prohibitive, and any analysis based on it incapable of scaling to larger text collections.
+
+Second, even if it were possible to easily operate on million-dimensional spaces efficiently, the direct association between corpus regions and the dimensions of the term-document matrix implies that any change in the number of documents will have structural consequences for any matrix representation of the corpus.
+The matrix-structural consequences of any change in the number of relevant documents means that any subsetting of the corpus for e.g. document sampling or for comparison between different regions of the corpus will require dealing with matrices that do not have the same shape\footnote{
+    The mathematical consequence of this problem is that different sets of documents will correspond to different, non-overlapping subspaces of the ``document space'' described by the entire term-document matrix, as subsetting documents will translate to subsetting \emph{dimensions}.
+    This complicates any meaningful application of the geometric metaphor enormously, as it is now necessary to produce transition maps between different subspaces or to include additional projection steps to make them comparable, even before we begin to deal with the alignment problem.
+}.
+As will be made clear, the construction of pictures of states of affair from corpus data uses these subsetting operations pervasively, so this is a major limitation of term-document representations.
+
+In this dissertation, fixed-region contexts produced by a segmentation of the corpus will be referred to as ``documents'' when referring to primary indexing units in a term-document matrix, but most usually simply as ``segments'', which formally correspond to sets of documents (including singleton sets).
+
+The canonical data structure used to represent the term-document matrix is an \emph{inverted index}\footnote{
+    The name ``inverted index'' is somewhat misleading, because every index is per definition ``inverted'', but that's how they call it.
+} that associates terms (i.e. words in most cases) to a list of postings that represent the non-zero entries of a term's document vector.
+
+In the case of the alternative understanding of context, the sets of positions contained in each $C$ are not mapped directly to the dimensions in the resulting matrix, overcoming the main limitation of term-document representations in that subsets of the corpus will not yield matrix representations with a different structure.
+Under this notion, the identity of $C$ is associated not to the continuous ranges of positions that are its elements, but to some higher-order phenomenon associated to the entire set of ranges\footnote{
+    This is the only other point besides lexicon construction at which results from an NLP pipeline may be considered.
+}.
+This can be as sophisticated as certain phrasal types (pair-patterns), dependency elements in a parse-tree, etc. but in most current applications it is defined as some function of the types of all the tokens with positions in $C$.
+This can be understood as a closer approximation of the distributional hypothesis, as it emphasizes a word's company directly, rather than trying to induce it from where it appears.
+The association between terms induced by the locations of their corresponding tokens in the relative vicinity of the tokens \emph{for other terms} is what we call \emph{co-occurrence}.
+
+The notion of \emph{vicinity} of a token can be defined on the same basis as fixed-context definitions such that it includes e.g. all other tokens located within the same document\footnote{
+    \label{foot:xddt}
+    This leads to a particularly insightful result: if computed like this, the co-occurrence matrix $X$ will be equal to the matrix product of the term-document matrix $D$ and its transpose: $X = DD^T$.
+}, but in most cases it is defined in terms of a window of positions in $T$ centered around each (context) term's tokens.
+
+Formally, we define contexts to be equal to a set of windows around a word $c$, each centered on the position of a token for $c$, $t_c$ such that a word $w$ will be associated to the context word $c$\footnote{
+    Note that $w$ and $c$ are interchangeable.
+} by the occurrence of one of its tokens $t_w$ at a position $pos( t_w )$ such that $pos( t_c ) - \delta_{lo} <= pos( t_w ) <= pos( t_c ) + \delta_{hi}$, where $\delta_{lo}$ and $\delta_{hi}$ are the width of the window before and after each $t_c$, respectively\footnote{
+    \label{foot:symmwindows}
+    Note that it is not necessary that $\delta_{lo} = \delta_{hi}$; i.e. windows can be asymmetric and this may in principle capture different aspects of the semantic relationship between $w$ and $c$.
+    All results discussed in this work have been produced using symmetric moving windows with $\delta_{lo} = \delta_{hi} = 10$.
+    % TODO See citation needed for a comparison of results produced by different window specifications.
+}.
+
+Since both $w$ and $c$ are words from the lexicon, the distributional information collected in this way produces a \emph{co-occurrence matrix}, which we will call $X$, and in which each word $w$ is associated to a vector of dimensionality equal to the cardinality of the lexicon\footnote{
+    \label{foot:contextset}
+    In the strictest of senses, there is no requirement for $w$ and $c$ to belong to the same lexical set.
+    This means that different lexical normalization rules could be used to define the set of words that will define the population of observations and the set of words that will define the set of available features for those observations, but this is seldom done explicitly.
+    Differences in the sets for $w$ and $c$ do arise as a side-effect of lexical sampling though, as explained in more detail in \autoref{chap:semnet} (p. \pageref{pp:features}ff.).
+    Note how this offers a strategy for validation of a given token-type rule, or, what is the same, for construction of an endogenous reduction of the set of a corpus' terms in raw inflected form into a tighter grouping with regards to a fixed lexicon.
+    This can be achieved via a comparison between the mapping from raw inflected forms and the entries in the normalized set and the mapping induced via clustering the raw inflected forms into the same number of groups as the cardinality of $L$ and comparing the results.
+    Note that when $w$ and $c$ are taken from the same lexical set (virtually always), the co-occurrence matrix $X$ will be square, with all associated advantages, but this is not a requirement and, strictly, should not be assumed.
+    % TODO (see \autoref{foot:ddipping}, supra.
+    % EXTRA
+}.
+
+Consequently, the data structure that contains this understanding of context is a ``term-term'' matrix.
+Beyond the fact that larger sets of documents will tend to contain observations for larger subsets of $L$, the number of dimensions in this matrix representation of a corpus has no connection to the number of documents in the corpus or any subset of it, meaning that an arbitrary sample of documents will always be represented as a matrix with similar structure\footnote{
+    In this sense, a term-term matrix can be thought of as a ``collapsed'' version of the term-document matrix, in that the (term-vectors of the) documents in the corpus are ``folded'', in a way, to spread the distributional information for each term in the document as loadings for that term on all the other terms as the coefficients of the row-space vectors of $X$, for every document in the set (cfr. \autoref{foot:xddt}, supra).
+    Mathematically, this can be interpreted to mean that any arbitrary set of documents can be represented by a matrix describing the \emph{same space}, eliminating the need for transition maps or additional projections for comparison between different samples of documents.
+    In other words, the representations of a given word induced from the data in a given set of documents is not taken to make up a different space, but merely different locations in the same space.
+    We will usually call this the ``distributional'' space.
+    Also note that this implies that co-occurrence collection is invariant under corpus size, at least in its storage costs.
+    This is a major advantage, because it allows the analysis to scale up to corpora of arbitrary size.
+}.
+
+This produces the primary data structure that will be used to construct the higher-order mathematical structures that form the bases for subsequent analyses, depending on how the information contained in this matrix is produced and interpreted.
+
+The inverted index is still of tremendous use, because it is the natural way in which additional non-textual data may be associated to different corpus segments (i.e. ``documents'') in order to encode its \emph{provenance}: the point in time at which it was produced and any additional non-textual context data that may play a role in the analysis.
+From this point of view, an inverted index may be considered a type of text-oriented database, useful for any necessary manipulation prior to the production of the term-term co-occurrence matrices that are the basis for further analysis\footnote{
+    See \autoref{app:software} for further discussion of the relationship between inverted indices and co-occurrence matrices as used in the analysis for this work.
+    In the software produced for this dissertation, co-occurrence counts are always collected over a set of documents, and these sets are defined using provenance data as contained in the term-document matrix from an index.
+}.
+Term-document matrices are also useful for the aggregation of distributional patterns across gross corpus segments e.g. years across a time-oriented corpus.
+The lexical analysis in the following chapter is based on this usage, similar to the technique used in \citet{rule2015} for periodisation of the SOTU corpus.
+
+\subsection{Production of the co-occurrence matrix}
+\label{subsec:cooc}
+
+The third step in the analysis is the definition of the function that will be used for computation of the values contained in the co-occurrence matrix, $X$.
+These represent the strength of association between words and contexts and is the basis for all further transformations.
+
+\emph{
+    The definition of this function will determine the coefficients that are contained in the matrices that constitute the primary data structure that are manipulated in the techniques discussed in this work.
+}
+
+The simplest functional form for the association between a term and a context is to simply count the number of times that the word $w$ appears in the context $c$, i.e. its term frequency:
+\[
+    X_{w,c} = | \{ C \subset T : \exists t_w \in C \} |
+\]
+Where $C$ is the set of token stream regions associated to $c$ that contain a token $t_w$ for $w$.
+
+Simple counts like these discard all information beyond the number of times a token pointing to a given term occurs in a given context, and are thus known as bag-of-word models, because they treat contexts as unordered sets of tokens.
+
+In general, the positional information discarded by bag-of-word models is useful to the extent that some semantic information is encoded in the relative locations of words to each other.
+E.g. some information is encoded in language via grammatical rules that impose some constraints on the relative positions in which words may appear in a sentence\footnote{
+    This is of course not language-invariant, and may be more or less relevant depending on the reliance of a language's grammar on word order versus morphological inflection.
+}.
+
+The incorporation of positional information is generally not available when contexts are defined as documents, independent of the form chosen for the primary matrix\footnote{
+    Though there are some options available for this; see \citet{sahlgren2008,recchia2015} for a process that incorporates positional information as permutations of random context vectors.
+    %See \autoref{subsec:rindexing} for a more detailed discussion of the uses of random vectors to compute and factorize similarity matrices.
+}.
+When contexts are defined as regions in the vicinity of other terms, positional information may be incorporated by a factor that takes into account the differences between the positions of $t_w$ and the locations of $t_c$ around which the moving windows for $c$ are defined.
+In this case, the value of the entries in the co-occurrence matrix $X$ will be equal to the sum of the values of a function $f$ of the position of a word $w$'s tokens $t_w$ and the position of a token for a context word $t_c$ that contains $t_w$ in its vicinity:
+\[
+    X_{w,c} = \sum_{ c \in C } f( pos( t_w ), pos( t_c ) )
+\]
+where $C = \{ \forall t_c : pos( t_c ) - \delta_{lo} <= pos( t_w ) <= pos( t_c ) + \delta_{hi} \}$, i. e. the set of all tokens for word $c$ that occur in the vicinity of (i.e. inside the moving window centered on) a token for word $w$.
+
+Counting functions with structures similar to this are used for the computation of the co-occurrence matrix in e.g. \citet{pennington2014}, in which $f = \frac{1}{|pos( t_w ) - pos( t_c )|}$\footnote{
+    Which is the general counting function used for the production of all versions of $X$ in this work, unless clearly stated otherwise.
+    The implementation of the counting function in the software package produced as a companion to this dissertation accepts arbitrary counting functions of $w$, $c$, $pos(t_w)$ and $pos(t_c)$.
+    See \autoref{app:software} for additional details.
+}.
+
+It is important to note at this point that independently of how sophisticated the counting function may be, the compilation of the co-occurrence matrix always implies a loss of information when compared to other corpus representations.
+For example, it is always possible to reconstruct the original token stream from a ``full'' inverted index\footnote{
+    A ``full'' inverted index is one that includes positions for each entry in its postings lists.
+    In this case, the inverted index can be thought of as a loss-less compression of the token stream, which can then be recovered from the posting lists in the index.
+    This operation is called, unsurprisingly, ``un-inverting the index''.
+    The raw textual source can then be reproduced in full, if the token-type function used to induce the lexicon from the raw inflected terms is reversible.
+    This is usually not the case, requiring the production of a map that retains the connection between raw forms and normalized forms at the moment of application of a lexical normalization rule if this operation is to be carried out.
+    This is in general only necessary if fast access to raw forms is required by subsequent analyses, for e.g. implementing additional NLP tasks; in general it is much easier to perform all of these operations at the time of constructing an index and avoid dealing with raw forms that have not passed through a standard normalisation process.
+}, but it is not possible to perform the same exercise from the collapsed representation of an inverted index contained in the co-occurrence matrix\footnote{
+    This may be mitigated somehow by using non-scalar valued functions for $f$, in which case $X$ is not a matrix, but some higher order tensor (also known in as an n-dimensional array).
+    See \autoref{app:software} for a brief discussion of higher-rank tensor values of $X$.
+}.
+
+This highlights what could be considered the central idea of the entire methodological framework proposed in this dissertation: no information that is not included in the distributional matrix $X$ is allowed to play any part in any analytical exercise beyond this point, so this function should always considered to be not \emph{reversible}; there is no going back after computing the co-occurrence matrix and whatever information is discarded by the counting function will be lost and not available at all.
+
+As I have already mentioned, $X$ is the primary data structure at the basis of most semantic models and related computational analyses, and the primary data structure for all analyses in this methodological framework.
+
+From this point on, we can stop thinking in terms of character or token streams and sequence or counting functions, and deal \emph{exclusively} with matrices; a much more elegant tool to tackle more civilised problems.
+
+There are a few notable characteristics of $X$.
+First, even though its dimensionality bears no relationship to the size of the corpus (being an instance of a term-term matrix), it must be remembered that it still is of considerable size, as its rows and columns are both defined by the size of a corpus' lexicon\footnote{
+    Or some set of comparable cardinality. See \autoref{foot:contextset}, supra.
+} and this is usually at least in the order of $10^5$, meaning a full instantiation of $X$ will have in the order of $10^{10}$ entries\footnote{
+    \label{foot:80gb}
+    I.e. it would occupy around $80GB$ if stored using double-precision floating point numbers.
+    As the discussion in the rest of the dissertation will eventually show, having to instantiate a full version of $X$ (which in this regard I will usually call ``distance matrix'') is assumed to be prohibitively expensive and avoided at all cost.
+}.
+
+However, Zipf's law also dictates the main feature of $X$: it is extremely sparse, as it is populated mostly by zeros and dominated by co-occurrences between the most frequent words\footnote{
+    \label{foot:sparsity}
+    The proportion of non-zero entries in a sparse matrix is known as its saturation rate.
+    The co-occurrence matrix for the entire POB corpus has a saturation rate of $~6\%$, consisting of merely $4.8e^{8}$ actual entries instead of the $\sim5e^{10}$ theoretically available entries.
+    Just as the XX most frequent words account for XX\% of the total mass of in the term frequency distribution for the POB lexicon, the sum of the entries in $X$ corresponding to co-occurrences between the same most-frequent words accounts for XX\% of the total mass in the co-occurrence matrix for the POB.
+}.
+
+Analytically, Zipf's law makes it necessary to apply some form of weighting to moderate the effect of the extreme differences in relative frequency across different elements in the lexicon.
+This is generally implemented as some point-wise function over the entries in $X$, which is relevant because point-wise functions over a sparse matrix maintain their sparsity, unlike linear-algebraic operations over the row- or column- vectors in $X$, which generally do not\footnote{
+    \label{foot:nnzeros}
+    This is because point-wise operations will produce the same value for all (non-realised) zeros in the sparse co-occurrence matrix, which means that these functions may be computed correctly considering only the non-zero entries.
+}.
+From a more analytical point of view given by the framework discussed above, point-wise functions that modulate the shape of the co-occurrence matrix as a weighting operation will generally yield values that model first-order similarities, based on syntagmatic relationships of direct co-occurrence, while linear algebraic operations over the row-vectors in $X$ will generally yield values that model higher-order similarities, like the ones based on paradigmatic relationships of complementarity.
+This is discussed in the next section.
+
+Weighting functions are a mapping from the distributional space described by $X$ to itself: $X \rightarrow X$.
+
+There are many variations for weighting functions.
+The review of different co-occurrence retrieval functions by \citet{weeds2005} includes a rather comprehensive catalogue.
+The canonical weighting strategy in most current work is the point-wise mutual information between words, $PMI$ \citep{church1990}.
+This is sometimes modified to exclude negative values\footnote{
+    There is no general consensus about the proper interpretation of negative $PMI$ values in the context of semantic modelling.
+    In brief, positive $PMI$ values indicate words that co-occur more than what would be expected by chance, while negative $PMI$ values indicate words that co-occur \emph{less} than what could be expected by chance.
+    However, it is not clear how to interpret this from a semantic point of view.
+    In general, empirical validation seems to indicate that the inclusion of negative values does not incorporate much useful information while theoretically, we should expect lower-than-expected co-occurrence to be as significant as higher-than-expected co-occurrence since they would signal the existence of some (grammatical) exclusion rule between words, which may or may not be related to paradigmatic similarity based on complementarity.
+}, yielding a positive point-wise mutual information matrix, $(P)PMI$\footnote{
+    The $PMI$ is also sometimes normalised in order to prevent co-occurrences from very low frequency words from dominating over co-occurrences from higher frequency words \citep{bouma2009}.
+    Since the canonical normalisation of the $PMI$ for two words depends on the self-information of one of the words, the normalised value is not reciprocal, so usage of normalised $PMI$ values is less common, as it breaks the symmetry of $X$ adding some further complications, but there are ways around them.
+}.
+
+The general formula for computing $PMI$ from $X$ is
+\[
+    PMI_{w_i,w_j} = \log{\frac{P(w_i,w_j)}{P(w_i)P(w_j)}}
+\]
+or the logarithm of the ratio between the observed co-occurrence between words $i$ and $j$ as a proportion of all observed co-occurrences and the expected co-occurrence between $i$ and $j$ under an assumption of independence.
+The bounds for $PMI$ are $-\infty \leq pmi(i,j) \leq min( -log(P(i)), -log(P(j) )$.
+Positive values indicate words that co-occur together more often than what would be expected by chance with its maximum indicating words that \emph{always} occur together, negative values indicate words that occur together less often than would be expected by chance with its minimum indicating words that \emph{never} occur together, and $0$ indicates complete independence.
+The truncated version excluding negative values is normally computed by a simple shift of the logarithm by $1$.
+See \autoref{app:weighting} for a more thorough discussion of weighting functions, including several variants of the $PMI$.
+
+As shown by the experiments carried out by \citeauthor{levy2014}, the $PMI$ matrix can be used directly for some semantic tasks but this is generally limited to baseline comparisons for more sophisticated models because in addition to the computational issues discussed above, sparse high-dimensional data-sets are generally not well-behaved\footnote{
+    One of the many problems labelled as the ``curse of dimensionality''.
+}, providing an additional motivation for their projection into other mathematical structures.
+
+The use of $PMI$-like measures is so widespread at this point, that the literature generally refers to the term-term $PMI$ matrix and the co-occurrence matrix $X$ interchangeably.
+I will follow this convention and will generally use $X$ to refer to matrices describing any distributional space computed from raw co-occurrence counts or as a point-wise function of raw co-occurrence counts.
+Unless stated otherwise, in the following discussion this computation will always consist in the truncated point-wise mutual information between words in $L$ and context words\footnote{
+    Which in this case are also extracted from $L$, but see \autoref{foot:contextset}.
+}
+
+\subsection{Projection}
+\label{subsec:proj}
+
+As mentioned repeatedly above, $X$ holds all the relevant distributional information contained in a corpus for all elements of its associated lexicon, such that it is sufficient to sustain an operationalisation of the distributional hypothesis capable of modelling the semantic content of a corpus.
+
+However, its extreme sparsity and very high dimensionality make it a very unfriendly object of analysis, motivating some form of projection into a more concise and generally more analytically powerful mathematical structure.
+
+More formally, and as mentioned in passing above, $X$ contains a description of a distributional space of dimensionality equal to the cardinality of the lexicon.
+By projection, I will refer to some (possibly non-linear) mapping of this distributional space to a ``semantic space'': $X \rightarrow S$.
+
+\emph{
+    In the context of the framework proposed in this dissertation, $S$ will correspond to the pictures of states of affairs that will allow for a direct measure of significance of the transitions between them.
+}
+
+There are many ways in which one can define an $X \rightarrow S$ projection, based on different understandings of how $S$ ---the theoretical semantic space of natural human languages--- looks like and what relationship it maintains to the usage patterns that produce the distribution of words contained in a corpus.
+This is partially related to the extent to which a given projection relies on the distributional hypothesis and/or the geometric metaphor, and will determine the general structure of the resulting representation of $S$, the different operations it allows and, in the context of this dissertation, the strategies available for solving the mapping and alignment problems that need to be resolved in order to associate elements in $S$ to sociologically relevant entities.
+
+We are primarily interested in two different strategies for projection that subject $X$ to different operations.
+The first one is the production of semantic networks from the computation of some similarity measure between the distributional vectors in $X$ for every word in the lexicon, and the interpretation of the resulting distance or similarity matrix as an adjacency matrix describing a graph.
+The second one is the result of embedding each word in the lexicon into a dense vector-space of arbitrary dimensionality, the inner product of which should approximate the coefficients contained in $X$.
+
+Beyond the superficial similarity between both approaches given by their reliance on some pair-wise function between the rows of $X$, the procedures for producing one or the other differ dramatically, specifically in the role that such function plays.
+
+In the first approach, a similarity or distance function is defined as some vector product $f(w_i,w_j) \rightarrow S$ that measures the extent to which the vectors for $w_i$ and $w_j$ share the same features (i.e. the same patterns of occurrence of $w_i$ and $w_j$ across the entire corpus).
+Then a distance/similarity matrix is constructed from the pair-wise computation of this measure across the relevant words, and the resulting matrix interpreted as an adjacency matrix containing the strength of association between words that will determine the weights of the edges in a graph.
+Since the extent function will yield some value for all $(i,j)$ pairs in the lexicon, the graph corresponding to this adjacency matrix will be saturated i.e. all possible edges in the resulting graph will be realised, generally necessitating a ``pruning'' process to remove less relevant, redundant edges.
+In this sense, this projection strategy follows a two step process: first compute a distance matrix from the given extent function, then prune the resulting graph to remove redundant non-significant edges.
+From a computational point of view, this strategy faces a severe limitation to the extent that it requires the computation of a full distance matrix.
+
+Unlike weighting functions, which are applied point-wise on the entries of $X$, extent functions are by definition not point-wise operations, but operations over the row-vectors in $X$ which will not maintain its sparsity: word pairs that contain $0$ values in $X$ will not obtain the same value from the extent function, as this value will not depend on the point-wise $0$ entry for that pair, but on some vector-product of the corresponding rows in $X$.
+Hence, computing the distance matrix for the full lexicon would produce a memory explosion that makes it generally prohibitive.
+This makes it necessary to introduce some form of lexical sampling to dramatically reduce the size of the lexical set over which the semantic network can be produced.
+We have then that this approach is characterised by three procedures that are, again, mostly independent of each other:
+Lexical sampling, computation of the distance/similarity matrix and edge pruning.
+In this approach, $S$ is a graph, and the mapping and alignment problems are solved by exploiting the structural properties of this graph.
+
+Chapter \ref{chap:semnet} discusses semantic networks in full.
+
+In the second approach, $X$ is considered to be the result of an inner product of the semantic space with itself, and used to produce a set of word vectors of arbitrary dimensionality such that the pair-wise application of some inner product defined over this arbitrary vector space will approximate the observed values in $X$.
+The resulting vector space is known as an ``embedding'' because the exercise can be interpreted as immersing the high dimensional distributional space in a lower dimensional vector space that should, in principle, capture the semantic information contained in the distributional space.
+The procedure relies on two, mostly independent steps:
+First, the definition of an inner product function $F$ that seeks to operationalise some theory of meaning in a functional form; that is, $F$ is a functional specification of a theory of meaning that operationalises principles such as the distributional hypothesis, such that $F(S) = X + \varepsilon$.
+Second, an optimisation procedure is applied in order to find a value for $S$ that minimises the error $\varepsilon$ between $F(S)$ and $X$; $\argmin_S \varepsilon = E(F(S),X)$ for some error function $E$.
+This should be immediately recognisable to readers with some familiarity with multivariate regression and other related techniques widely in use in sociological research: it is not unlike the procedure by which the coefficients for the functional specification of a regression model are found from minimisation of some error function against an empirical correlation matrix.
+And this should also point to the fact that both steps in the process are mostly independent, as the definition of the inner product function $F(S) \rightarrow X$ imposes no constraints over which optimisation procedure to use, beyond its necessary relationship to $E$.
+From a computational point of view, this approach enjoys the advantage that at no point is a full distance matrix between the row-vectors in $X$ actually computed, eliminating the need for lexical sampling.
+On the other hand, it suffers from the inherent difficulty of any optimisation problem, in that finding a version of $S$ that minimises $\varepsilon$ is generally computationally expensive, but there are many possible avenues to address this problem.
+In this approach, $S$ is a (metric) vector space of arbitrary dimensionality several orders of magnitude smaller than the original dimensionality of $X$, and the mapping and alignment problems are solved by exploiting the internal linear structures of this vector space.
+
+Chapter \ref{chap:wspaces} discusses semantic vector spaces in full.
+%
+% \section{Summary}
+% \label{sec:ch2sum}
+%
+% distributional hypothesis \\
+% geometric metaphor of meaning \\
+% Levy's discovery \\
+% Zipf's law \\
+%
+% normalize token sequence, define lexicon. \\
+%     token-type identity rule determines the information that will be associated by a token to a location in the corpus. \\
+%     this determines the first rank in matrix/tensor representations. \\
+% context definition and indexing \\
+%     position-context identity rule determines the information that will be compiled from token locations in the corpus for each \\ element in the lexicon. \\
+% computation of similarity measures \\
+%     different weighting functions over a cooccurrence matrix will approximate different forms of similarity as functions of direct \\ cooccurrence. \\
+% projection \\
+%     different projections of the weighted cooccurrence matrix will produce data structures that can model higher-order similarities between elements in the lexicon and between higher-order units of analysis induced by their topological properties.

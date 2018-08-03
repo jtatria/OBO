@@ -1,0 +1,40 @@
+\include{./inc/00_packages}
+\include{./bib/bib}
+
+\begin{document}
+    \include{./inc/01_style}
+
+    \include{./00_front/title}
+    \include{./00_front/copyright}
+    \include{./00_front/abstract}
+
+    \frontmatter
+    \tableofcontents
+    \clearpage
+    \listoffigures
+    \clearpage
+    \listoftables
+
+    \include{./00_front/acknowledgements}
+    \include{./00_front/dedication}
+    \include{./00_front/preface}
+
+    \mainmatter
+    \include{./01_main/00_intro}
+    \include{./01_main/ch_1}     % theory
+    \include{./01_main/ch_2}     % old bailey
+    \include{./01_main/ch_3}     % semantic networks
+    \include{./01_main/ch_4}     % vector spaces
+    \include{./01_main/zz_conc}  % conclusion
+
+    \printbibliography
+
+    \appendixpage
+    \appendix
+    \include{./zz_back/crouch}
+    \include{./zz_back/weighting}
+    \include{./zz_back/simdiv}
+    \include{./zz_back/software}
+    \include{./zz_back/obo_proc}
+
+\end{document}

@@ -8,15 +8,16 @@ source( 'inc/obo_graphs.R', chdir=TRUE, local=( if( exists( 'gr' ) ) ut else ( g
 
 PROJ_NAME <- "c3_global"
 DEVICE <- 'tikz'
-source( sprintf( '%s_data.R', PROJ_NAME ) )
+
+source( sprintf( 'inc_%s_data.R', PROJ_NAME ) )
 
 need.save <- FALSE
-if( !gr$has_vattr( ppmi$G, 'wgt_v2c' ) || !gr$has_vattr( ppmi$G, 'wgt_c2v' ) ) {
+if( !ut$has_vattr( ppmi$G, 'wgt_v2c' ) || !ut$has_vattr( ppmi$G, 'wgt_c2v' ) ) {
     need.save <- TRUE
     message( 'Computing contribution scores for ppmi network' )
     ppmi$G %<>% gr$add_contrib_scores( ppmi$K$membership )
 }
-if( !gr$has_vattr( difw$G, 'wgt_v2c' ) || !gr$has_vattr( difw$G, 'wgt_c2v' ) ) {
+if( !ut$has_vattr( difw$G, 'wgt_v2c' ) || !ut$has_vattr( difw$G, 'wgt_c2v' ) ) {
     need.save <- TRUE
     message( 'Computing contribution scores for difw network' )
     difw$G %<>% gr$add_contrib_scores( difw$K$membership )
@@ -26,10 +27,10 @@ if( need.save ) save_data()
 # strengt-centrality plots --------------------------------------------------------------------
 
 plot_str <- function( g ) {
-    tf <- gr$vattr( g, 'tf' )
+    tf <- ut$vattr( g, 'tf' )
     st <- igraph::strength( g )
-    wt <- ( gr$vattr( g, 'wgt_v2c' ) * gr$vattr( g, 'wgt_c2v' ) )
-    k <- gr$vattr( g, 'comm' )
+    wt <- ( ut$vattr( g, 'wgt_v2c' ) * ut$vattr( g, 'wgt_c2v' ) )
+    k <- ut$vattr( g, 'comm' )
     col <- ut$color_mk_palette()( length( unique( k ) ) )[ k ]
     x <- wt
     y <- st
@@ -62,7 +63,7 @@ k1 <- kmeans( d, 10 )$cluster
 score <- c2v_contrib( m, k1 )
 ppmi_scores <- vapply( 1:length( unique( k1 ) ), function( kid ) ifelse( k1 == kid, score, 0 ), rep( 0, length( score ) ) )
 
-cap1 <- intersect( gr$vattr( ppmi$G, 'term' ), gr$vattr( difw$G, 'term' ) )
+cap1 <- intersect( ut$vattr( ppmi$G, 'term' ), ut$vattr( difw$G, 'term' ) )
 ppmi_s <- ppmi_scores[ gr$V( ppmi$G )$term %in% cap1, ]
 difw_s <- difw_scores[ gr$V( difw$G )$term %in% cap1, ]
 x1 <- simdiv( ppmi_s, difw_s, trans=TRUE )

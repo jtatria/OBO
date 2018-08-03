@@ -67,6 +67,8 @@ COLOR_SCALE <- function( n ) {
     viridis::viridis_pal( option='D' )( n + 1 )[ 2:( n + 1 ) ]
 }
 
+TIKZ_DICT_FILE <- file.path( DIR_DATA_ROBJ, 'metrics.dict' )
+
 # Semnet parameters ---------------------------------------------------------------------------
 SAMPLE_THETA       <- .95
 EPOCH_SAMPLE_THETA <- .90
@@ -257,6 +259,7 @@ gr_setup <- function(
     switch( device,
         tikz = {
             require( tikzDevice )
+            options( tikzMetricsDictionary=TIKZ_DICT_FILE )
             file <- file.path( DIR_PLOT, paste( file, '.tex', sep='' ) )
             tikz( file=file, width=x, height=y * n, pointsize=GR_PTS, onefile=FALSE, engine='luatex', ... )
         },
@@ -796,7 +799,7 @@ draw_vertices <- function( g, pos, cols=NULL, size=NULL, alpha=1, K=.05, cex=1, 
     } else {
         size <- rep( 1, length( V( g ) ) )
     }
-    size %<>% make_scale( lo=K, ... )
+    #size %<>% make_scale( lo=K, ... )
     if( is.null( cols ) ) {
         cols <- rep( color_mk_palette()( 1 )[1], nrow( pos ) )
     }
@@ -808,11 +811,44 @@ draw_vertices <- function( g, pos, cols=NULL, size=NULL, alpha=1, K=.05, cex=1, 
         size <- sort( size )[ seq.int( 1, length( size ), length.out=n ) ]
         x <- seq( par()$usr[1] + ( K * 10 ) , par()$usr[2] - ( K * 10 ), length.out=n )
         y <- rep( par()$usr[3] + diff( c( par()$usr[3], par()$usr[4] ) ) / 2, n )
-        symbols( x=x, y=y, circles=( size * K * cex ), add=TRUE, inch=FALSE, bg=unique( cols ), fg=unique( cols ) )
+        symbols( x=x, y=y, circles=( size * K * cex ), add=TRUE, inches=K, bg=unique( cols ), fg=unique( cols ) )
         text( x, y, labels=c( 1:n ), pos=3 )
         text( x, y, labels=sprintf( "%8.6f", size ), srt=-90, adj=c( -K * 10, 0.5 ) )
     }
 }
+
+
+# draw_vertices <- function( g, pos, cols=NULL, size=NULL, alpha=1, K=.05, cex=1, debug=FALSE, ... ) {
+#     K <- K * xinch()
+#     if( !is.null( size ) ) {
+#         if( is.character( size ) && !is.null( vattr( g, size ) ) ) {
+#             size <- vattr( g, size )
+#         } else if( length( size ) == 1 ) {
+#             message( 'single value passed as vertex size. better passed as cex' )
+#             size <- rep( size, length( V( g ) ) )
+#         } else if( !is.integer( size ) && !is.numeric( size ) ) {
+#             stop( 'invalid value for size' )
+#         }
+#     } else {
+#         size <- rep( 1, length( V( g ) ) )
+#     }
+#     size %<>% make_scale( lo=K, ... )
+#     if( is.null( cols ) ) {
+#         cols <- rep( color_mk_palette()( 1 )[1], nrow( pos ) )
+#     }
+#     cols %<>% color_add_alpha( alpha=alpha )
+#     if( !debug ) {
+#         symbols( pos, circle=( size * K * cex ), add=TRUE, inch=FALSE, bg=cols, fg=cols )
+#     } else {
+#         n <- cols %>% unique() %>% length()
+#         size <- sort( size )[ seq.int( 1, length( size ), length.out=n ) ]
+#         x <- seq( par()$usr[1] + ( K * 10 ) , par()$usr[2] - ( K * 10 ), length.out=n )
+#         y <- rep( par()$usr[3] + diff( c( par()$usr[3], par()$usr[4] ) ) / 2, n )
+#         symbols( x=x, y=y, circles=( size * K * cex ), add=TRUE, inch=FALSE, bg=unique( cols ), fg=unique( cols ) )
+#         text( x, y, labels=c( 1:n ), pos=3 )
+#         text( x, y, labels=sprintf( "%8.6f", size ), srt=-90, adj=c( -K * 10, 0.5 ) )
+#     }
+# }
 
 draw_labels <- function(
     g, loc, labels=NULL, label.attr='name', cex=1, marks=NULL, marks.cex=2, pos=1, debug=FALSE

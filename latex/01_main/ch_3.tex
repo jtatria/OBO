@@ -1,0 +1,703 @@
+\chapter{Semantic Networks}
+\label{chap:semnet}
+
+This chapter discusses one of the two general strategies available for projection of $X$ into $S$: the construction of semantic networks from the interpretation of the pair-wise distances contained in $X$ or some function of it as an adjacency matrix.
+Since this is the first of the two projections discussed in this dissertation, it will also serve as an opportunity to touch on some general issues that arise in the analysis of any $X \rightarrow S$ projection.
+
+Analytically, the process of semantic network construction corresponds to the induction of a graph topology from the pairwise distances derived from the distributional patterns contained in $X$.
+As explained in more detail in \autoref{chap:conc}, this is one of two general strategies for the broad underlying analytical exercise that is the background for the techniques discussed in this dissertation:
+The approximation of an hypothetical semantic topological space of unknown structure.
+From the minimal linguistic theory that powers this approach, we know two things:
+Words acquire their meaning from the company they keep (the distributional hypothesis), and the semantic space can be organised according to dimensions of meaning (the geometric metaphor).
+Different $X \rightarrow S$ projections will rely on one or the other of these two ideas to more or less degree.
+Semantic networks are based exclusively on the first of them, as the structures that they produce (i.e. graphs) are not equipped with the structures necessary for an exploitation of the geometric metaphor, unlike the metric vector spaces discussed in the next chapter.
+
+Semantic network construction requires two basic operations over the data contained in $X$:
+Definition of a similarity function in order to produce an adjacency matrix and the selection of a pruning procedure to simplify the (usually saturated) graph corresponding to this adjacency matrix in order to eliminate redundant information.
+Note that in strictly theoretical terms, the second step is not necessary for producing \emph{some} graph, but it is necessary in order to produce a \emph{useful} graph, since the requirements of our analysis are to produce rich pictures of the state of affairs that correspond to the context in which a given textual source is produced, and this means that we want graphs to have a rich inner structure: fully saturated graphs are generally uninteresting in this regard\footnote{
+    \label{foot:wgraphs}
+    \label{foot:dracones}
+    In theoretical terms, fully saturated \emph{weighted} graphs are interesting to the extent that the complexity usually preserved by non-fully saturated graphs in their connectivity structure is captured somehow by the edge weight distribution in the graph.
+    However, it is very hard to imagine a situation in which this would offer an advantage over a different (i.e. non-graph) treatment of the same data.
+    This is related to the connection that exist between graphs (discrete mathematical entities) and (continuous differentiable) manifolds, which will come up at several points in the following pages and which we can in general consider to be a level of abstraction that is beyond the concerns of this dissertation (and most certainly beyond that about which I feel qualified to offer an opinion).
+    I.e. notes in this regard should be interpreted as a kind of ``with caveats, but \emph{hic sunt dracones}''.
+}.
+
+From a practical point of view, there is an additional requirement imposed by the costs associated to the actual computation of an adjacency matrix:
+Unlike $X$, the adjacency matrix produced by virtually any sufficiently interesting similarity function will \emph{not} be a sparse matrix, meaning that each and every one of the entries in this matrix will have some value\footnote{
+    Remember that $X$ is very large and extremely sparse; the full POB matrix has only $6\%$ of its potential entries, which is the reason why we are capable of actually manipulating it.
+    See \autoref{foot:sparsity} in \autoref{chap:frame}.
+}.
+This means that the computation of an adjacency matrix for an entire lexicon for any reasonably sized corpus will have prohibitively expensive storage requirements for most mere mortals, requiring an additional prior step of lexical sampling.
+
+In a sense, this is a little bit like cheating:
+The strategy argued for in this dissertation is predicated on the notion that we have the data and the raw computing power necessary to carry out this exercise, so simply dealing with these practical problems by (1) dropping some words from the lexicon and (2) censoring the range of values in the adjacency matrix seems a little paradoxical.
+However, there are good reasons to believe that this is not such a serious deviation from the general ideas behind the techniques discussed in this work.
+On the one hand, given the statistics presented in \autoref{tab:lexrules} in the previous chapter the final effect of a suitable lexical sampling strategy are rather negligible in terms of information loss from the corpus token stream, because Zipf's law ensures that we retain a considerable proportion of the total mass in the term distributional patterns by taking into a account a relatively small subset of the lexicon.
+On the other hand, there is some support for the harmlessness of edge pruning from graph theory, as we know that complex graphs tend to be surprisingly robust to the selective deletion of edges, making it appear as an attractive strategy for the simplification of complex graphs.
+In this last sense, lexical sampling and edge pruning play a complementary function in a process of graph reduction; lexical sampling removes vertices that we can expect to be marginal because their low relative frequency should be associated to a rather marginal position in a graph projection of $X$, while edge pruning is carried out endogenously from the resulting graph paying particular attention to its effect on the global structure of the graph.
+
+There are, however, a number of practical consequences to both processes that impact the potential of graph-based $X \rightarrow S$ projections to fully capture the structure that we expect a semantic space to have.
+In the end these interfere with the two fundamental tasks that we require of any $X \rightarrow S$ projection: A solution to what I referred to in \autoref{chap:frame} as the ``mapping'' and ``alignment'' problems, the issue of how the pictures of state of affairs that we expect $X \rightarrow S$ projections to provide map to relevant entities in sociological phenomena, and the issue of how the representations of $S$ that are produced from different values of $X$ can be aligned in order to facilitate the direct measurement of the significance of any variations between them that we expect to provide an alternative to a narrative account of social processes via the avoidance of an event-sequence based representation.
+I will discuss these issues throughout this chapter by reference to the semantic network projections of the POB corpus.
+
+The first section provides a more detailed discussion of the background for semantic network construction and the way they fit into the proposed methodology.
+The second section will discuss the operations that can be performed over the mathematical structures present in semantic networks for the solution of the mapping and alignment problems.
+The third section offers an impressionistic view of semantic networks from the projection of a single trial, in order to demonstrate how semantic networks look from the comparison of an amount of text that can be easily understood by a human reader.
+The fourth section illustrates some general structural features of semantic networks by looking at the patterns observed in a ``global'' network, a projection of the POB that discards time and models it as a single semantic space.
+%In the fifth section I will attempt to use semantic networks to look in more detail to some of the results from the last chapter.
+Finally, I'll close this chapter with a summary of its main ideas and an assessment of semantic networks for the purposes of my proposed methodology.
+
+\section{Background}
+\label{sec:concept_maps}
+
+Following the general state of affairs in computational text analysis, we find again some confusion in the available literature with regards to what we understand by ``semantic network''.
+This is mostly due to a name-space clash: the term we are using here to refer to an $X \rightarrow S$ projection of the distributional space induced by co-occurrence counts from a corpus into a graph-like representation of a semantic space is also used to refer to a completely different object, produced as the result of attempts at constructing formal representations of concepts\footnote{
+    Which is, incidentally, what you will find if you search for ``semantic network'' in e.g. the Wikipedia.
+} in the context of knowledge management systems.
+This is what is technically known as the construction of ``ontologies'': taxonomical classifications of entities that take on a graph-like structure when the predicates that put them in relation to each other are modelled as the edges of a ``semantic graph''.
+As I will explain below, the semantic networks that I'm discussing have little relation to these, beyond the fact that they are both graph-based representations of objects that have semantic features.
+On the other hand, there is some convergence at the technical level out of practical necessity between the application of semantic networks for distributional semantics (that we are interested in) and for the automatic construction of ontologies (that we are not), making it necessary to clarify the difference in more detail.
+
+I'll refer to this other type of ``semantic network'' as ``concept maps'', but the issue is not only a matter of terminology: there are profound theoretical and operational differences in the way in which the two objects are constructed and in the objectives they pursue, but lack of precision in the available literature makes it hard to disentangle the confusion between them.
+This is notorious in, for example, \citet{evans2016}'s review of the state of affairs in machine translation for the social sciences.
+The works cited by \citeauthor{evans2016} as examples of semantic networks \citep{carley1993,carley1993a} refer specifically to concept maps, confusing them with the few applications there are in sociology of semantic networks proper (e.g. \citet{rule2015}).
+
+To put it bluntly: Concept maps are an effort at modelling theoretical concepts in order to produce a formal representation of \emph{knowledge}.
+This is what you'll find in most of the relevant literature in this field, even in sociology (e.g. \citet{lee2015}), dominated mostly by bibliometric analyses of e.g. the scientific literature in a given discipline\footnote{
+    A sufficiently rich and productive area of research in its own right.
+    See \citet{cohen2010} for a demonstration of the way in which this style of work has produced new findings in e.g. pharmacology, molecular biology, etc. and \citet{lee2015} for an attempt at applying graph-based representations of text to model theoretical arguments in sociology.
+}.
+
+In terms of the framework presented in this work, concept maps can be understood as an effort at producing a formal representation of the knowledge produced by the historian as a replacement to the close reading exercise that is characteristic of historical work; this is notoriously \emph{not} what I'm arguing for: as stated in full in \autoref{foot:interp1} from the introduction, the purpose of the analysis that I'm discussing seeks not to replace interpretation, but to facilitate it via its protection from confusion with its data sources.
+This is not merely a disciplinary good-will gesture; there are very good reasons to be profoundly suspicious of such attempts, as they rely on very strong assumptions about the machinery of human cognition and a rather unfounded faith in the capacity of (our current understanding of) formal mathematical methods to actually model meaning, directly.
+I do not believe this to be possible: the turtles are not going away.
+Hence the need for this clarification.
+
+There is a connection to work in this area to the extent that more recent efforts in the production of concept maps are increasingly closer to the procedures discussed here, though they are still predicated on sophisticated theories of meaning and cognition based on some rather strong assumptions.
+This is notorious in works like \citet[ch. 5]{vanatteveldt2008}, in which he discusses ``using co-occurrences for ``extracting relations between concepts. Concepts can be actors, issues, or abstract values'', from the point of view of ``associative frame analysis'' \citep{tversky1977,druckman2004} in the context of communication theory, or in \citet{corman2002} and their ``centring resonance analysis'', more or less in the same vein.
+But if one pays attention to the actual operationalisation of the theoretical models discussed in those works, one will realise that, in terms of my proposed methodological framework, these methods differ from mine only in the context definition used for collection of co-occurrence counts and the similarity function used for production of the adjacency matrix; beyond this they are equivalent\footnote{
+    I.e. the exact same software used for production of the semantic networks discussed in this work can be used to produce \citeauthor{vanatteveldt2008}'s networks with a mere adjustment of the parameters: no extra information is needed.
+    They are merely a different (more ambitious and less robust) projection of the exact same data.
+}.
+
+The similarity stops there, though.
+Later work in this field (e.g. \citet{vanatteveldt2008a}) has moved in the direction of using more sophisticated syntax patterns for context definitions, again in an effort to model the content of text more directly in an attempt to merely automate the construction of concept maps from textual sources.
+This should be interpreted as an effort to automate \citeauthor{franzosi2009}'s style of text analysis, that seeks to recover maps of relationships between the entities mentioned in text.
+In other words, they are attempts at solving the named entity and relation extraction problem, not a general effort to model a semantic space.
+This is not surprising, given the underlying field of study that sustains most of this work, associated to the efforts of producing semantic annotations to information resources (the permanently unrealised promise of the ``semantic web'' \citep{berners-lee2001,shadbolt2006}).
+Work in this area has seen extensive application in media studies and in the analysis of political discourse, particularly political campaigns.
+% TODO: citation needed
+Beyond the superficial similarity to my approach from the procedures used in their construction, concept maps bear little relevance for the discussion in these pages, but there is an additional element of divergence with work in this field that is too important not to discuss.
+
+\subsection{Language in data and theory}
+\label{subsec:lang}
+
+In the context of the discussion in \autoref{chap:frame}, the difference between concept maps and what I call semantic networks
+has a deeper implication.
+In that discussion, I emphasised that terms, the elements in a lexicon, are merely the units of observation that power the construction of the different data structures that facilitate the strategy for text analysis argued for here.
+In concept maps, there is an identity between these observation units and the analysis units:
+The objective of concept maps is ``to extract relations between concepts'', possibly using the co-occurrences seen in a text \emph{between the concepts themselves} as a replacement for the manual coding procedure that is characteristic of traditional content analysis.
+\citeauthor{vanatteveldt2008}'s example of the relation between the ``concept'' of \term{muslim} and the ``concept'' of \term{immigration} is exemplary of this: What they refer to as ``concepts'' are equated without any further complication to what I refer to here as ``terms''.
+It seems pedantic at this point to insist, once again, that this is given because in media studies, etc. the problem being studied is the process by which different actors use these concepts in their strategic use of discourse, etc.
+In the analysis that I'm proposing, text is not treated as discourse, which means that we are not interested in the positions occupied by the terms themselves in whatever projection of $X$ we choose, but merely in the way in which these positions can be used to produce \emph{second order units of analysis}.
+This is what I referred to in \autoref{chap:frame} as the ``mapping'' problem, which refers specifically to the way in which some theoretically relevant entity (i.e. ``concepts'' proper) emerges out of the structural patterns observed in $S$ from the locations in which the projection $X \rightarrow S$ places them.
+In my approach, $X \rightarrow S$ implies a corresponding function that maps some subset of $S$ to the elements in the vocabulary $\Sigma$ of a theoretical language $\Theta$, in which the elements of $\Sigma$ constitute the entities and relations that are available as the subjects and predicates that make up (sociological) theoretical propositions.
+Hence, $\forall X \rightarrow S \: \exists \: S_{W \subset L} \rightarrow \sigma \in \Sigma_{\Theta}$ that makes it possible to associate the features in $S$ acquired by some subset $W$ of terms from the lexicon $L$ to an element $\sigma \in \Sigma$, such that e.g. $\sigma_{muslim} := f(S_{W \subset L})$.
+In the use of concept maps to model discourse there is an identity between the theoretical language $\Theta$ and \emph{the language of the textual sources}, such that the lexicon $L$ is \emph{equal} to the vocabulary $\Sigma$ of $\Theta$ such that $S_{W} \rightarrow \sigma$ is the identity function: $\sigma_{muslim} := w_{\term{muslim}}$; terms in the lexicon are taken to be theoretical concepts.
+This is the formal expression of the idea of confusion between data and theory presented in the introduction.
+
+In my view, $\Theta$ is \emph{not} the same as the language of the text, because text is nothing more than primary data (the content of which is produced strategically by actors following their own interests, etc.) which is why we require a solution to the mapping problem: the titular mapping here refers concretely to the $S_{W \subset L} \rightarrow \sigma$ mapping that makes it possible to \emph{define} concepts as $\sigma := f(S_{W \subset L})$ by choosing some value of $f$ that is generally \emph{not} plain identity.
+That is, more or less independently of the understanding of a given social phenomenon possessed by the authors of textual sources\footnote{
+    Which is why this dissertation opens with a reference to Durkheim's definition of social facts: we assume that social facts can not be properly understood from the point of view of its participants, because the point of view of the participants in social facts is dominated by the interests they have from the positions they occupy in them.
+}
+
+This points is critical: it is due to this additional analytical step that I can establish that the uses of semantic networks (or any other $X \rightarrow S$ projection like the metric vector spaces discussed in the following chapter) in my approach seek not to replace or eliminate interpretation, and are thus what I have referred to as ``theory-free'' data structures \citep{atria2016a,atria2016}, which is also the reason why $X \rightarrow S$ projections require no comparable theoretical bases to the ones that support concept map construction; we don't need no theory of ``associative framing'' or ``centring resonance'' in order to make use of them, because in this view, semantic networks are just \emph{data} and not an effort to produce some empirically grounded theory from the way in which social facts are narratively described from within them.
+Theory is what comes after, out of our disciplinary assessment of the results of $X \rightarrow S$ projections, in whose production theoretical issues have not been allowed to play any part.
+
+This also explains the other fundamental difference between my understanding of semantic networks and the usual strategies pursued in concept map construction: semantic networks are not multi-modal, because we don't expect them to provide a specification of the many ways in which concepts can be related to one another by different predicates; we merely expect them to provide a convenient representation of a semantic space that we expect to be aprehensible \emph{only} from distributional patterns, nothing else.
+This determines radically different approaches to the consideration of textual sources, because in concept map construction there is an attempt at extracting the \emph{quality} of the connections between their ``concepts'' from the predicates in which they are put in relation to each other in the text itself, which explains the interest from this field in the exploitation of e.g. syntactic patterns in order to establish not only that two ``concepts'' (terms) are related, but \emph{how}, i.e. through which predicates.
+
+For example, consider the sentence ``Arthur Crouch was indicted for feloniously wounding Mary Crouch''.
+Concept map construction rests on the hope that it is possible to systematically recover from sentences like this that there is something called Arthur Crouch, who is an individual, that was subject to an institutional process, a trial, because he participated in an interaction with a different individual called Mary Crouch, and that this interaction is designated as wounding.
+This exercise requires a very sophisticated formal theory of language that can sustain a very sophisticated unsupervised process of entity and relation extraction.
+On the other hand, semantic networks are constructed exclusively on the basis of the distributional patterns that are observed through the superposition of many sentences like this, in order to eventually infer a connection between e.g. ``wounding'' and ``being indicted'' from \emph{nothing more} than the fact that they\footnote{
+    Strictly, ``the terms associated to them''.
+} tend to appear in certain combinations with higher probability.
+At no point in this exercise is the quality of this association assessed beyond its empirical recurrence\footnote{
+    %[TODO: this goes against the general direction in computational linguistics, for example].
+    It would be much more elegant to actually have a useful formal model of natural language, but so far this has not been produced.
+}.
+The advantage of this approach is given by its independence from a (so far inexistent) theory of meaning that releases its results from any particular interpretation (or ``parse'') of a given sentence or grammatical structure\footnote{
+    Not a trivial matter, considering the pervasive problem of polysemy found in natural languages, and the more or less established truism that natural languages do not have unique parses:
+    There is more to semantics than what can be specified by grammar.
+}.
+Its fundamental drawback is that the recovery of meaningful distinctions exclusively from distributional patterns require \emph{enormous} amounts of data.
+However, we \emph{do} have enormous amounts of data these days; entire industries are predicated on this.
+
+Note that the idea above also applies to my own theoretical interpretation of the usefulness of semantic networks.
+I.e. the theoretical view presented in this dissertation, in which text is considered to be a material remain of social practices and language is considered to be the medium over which social facts are constituted through functional associations, etc. is not \emph{necessary} for semantic networks to function for the production of a formal characterisation of the content of text\footnote{
+    Which is why I expect my work to be useful even for an sceptic reader that doesn't believe the Searlean view of social facts to hold any water.
+}.
+
+\subsection{Semantic relatedness in graph projections}
+
+I have insisted several times on the idea that there are distinct forms of semantic relatedness between words: syntagmatic relationships of direct co-occurrence and paradigmatic relations of complementarity or second-order co-occurrence.
+I have also insisted on the idea that we are generally more interested in the second form, because of its more direct connection to the process of imputation of agentive functions that actualises social facts through language, but accepting or rejecting this interpretation does not subtract from the idea that words are in fact related in different ways to one another, even before considering the question of their denotational connections\footnote{
+    On top of the syntagmatic/paradigmatic distinction that can be made over the associations captured by different notions of co-occurrence and similarity, words could be connected from the relations between the things they describe as synonyms, antonyms, hypernyms, hyponyms, etc.
+    This is dependent on a word's sense and is part of the broad problem that linguists call ``sense disambiguation''.
+    This is a critical part of accessing semantics, but this is a problem that appears at a higher level than the syntagmatic/paradigmatic distinction.
+}.
+
+Until now I have discussed this issue only in abstract, but semantic networks offer an opportunity to demonstrate concretely how both notions will yield radically different but fundamentally connected projections of $X$ into a network-like structure.
+
+It must be noted here that different types of relatedness generally \emph{do not} require different forms of distributional information to be collected, neither in its functional specification nor in the contexts used to determine co-occurrence as it has been suggested by some authors \citep{sahlgren2006}\footnote{
+    As will be made clear in the next chapter, this issue has dominated a large part of the discussion in distributional semantics, but this has revealed to be not correct, both from the fact that different functions of a given value of $X$ can be produced to infer different forms of relatedness, and because it has been established that some projections can capture several forms of relatedness simultaneously.
+    The discussion below about the relationship between equivalence classes and communities is related to this, but there are wide gaps that would need to be filled for this idea to serve as an additional demonstration of this.
+}:
+$X$ contains sufficient information to model one or the other of these forms of relatedness.
+
+Specifically with regards to the semantic network projection of $X$, different forms of relatedness can be captured by a semantic network in two ways:
+First, different similarity functions can be used to produce the edge weights in an adjacency matrix from the values in $X$ in order to capture different notions of relatedness.
+Second, given a semantic network built over the values of $X$ with a given similarity function, different forms of relatedness will be captured in the resulting graph by different aspects of its internal structure.
+The first refers to the way in which semantic relatedness is captured by the resulting network's modality: the content of the edges linking the graph's vertices.
+The second point is related to the functional relationship that exists between different forms of relatedness, such that the structural equivalence patterns in a lower-order network should reflect the connectivity patterns found in a higher-order network.
+
+More formally, we can formulate the above as:
+The projection of a co-occurrence matrix $X$ into a semantic graph $G$ will capture different forms of semantic relatedness in its modality as a result of the specification of an edge weight function $s(X_{i,j})$\footnote{
+    $S$ always indicates ``the values obtained by a term or group of terms from the features associated to them in a given $X \rightarrow S$ projection''.
+    Per opposition, $s( e_{v,w} )$ is the weight of an edge between $v$ and $w$, and $s(v)$ indicates the strength of a vertex $v$, given by the sum of its incident edges.
+}.
+The form of semantic relatedness expressed in the modality of a a graph by a given specification of $s$ will determine the structure of connections between terms in the resulting graph, which is captured by e.g. its community structure.
+A given instance of $G$ with modality corresponding to a given order of similarity should also capture higher-order similarities in its structural equivalence patterns, as captured by e.g. its block structure.
+
+The key element here is the idea of \emph{order}: syntagmatic similarity is direct co-occurrence; paradigmatic similarity is higher-order co-occurrence: ``similarity-of-similarity''.
+For example, modelling $X$ directly as an adjacency matrix will yield a network of direct co-occurrence that will ``group together'' words that are syntagmatically related.
+Modelling $X$ through an adjacency matrix containing the values of some higher-order similarity function will yield a network of indirect co-occurrence that will ``group together'' words that are paradigmatically related, etc.
+
+Since there exists a fundamental relationship between the modality of the edges in a lower-order network and the modality of the edges in a higher-order network (as the latter is a function of the former), there exists a fundamental connection between the connectivity patterns in the higher order network and the structural equivalence patterns in the lower-order network.
+In other words, the clusters that could by discovered in the \emph{topology} of a higher-order network via e.g. a community detection process should approximate the clusters that could be discovered in the structural equivalence patterns of association in a lower-order network via e.g. a block model.
+
+\section{Operations over semantic networks}
+\label{sec:semnet_ops}
+
+% FWDREF
+The general features of semantic networks as mathematical objects offer the available alternatives for solutions to the mapping and alignment problem.
+More concretely, semantic networks are graphs, and graphs are fundamentally set-based mathematical structures (more on this below).
+This means that in general, the values of $S_{W \subset L}$ obtained from a semantic networks $X \rightarrow S$ projection will be \emph{sets}, characterised primarily by the list of its members.
+I will come back on this at the end of the chapter.
+% FWDREF
+There is more to say about the choice of a suitable $S_{W \subset L}$ for the approximation of different $\sigma \in \Sigma$ for the study of specific social processes.%, TODO but I'll return to this in \autoref{sec:semnet_experiments}, below.
+
+\subsection{Mapping}
+
+% FWDREF
+Membership lists offer a way to identify certain structural features with independence of their location within a given graph, an exercise that also provides a strategy for alignment as discussed in more detail below.
+For the purposes of mapping, there are basically two levels at which membership lists can be exploited for a solution to this problem in semantic networks:
+Looking at the membership lists of a partition of the network induced by its global structure or looking at the membership lists in some local structure, like the direct neighbourhood of a vertex or set of vertices, etc.
+In the simplest case, these structures are considered to be only unordered sets, fully characterised by the entries in their membership lists, such that $\sigma_1 \in \Sigma = S_{W_1 \in L} = \sigma_2 \in \Sigma = S_{W_2 \in L} \Leftrightarrow S_{W_1} \cap S_{W_2} = S_{W_1} \cup S_{W_2}$, i.e. the mapping of two concepts will be the same if the sets associated to them by some topologically induced partition of the semantic network contain the same elements\footnote{
+    This is equivalent to saying that semantic networks can induce ``bags-of-words''.
+}.
+Unordered sets also induce a basic measure of similarity between different mappings in a graph projection of $S$:
+$f(\frac{ S_{W_1} \cap S_{W_2} }{ S_{W_1} \cup S_{W_2} })$, i.e. the Jaccard distance, which in turn induces a metric over the space of sets.
+Variations over the basic Jaccard measure can be produced by modifying the definition of the numerator and denominator sets, changing the specification of $f$ in the computation of the values for both sets and changing the definition of the function over their ratio, etc.\footnote{
+    This can be used to construct non-metric or asymmetric measures of similarity, like the Tanimoto divergence that is subtly different from the classical Jaccard distance but does not induce a metric \citep{salton1968}.
+    Note that \citeauthor{weeds2005}'s difference-weighted co-occurrence retrieval model also falls into this category.
+}.
+
+In addition to treating structural patterns as unordered sets, there are two possible extensions that can be used to construct more sophisticated similarity measures:
+First, an ordering of the different elements in $S_{W}$ can be defined such that $S_{W}$ becomes a partially ordered set (a ``poset'').
+Second, a measure of significance for the different elements in $S_{W}$ in the definition of $\sigma$ can be defined, which in this case operates as an extent or weight function of different terms over $S_{W}$.
+Since semantic networks are generally weighted, the relative strengths of different vertices in any set offers a natural weighting function and by implication, an ordering, but any of the available measures for vertices in graphs can be used (e.g. any centrality measure).
+Finally, these different operations can be mixed in virtually limitless combinations, such that the value obtained by a real-valued set ratio function can be used as the weight or extent function for an additional set ratio function.
+This offers a range of strategies for quantification of the role that a given vertex or set of vertices occupies in a given structural pattern, and vice versa, the influence of a given structural feature over the structural location of a term or set of terms.
+
+An example of this is given by the cluster-vertex contribution scores used by \citeauthor{rule2015} in their analysis of the SOTU corpus.
+These offer an insight into the importance of a vertex's neighbourhood over its containing community and its containing community's importance over its immediate neighbourhood, but these can be easily modified to apply them to other structural configurations by changing the definition of the relevant sets.
+The cluster-vertex contribution score of a cluster $k$ for a vertex $v$ is given by
+$\varphi_{v \leftarrow k} = \sum_{w \in k} s(v,w) / \sum_{w \in N(v)} s(v,w)$, i.e. the ratio between the strength of all of its non-community crossing edges over the strength of the edges in its open neighbourhood, $N(v)$.
+The vertex-cluster contribution score of a vertex $v$ to a cluster $k$ is given by
+$\varphi_{v \rightarrow k} = \sum_{w \in k} s(v,w) / \sum_{w_1,w_2 \in k^2} s(w_1,w_2)$, i.e. the ratio between the strength of all of its non-community crossing edges over the strength of the edges between all vertices in $k$.
+
+In the case of sets of vertices, all of these measures can be used to construct a vector of weights over its members, which can subsequently be used as the arguments to one of the many similarity/dissimilarity measures I have discussed throughout this dissertation.
+This offers a natural way for comparing vertex sets and by implication, a solution to the alignment problem.
+
+\subsection{Alignment}
+
+The alignment problem revolves around the issue of constructing measures of similarity/dissimilarity between the values of $S$ obtained from a given $X \rightarrow S$ projection of different values of $X$.
+This is a necessary step in any comparison between the values of $S$ corresponding to different corpus segments; most critically, those corresponding to different points in time when we are interested in assessing the significance of transitions between different states of affairs that I claim to offer an alternative to traditional event-based historical analysis.
+
+There are two senses in which the alignment problem is relevant.
+First, as discussed in \autoref{foot:semstat} from \autoref{chap:pob}, we can not assume the semantic stability of terms across different corpus segments.
+This requires the construction of an endogenous characterisation of a given term beyond its lexical identity.
+I.e. we need a strategy that allows to produce a formal characterisation of a term in order to assess the extent to which its representation in a given value of $S$ has \emph{changed}:  how similar is \term{kill} in 1683 to \term{kill} in 1876? is it more or less similar to \term{slaughter}? etc.
+Second, since we are not interested in the terms themselves, but on the values of $\sigma \in \Sigma$ that are obtained as a function of second-order units of analysis in $S$, we need to be able to associate these second-order units of analysis across different values of $S$ beyond the lexical identity of the terms that are associated to them:
+We need to compare values of $S_{W \in L}$ without relying on an identity of the $W \in L$ sets over which they are computed.
+E.g. we want to be able to determine the extent to which a cluster of terms identified in the network for 1683 corresponds to any of the clusters of terms identified in the network for 1876, etc.
+
+It should be fairly obvious that the range of solutions to the alignment problem will be determined by the solutions available to the mapping problem, as alignment consists in establishing a measure of comparison between the values of the second order units of analysis that are produced by solving the mapping problem.
+Consequently, the alignment of semantic networks proceeds through the comparison between the set and list\footnote{
+    ``List'' is just an alias for ``poset''.
+} structures that are obtained in the semantic networks corresponding to different corpus segments.
+
+This presents the practical problem of lexical overlap: since the range of solutions to the alignment problem in graph-based structures consists in the comparison of sets, typically via the construction of feature vectors over their elements, the only relevant elements for comparison between the sets obtained from two different graphs will be those vertices that are present in both graphs.
+I.e. we need the partial lexicons of the corpus segments under comparison to \emph{overlap}, as the set of terms that will be available to construct any measure of comparison will consist of the intersection between these two lexical sets.
+
+% FWDREF
+Ensuring lexical overlap generally means that there is a limit to the granularity with which a given corpus may be split, as shorter corpus segments will necessarily have smaller partial lexicons, in addition to the problems derived from the projection of semantic networks with few observations (though the projection of the Crouch trial discussed below indicates that this problem is less serious than what it may appear at first).
+For example, there are only $113$ terms out of the $77,610$ terms in the normalised POB lexicon that appear in each of the 240 years covered by the corpus and $47$ of those correspond to functional terms, leaving only $66$ lexical terms available for lexical overlap between all corpus splits at the year level\footnote{
+    For the curious, of those $66$, $24$ are common nouns (NN), $19$ non-auxiliary verbs (V), $11$ adjectives (ADJ), $9$ adverbs (ADV) and the others are \term{london}, a proper noun, and \term{mr.} and \term{jury}, which are inexplicably also classified by the Stanford POS tagger as proper nouns (NP).
+}.
+
+Given the discussion above about the relationship between $W \in L$ sets and values of $\sigma$ and the set-based solution to the mapping problem, we are generally not interested in establishing comparisons between terms directly, but between the sets that are associated to them in different semantic graphs.
+This implies that the terms outside the intersection between the set of vertices of different graphs can still be compared, from a comparison of the elements in the sets that contain them that are contained in the intersection between the two graphs.
+For example, the difference weighted network for the POB does not contain \term{summary}, which is present in the direct co-occurrence network of the POB, such that a direct comparison between them is impossible: there are no sets of vertices in the higher-order graph that contain \term{summary}.
+However, all of the terms that appear as neighbours of \term{summary} in the lower-order network for the POB do appear in the higher-order network, so we can compare \term{summary} in both networks by proxy of its neighbours\footnote{
+    Given two graphs $G_1$ and $G_2$ such that $G_1 \ne G_2$, $G_1 \supset v_{summary}$ and $G_2 \not\supset v_{summary}$,
+    we define the term (vertex) set
+    $N^{G_1}(v_{summary})$
+    corresponding to the order 1 open neighbourhood of the vertex for \term{summary} in $G_1$.
+    We then define the term set
+    $Proxy_{summary}^{G_1} = \bigcup_{ w \in N^{G_1}(v_{summary}) }N^{G_1}(w)$
+    , i.e. the union of the neighbourhoods of each of the neighbours of \term{summary} in $G_1$ (equal to the order 2 neighbourhood of $v_{summary}$) and the set
+    $Proxy_{summary}^{G_2} = \bigcup_{ w \in N^{G_1}(v_{summary}) \cap G_2 } N^{G_2}(w)$
+    , i.e. the union of the neighbourhoods in $G_2$ for all the vertices that are in the neighbourhood of \term{summary} in $G_1$ that are also present in $G_2$.
+    Hopefully $N_{summary}^{G_1} \cap G_2 \ne \emptyset$, and we can use the two $Proxy$ sets thus defined to construct a comparison.
+    Other structures containing \term{summary} could be used in the same manner, open neighbourhoods are just the most basic example.
+},
+after which the problem is reduced to the computation of the same similarity measures that we used in the context of the mapping problem.
+This can be used to also produce a measure of the reliability of this proxy, from the strength of association between the ego networks and the elements in the proxy, e.g. between \term{summary} and its neighbours, etc.
+However, the limit to this strategy is still determined by the total lexical overlap between the two graphs, as the set of vertices that can be used in these proxy sets will still have to be contained in the intersection of both graphs.
+In the final analysis, the cardinality of the intersection between the two graphs determines the maximum range for all measures of similarity that can be constructed over them, because the set operations that we are using as the basis for the construction of all measures over semantic network $X \rightarrow S$ projections are combinations (and permutations if we can induce an ordering) of the elements in this set.
+
+On the other hand, and going beyond the set-theoretic structures that can be exploited in graph-like objects, there is a much more elegant and interesting alternative solution for the comparison of graphs with \emph{no} overlap.
+This offers two very attractive advantages:
+Practically, it allows for very fine granularity in the construction of corpus partitions, because we are not constrained by lexical overlap (though we are still constrained by the general data amount requirements of distributional semantics in general).
+Theoretically, it allows for complete disregard to the identity of the terms themselves, either as a mechanism to anchor a comparison between sets, or in terms of the identity of the sets themselves (i.e. we can do away with the proxies and neighbourhoods, etc).
+This alternative strategy is to base the comparisons on \emph{motifs}: recurrent sub-graphs that are statistically significant and recurrent across different graphs and are fully characterised by the structure of their connections, with independence of the identity of its vertices\footnote{
+    This property is formally known as ``invariance under relabelling'', i.e. the graphs are ``the same'' if they have the same edge-structure, independent of which vertex goes where.
+}.
+
+The problem with this strategy, which is more elegant in the sense that it treats semantic networks as graphs proper instead of just using them as convenient mechanisms for inducing sets, is that motif mining and matching is an instance of the graph isomorphism problem, which so far is not known to be solvable in polynomial time.
+This means it is impossible to devise a strategy for the systematic use of motif mining for the analysis of semantic networks in full\footnote{
+    Though there are very exciting recent developments in this area, see \citet{babai2015} for (unproved) claims of a solution to graph isomorphism in quasi-polynomial time.
+},  and their application to the analysis of concrete features in semantic networks would require a much more profound understanding of the distributions of structural configurations that arise in semantic networks built from different similarity measures\footnote{
+    \label{foot:knn_graphs}
+    Which, at this level of generality, starts to resemble a question about the distributions of structural patterns in graphs produced by connecting k-nearest neighbours in metric spaces, a problem sufficiently understood for the case of $k=1$ \citep{eppstein1997}.
+    Measures of semantic similarity are generally not metric, though, and the strategy we pursue in their construction is generally \emph{not} a k-nearest neighbours approach, so there are several additional complications for this.
+    See \citet{karlgren2008,gyllensten2015} for an application of nearest neighbour graphs as a mode of querying semantic vector spaces, which has direct connections to this issue.
+    Note that this approach has become partially obsolete for this particular purpose given the geometric properties of more recent vector spaces (as discussed in the next chapter) but it seems broadly applicable to this problem.
+    This is, again, related to the deep connection between graphs and topological spaces.
+}.
+Motif mining has seen extensive application in fields that deal with smaller graphs taken as analysis units in whole: i.e. characterised by the problem of matching two given different motifs, instead of the more general problem of enumerating and searching for motifs in complex graphs, which is what would be required for this to be a viable strategy \citep{milo2002,dunne2013,wang2014a,wei2017}\footnote{
+    Note that this is equivalent to solving graph isomorphism in a very restricted context, for which solutions exist, though they are not cheap.
+}.
+
+Having established in general terms how mapping and alignment are dealt with in the context of semantic network $X \rightarrow S$ projections, we can now look at concrete examples, starting with the projection of a single trial from the POB.
+
+\section{The trial of Arthur Crouch}
+\label{sec:crouch_net}
+
+On the evening of Thursday the 15th of February in 1894, Arthur Crouch, a 37 year old man, came home to find that his tea was not ready.
+He accused his wife, Mary Crouch, of having been drinking.
+Enraged, she ``flew at him in a temper''.
+There was an altercation between them, and she fell through the landing window on top of a cistern.
+The lid of the cistern gave way under her weight and she fell into it.
+As Mary was getting out of the cistern, Rosina Porter, the landlady; and William Hawse, a neighbour; came into the backyard to find Mary half in the cistern, bleeding profusely from a wound in her hand.
+Someone called the police.
+William Spencer, a policeman, came into the courtyard to find Hawse helping bind Mary's wound, which was still ``bleeding very much''.
+Mary asked Spencer to take Arthur into custody.
+Arthur, Mary and Spencer came into the Harrow Road police station and were interrogated there by James Bristow, the inspector in charge.
+Mary was also examined there by George Robertson, the surgeon of police at Kilburn.
+Arthur Crouch was tried at the Central Criminal Court in the session of March 5th 1894, charged with feloniously wounding Mary Crouch with intent to do grievous bodily harm.
+All of the people mentioned in this brief account appeared at court.
+Mary insisted that the incident had been an accident and that she did not want to go on with the case.
+Arthur was found guilty of ``unlawful wounding'' (a lesser offence to the ``feloniously wounding with intent'' with which he was originally charged) and sentenced to six month's hard labour.
+
+The full transcript of the trial of Arthur Crouch is presented in \autoref{app:crouch}.
+
+Figures \ref{fig:crouch_ppmi} and \ref{fig:crouch_difw} present the network maps corresponding to two different projections of the co-occurrence counts obtained from the $18$ paragraphs contained in trial account t18940305-268, the trial of Arthur Crouch.
+
+The ``direct co-occurrence network in \autoref{fig:crouch_ppmi} was constructed using the PPMI values of $X$ directly as edge weights.
+The ``higher-order co-occurrence network in \autoref{fig:crouch_difw} was constructed using a Jaccard distance over the PPMI feature vectors\footnote{
+    The issue of the relative merit of different measures for higher-order co-occurrence will be retaken in \autoref{chap:conc}
+}.
+Both networks were pruned by deleting all edges such that no component larger than one is detached from the network's main component (see below) \citep{zhou2012}, dropping some terms from the full $371$ terms in this segment; the first order network has $281$ vertices, and the second order network has $301$ vertices.
+Communities were detected with the Louvain modularity optimisation procedure \citep{blondel2008}.
+This yields $11$ clusters with a modularity of $0.62$ for the direct co-occurrence network and $13$ clusters with a modularity of $0.68$ for the higher-order network.
+
+% FWDREF
+I would suggest taking a moment to read the source material and contrast it with both the network maps and the narrative description presented above in order to see directly how a given text is represented in a semantic network.
+I'll return to this at the end of this chapter.
+
+\begin{figure}
+    \centerfloat
+    \input{figures/c3_crouch_ppmi}
+    \caption{Direct co-occurrence network for the trial of Arthur Crouch}
+    \label{fig:crouch_ppmi}
+\end{figure}
+
+\begin{figure}
+    \centerfloat
+    \input{figures/c3_crouch_difw}
+    \caption{Higher-order co-occurrence network for the trial of Arthur Crouch}
+    \label{fig:crouch_difw}
+\end{figure}
+
+This is just a toy example of a semantic network for demonstration purposes only, considering that the Crouch trial has only $18$ paragraphs and a lexicon of just $371$ terms, which means that it captures a very small sliver of the semantic context captured in the global patterns of the full POB corpus.
+However, it serves as a basic illustration of the ideas discussed above about the difference between the networks obtained by different association measures that model different forms of semantic relatedness.
+Pay particular attention to the relative locations of the four terms marked by larger labels in both network maps: \term{prosecutrix}, \term{cistern}, \term{prisoner} and \term{hard-work}.
+If we go to the original source, we will see that \term{prosecutrix} is the term used by witnesses to refer to Mary Crouch, as this is the term used in Old Bailey trials to refer to female victims, while \term{prisoner} refers to Arthur Crouch, as this is the term reserved for the defendant.
+In the direct co-occurrence network \term{cistern} and \term{prosecutrix} are located in the same community, due to the topical association between these two terms contained in the witnesses' accounts of the case, while \term{hard-work} and \term{prisoner} are located in the same community because that term was used to describe Arthur by Rosina Porter, who appeared as a witness for the defence (and also by Arthur himself when describing his marriage to the judge in his brief defence statement).
+This association is induced in the direct co-occurrence network by the collocation of the terms in close proximity to each other, and is not present in the higher-order network, with all four terms being located in different communities.
+
+This contrast between the two projections of $X$ into a graph from the computation of different association functions also holds at the local level, as can be appreciated by looking more closely at the direct neighbourhoods occupied by a term in both projections.
+\autoref{fig:crouch_egos} shows the order 2 ego network for \term{prosecutrix}\footnote{
+    The order of an ego-centred induced sub-graph refers to the number of edge hops away from the focal point that are included in the sub-graph.
+    Order 2 means we are looking at the sub-graph induced by the set of all vertices located no more than two hops away from the focal vertex and all edges between these vertices.
+}.
+
+\begin{figure}
+    \centerfloat
+    \input{figures/c3_crouch_egos}
+    \caption{Ego-networks for \term{prosecutrix} in the trial of Arthur Crouch}
+    \label{fig:crouch_egos}
+\end{figure}
+
+% ppmi: kid 7 kn 49 v2c 0.3545379  c2v 0.02650508  prod 0.009397056
+% difw: kid 7 kn 33 v2c 0.5        c2v 0.005234998 prod 0.002617499
+In terms of the solution to the mapping problem discussed above, we obtain that in the direct co-occurrence network, \term{prosecutrix} is located in a community together with $49$ other terms, with a $\varphi_{k \leftarrow v}$ score of $0.3545$ and a $\varphi_{k \rightarrow v}$ score of $0.0265$.
+In the higher-order network, \term{prosecutrix} is located in a community together with $33$ other terms, with a  $\varphi_{k \leftarrow v}$ score of $0.5$ and a $\varphi_{k \rightarrow v}$ score of only $0.0052$.
+
+In words, the above means that in the direct co-occurrence network \term{prosecutrix} plays a less central role in the structure of its enclosing community (the total strength in its immediate neighbourhood accounts for a $35.4\%$ of the total strength in its community versus $50\%$), while in the other direction, its neighbourhood in the higher-order network is comparatively more cosmopolitan (only $0.5\%$ of the total strength in its neighbourhood is accounted for by its enclosing community).
+We can also produce an aggregate measure of the embeddedness of \term{prosecutrix} in its enclosing community via a product between the two measures: $0.0094$ and $0.0026$ for the direct co-occurrence and the higher-order networks, respectively.
+
+% Using constribution scores we can also produce a basic characterization of the communities in both networks, by looking at the 10 terms with the highest embeddednedd score and using that as an identification string for the cluster.
+% This is shown in tables \ref{tab:crouch_ppmi_sig} and \ref{tab:crouch_difw_sig}
+%
+% \input{tables/c3_crouch_ppmi_sig}
+%
+% \input{tables/c3_crouch_difw_sig}
+
+There are a few additional patterns that indicate further differences in the graphs corresponding to different similarity measures.
+Note the differences in the general structural patterns of both networks, given by the relative density of edges around some terms, and the relative higher density of edges in the higher-order network (i.e. the density and concentration of the inter-community edges), as well as the presence of chains in the lower-order network:
+This is an effect of the impact of the different vertex strength\footnote{
+    Strength refers to the sum of a vertex's incident edges weights, per opposition to degree which is the count of a vertex's incident edges.
+} distributions of each network over the edge-pruning process, and offers an insight into the general shape of the distributions of different similarity measures.
+Edge pruning operates by deleting edges beneath an endogenously determined threshold $\theta$ defined as the value of edge weights beneath which edges can be removed without producing the detachment of any component larger than one\footnote{
+    Edge pruning is implemented in the \code{graph\_prune\_connected} function of the graph module of the \code{wspaces} R package produced for this dissertation.
+    The maximum allowed size of detached components is implemented as the \code{tol}(erance) parameter to that function.
+    See \autoref{app:software}.
+}.
+The different weight distributions of different similarity measures implies that a $\theta$ value derived from the same connectivity tolerance will delete a different proportion of edges given the differences in skewness of different similarity measures.
+In general, we can expect higher-order similarities to be less skewed than lower-order ones, because the computation of higher-order measures is, in a sense, a convolution of the distribution of the lower-order measure with itself, such that the effect of a connectivity threshold procedure will be larger on lower-order networks\footnote{
+    More research is needed in order to determine the general distributions followed by different similarity functions, but in principle, to the extent that higher order measures are convolutions of lower order measures, we can expect higher order functions to have increasingly smoother distributions approaching a normal distribution.
+}.
+This explains the relative higher density of higher-order networks (and in hand with this, the differences in the final number of vertices in the graph, as the lower-order network will tend to produce more orphans after the deletion of a comparable proportion of edges).
+It also explains why the lower-order network tends to be less compact; i.e. to have more of a sprawling hub-and-spokes structure; in very sociological terms, this is the distributional semantic equivalent to the Blau principle \citep[p. 71]{blau1987}, as using direct co-occurrence for the modality of the network restricts the available neighbour candidates for any given term.
+There are only so many terms that can occupy positions in the vicinity of a given term.
+This restriction doesn't apply when we use higher order measures, because higher order measures don't require direct co-occurrence, it suffices that terms have ``similar'' co-occurring patterns\footnote{
+    Though this difference should decrease as the relevant token stream increases in length, as longer token streams will present additional co-occurrence ``opportunities''.
+}.
+
+It must be noted here that semantic networks constructed from the co-occurrence patterns for a single trial do not really allow for a proper assessment of the higher-order network, because higher order similarity measures require more information than lower-order similarity measures.
+The representation that can be induced from a single observation severely limits their potential to model paradigmatic relationships.
+This is better explained by reference to the structural linguistics understanding of syntagmatic and paradigmatic relatedness:
+Syntagmatic relatedness is a \emph{diachronic} phenomenon, while paradigmatic relatedness is a \emph{synchronic} phenomenon \citep{desaussure2011}.
+As readers familiar with traditional content analysis will recognise, there isn't much point to carrying out a synchronic analysis of just one ``text'', because the purpose of synchronic analysis is to bring in information that is not directly present in the diachronic representation of text.
+With only one trial, this exercise is equivalent to modelling the semantic context of the one trial as if the linguistic sample offered by that particular trial were a full, exhaustive image of the semantic context of the state of affairs in which that text was produced: i.e. the $371$ terms in the trial and whatever patterns could be observed in it directly constituted the entire vocabulary and the full set of grammatical rules in the text's language\footnote{
+    In structural-linguistics terms, this would be the same as saying that the single trial with its $371$ words constitutes the entire structure of the text's language.
+}.
+
+\section{The semantic network projection of the POB corpus}
+\label{sec:global_net}
+
+Unlike the trial of Arthur Crouch, the full POB corpus is in a completely different order of magnitude in terms of the amount of information contained in its distributional patterns.
+Consequently, the semantic network projection of the value of $X$ for the full POB is much more complex than the networks that can be produced from a small subset of the corpus, like the trial of Arthur Crouch, even taking into account both lexical sampling and edge pruning.
+The same general trends in the projection of a single trial should hold for the projection of the global semantic network (and in the semantic networks corresponding to different points in time, discussed in the next section), with the caveats mentioned above about the impact of larger population counts.
+
+I have already mentioned that the storage and time complexities of producing an adjacency matrix for the full corpus are generally prohibitive, requiring a process of lexical sampling in addition to the edge pruning process.
+For this task I will use the same strategy as the one used for the sampling in the production of the term-frequency vectors in the experiments of the previous chapter:
+Defining a term-frequency threshold in order to only take into account the highest frequency terms that will cover a given percentage of the total corpus token stream.
+The sample threshold used for production of the global network discussed in this section was set at $90\%$.
+Correspondingly, the lexical sample produced by this threshold is designated as $S90$ and contains $2,187$ terms.
+% FWDREF
+In the analysis in this chapter, though, we are using a different reference population, as we are only including nouns in the sample (I'll come back to this point in the summary).
+As per the POS class trends illustrated in \autoref{fig:posrank} shows, nouns tend to occupy positions towards the lower end of the term frequency distribution compared to other POS classes, such that exclusion of the other POS classes means that we will need to include a larger number of noun terms in order to account for an equivalent proportion of the token stream than the one we would need if we included all POS classes.
+For reference, the $S90$ sample corresponding to the entire lexicon has only $1,018$ terms, while the same sample excluding all non-lexicals has $2,807$.
+This should offer some indication of the effect of different coverage thresholds on different lexical populations.
+
+\label{pp:features}
+It is also necessary at this point to remember that the sampling procedure operates only over the \emph{rows} of $X$ and not over its columns:
+This is what I've referred to in previous discussions as the distinction between sampling on observations and sampling on features, and it implies that even though we are only taking into account a subset of $2,187$ terms from the lexicon as observations, this is not the number of \emph{dimensions} in the feature vectors used to construct the higher-order measure of similarity.
+I do apply an independent lexical sampling procedure on the feature vectors, though, in order to remove some of the noise introduced by extremely low frequency terms\footnote{
+    Note that in the construction of similarity measures from a value $X$, the number of observations in $X$, given by its rows, affect the complexity of any similarity measure quadratically, while the number of features in $X$, given by its columns, affect the complexity of the computation linearly.
+    In formal terms, these are at best $O(|L|^{2}|D|) \sim O(|L|^{2})$ operations, where $|L|$ is the cardinality of the lexicon and $|D|$ is the dimension of the feature vectors.
+    In simple terms, the running time for the computation of some similarity function over $X$ will increase quadratically with the addition of an extra entry in the lexicon, but linearly with the inclusion of an additional feature.
+    Also note that the complexity is invariant over differences in the saturation rate of $X$, i.e. unaffected by the word-length of the relevant corpus segments.
+}.
+This is built over a coverage threshold at $99\%$, and includes $27,690$ terms, which is thus the dimensionality of the feature vectors used in the construction of higher-order similarities.
+As per \autoref{tab:lexrules} and as the results below will show, the effect of this double censoring of the lexicon does not impose a very large information loss, and consequently doesn't seem to impact the capacity of a semantic network to capture meaningful patterns.
+
+It could, however, interfere with the second idea discussed above about the relationship between connectivity in higher-order networks and structural equivalence in lower-order networks.
+The connection between higher-order connectivity and lower-order equivalence is predicated on the fact that the way in which structural equivalence is assessed in relational data for e.g. block modelling, is mathematically equivalent to the process of creating higher-order similarity-measures (like the difference weighted extent function) from lower order indicators of association (like PPMI weighted co-occurrence counts).
+The relationship between the adjacency matrix of the lower-order network and the adjacency matrix of the higher-order network is functionally the same as the relationship between a network's adjacency matrix and a block model's distance matrix because the matrix product that relates both matrices is similar, as long as the vector product used to compute the higher-order measure is the same as the one used to compute the distances between the association patterns of vertices in order to assign them to different blocks\footnote{
+    More formally, the clustering of vertices in a graph with respect to their structural similarity operates through the computation of a bi-linear quadratic form of the adjacency matrix in a network.
+    I.e. its transformation into a distance matrix directly, per opposition to the ``distance matrix'' induced from path lengths or edge weights used in community detection.
+    This is for example the way in which CONCOR operates, by using convolutions of Pearson's correlation coefficients as vector products in an iterated procedure \citep{breiger1975}.
+    With variations, all spectral clustering procedures operate in a similar way to produce structural equivalence classes from adjacency matrices (though they can get quite complex, as in stochastic models \citep[, appendix 2A]{nowicki2001,accominotti2016}.
+    This functional relationship between the adjacency matrix and the clustering distance matrix is precisely the same relationship that exists between the adjacency matrices of networks built from measures in different orders:
+    A higher-order adjacency matrix is equal to the bi-linear quadratic form of a lower-order adjacency matrix, i.e. a matrix product between itself and its transpose, with a vector product defined by whatever similarity function we choose.
+    This is what was discussed in \autoref{sec:method} of \autoref{chap:frame} when I said that projections involve ``linear algebraic'' operations on the entries of a (weighted) co-occurrence matrix, and also what I meant in \autoref{foot:xddt} about the relationship the term-document matrix and the term-term matrix.
+    In consequence, if the vector product function used to induce the higher-order adjacency matrix is the same as the vector product used to carry out an spectral clustering procedure to detect equivalence classes in the lower-order network, the resulting partitions should be similar, because the adjacency matrix in the higher-order network and the distance matrix used as input in the spectral clustering of the lower-order matrix should be equivalent.
+}.
+
+Lexical sampling interferes with this mathematical equivalence, because in the case of a lower-order network built from direct co-occurrence measures (like the PPMI), that is not the result of a matrix product but either the raw co-occurrence counts or of a point-wise weighting function of them, the lexical sampling process will remove some columns from the vectors available for computation of the matrix product that can be used as the basis for a spectral clustering algorithm because these terms will not be present in the adjacency matrix of the resulting network.
+In the computation of the edge weights in the adjacency matrix of the higher-order network, the feature columns corresponding to sampled-out terms are \emph{not} removed as dimensions from the sampled row vectors, because we are only sampling observations, not features.
+Hence, the equivalence is lost because the vector products that would otherwise be equivalent are in effect computed over vectors that are not the same.
+If the idea about the connection between equivalence classes in the lower-order network and communities in the higher-order networks is valid, then (1) the divergence between the clusters induced by structural equivalence in the lower-order network and the clusters induced from connectivity patterns in the higher-order network could offer an indication of the impact of different lexical sampling strategies on the quality of the resulting networks and (2) we should expect in any case this divergence to be small.
+
+In order to further explore (and take advantage of) the idea about the connection between structural equivalence in lower-order networks and connectivity in higher-order networks it would be necessary to carry out a systematic exploration of the effects of lexical sampling and edge pruning over graph based representations of $X$.
+This should probably begin with an assessment of this connection over non-sampled and non-pruned networks, but until we can avoid the computational costs associated to semantic network construction, this seems like an impossible task\footnote{
+    This is in addition to the problems imposed by working with saturated weighted graphs.
+    See \autoref{foot:wgraphs}, supra.
+}.
+
+The two global networks produced for this section were constructed with a similar procedure to the networks used for projection of the Crouch trial.
+The direct co-occurrence network uses the weighted $PPMI$ as its edge modality, the higher order network is built from the values of the difference weighted co-occurrence retrieval model.
+Note that this measure is non-symmetric, so the higher order network is in principle directed, but in most analyses edge directionality is discarded
+% \footnote{
+%     [TODO: justify]
+% }
+.
+After lexical sampling and edge pruning, the direct co-occurrence network has $2,106$ vertices, $16,083$ edges, and a total strength of $11,750.15$ for an edge weight average of $0.7306$.
+The difference weighted network has $1,736$ vertices and $70,529$ edges, with a total strength of $64,263.6$ for an edge weight average of $0.9112$.
+As can be appreciated, these numbers correspond to very different edge strength distributions.
+Both networks were pruned to a connectivity tolerance of $2$.
+% > min( gr$E( ppmi$G )$weight )
+% [1] 0.2943562
+% > min( gr$E( difw$G )$weight )
+% [1] 0.3768132
+The direct co-occurrence network produced an edge weight $\theta$ of $0.2943$, while the difference weighted network produced a $\theta$ of $0.3768$.
+Communities were detected through the Louvain modularity optimisation procedure \citep{blondel2008}, with final modularity values of $0.5151$ for the direct co-occurrence network and $0.3213$ for the difference weighted network.
+The algorithm partitioned both networks into $10$ communities\footnote{
+    This is entirely coincidental; see the discussion about robustness at the end of this chapter.
+}.
+Community contribution scores were computed following the procedure detailed in \autoref{sec:semnet_ops}.
+
+\autoref{fig:strength_contrib} presents the scatter plot of total vertex strength against the cluster-contribution score for each vertex in each network.
+Point colour represents the communities into which the vertices have been assigned by the Louvain algorithm while size corresponds to the (log) term frequency of their associated terms.
+
+\begin{figure}
+    \centerfloat
+    \input{figures/c3_global_strength}
+    \caption{Vertex strength and cluster contribution scores}
+    \label{fig:strength_contrib}
+\end{figure}
+
+As is immediately apparent both networks are very different, beginning with the reverse association between vertex strength and cluster-contribution scores for the higher-order network.
+Even more striking though, are the relative levels of entropy in both distributions, with vertices more or less neatly organised into bands in the higher-order network, compared to the much more random-looking distribution seen in the lower-order network.
+In addition, the patterns in the higher-order network seem to indicate a strong association between cluster membership and vertex-strength and contribution scores.
+A full understanding of the meaning of these patterns would require a more thorough analysis, but I would advance that these patterns could indicate that the higher-order network is in fact capturing a more paradigmatic notion of relatedness, as we can expect paradigmatic similarity classes to represent different functional roles in a language's grammar, such that the strength of their connection to other terms and the general structure of the classes to which they belong should be different for different paradigmatically related groups of words, while the topical associations prevalent among syntagmatic similarity classes should not present this association\footnote{
+    Remember that syntagmatic similarity is related to co-occurrence, such that words will be syntagmatically similar if they occur in the same context, independent of the position they occupy in those contexts.
+    Paradigmatic similarity is contextual similarity, such that words will be paradigmatically related if they appear in similar contexts, and the position in which they appear contributes to this similarity.
+    This is the reason we can talk about paradigmatic similarity as a relation of substitutability, and also the reason why this notion of relatedness is theoretically closer to what I call material processes, expressed through the imputation of agentive functions, per opposition to discursive processes, expressed through topical organisation.
+}.
+% Score!
+This figure suggests this is actually the case.
+
+We can asses the ideas above about the connection between connectivity and structural equivalence by producing a block model for the lower order network and contrasting the assignment of vertices to blocks in this reduction to the communities into which they are assigned in the higher-order network.
+I induce equivalence classes by a classic, particularly naive procedure: First I compute a distance matrix over the adjacency vectors using the same measure as the one used to induce the measures used in the higher-order network and then feed the resulting distance matrix as input for a clustering procedure.
+Since the difference weighted co-occurrence model measure is not a proper metric, producing a distance from it requires coercing it into one; in this case by adding the resulting similarity matrix to its transpose and dividing by two and then subtracting from one to transform this symmetrised similarity into a distance\footnote{
+    I.e. $D(w_i,w_j) = 1 - ( \frac{Sim(w_i,w_j) + Sim(w_j,w_i)}{2} )$.
+    This is equivalent to the process by which directionality is discarded in the spectral analysis of graphs: taking the average between the in-degree and the out-degree.
+    I do not have a proof for whether the result of this operation on the difference weighted co-occurrence measure is in fact a proper metric (i.e. it respects the triangle inequality) and lack the mathematical knowledge to recognise if this is obviously the case, but most clustering procedures are robust to non-metric distances, they only require the distance to be symmetric and that $D(i,j) = 0 \Leftrightarrow i = j$ (i.e. they don't require transitivity); this is the case with this measure.
+}.
+Since we are trying to produce a ``confirmatory'' block model to test the hypothesis that equivalence classes in the lower order network correspond to communities in the higher order network, we use a fixed-number clustering algorithm to classify the vertices into the same number of classes as communities in the higher-order network, i.e. $10$, though in the difference weighted network, $6$ classes are tiny and together account for only $20$ of the $1,736$ vertices in the network\footnote{
+    A listing of these ``tiny clusters'' is given in \autoref{tab:tiny_k} at the end of this chapter.
+}, so we produce a second model for a partition into 4 equivalence clusters and exclude these $20$ from the cross-comparison.
+Tables \ref{tab:c3_global_block1} and \ref{tab:c3_global_block2} present the cross tabulation of the resulting classification for the $10$ and $4$ class models against the classification of vertices in the higher-order network.
+Using the same procedure for construction of similarity measures between vertex sets in the context of solutions to the mapping problem, we can produce a stronger measure of association than the probabilities induced from a contingency table.
+\autoref{fig:block_assoc} contains the heat-maps corresponding to the similarity matrix between the observed communities in the higher-order network and the equivalence classes obtained from the block model.
+Note that for these results we only consider the terms that are present in both networks ($1,661$ terms).
+
+\input{tables/c3_global_block1}
+
+\input{tables/c3_global_block2}
+
+\begin{figure}
+    \centerfloat
+    \input{figures/c3_global_assoc}
+    \caption[Association between eq. classes and communities]{
+        Association strength between eq. classes in direct cooc. network and communities in diff. weighted network
+    }
+    \label{fig:block_assoc}
+\end{figure}
+
+Both the contingency table and the heat-map lend support to the idea that there is an association between the two structures in the two networks, though there are some clear artefacts induced from the variations in the cardinality of both partitions in the case of the full 10-class model.
+This seems to indicate that the conjecture about the connection between lower-order equivalence classes and higher-order communities is actually the case.
+Taking advantage of this result in order to construct multi-modal semantic networks seems like a very promising avenue for further research; I have not been able to find any literature around this.
+The proper assessment of this finding would require constructing bounds in order to assign some notion of significance to these observed associations, and comparing its strength across different similarity measures, particularly those derived from further convolutions of $X$ over itself.
+For what its worth, a simple chi-squared test of both contingency tables yielded $p$-values below the machine epsilon\footnote{
+    I.e. technically indistinguishable from 0.
+    All results in this dissertation were produced using double-precision IEEE floating point numbers, with a machine epsilon of $2.220446x10^{-16}$
+}, but the usual populations found in lexical analyses make statistical significance tests lose all discriminatory power.
+
+% \section{Experiments}
+% \label{sec:semnet_experiments}
+%
+% The results presented up to this point should a offer a sufficiently detailed view of the general shape and structure of semantic networks, the way in which they can be constructed to capture different forms of semantic relatedness, and the manner in which the structural positions in higher order networks relate to the regular positions in lower order networks.
+%
+% These results also indicate a natural way for a possible solution to the mapping problem over semantic network $X \rightarrow S$ projections: the structural and regular positions occupied by the vertices in semantic networks constitute the \emph{image} of the $S_{W \subset L} \rightarrow \sigma \in \Sigma$ function.
+% Since in my approach the language of theory is not the same as the language of data, it is the image of this function that we are interested in, not its domain: the relevant analysis units are given by the $\sigma \in \Sigma$, not the $W \in L$.
+%
+% In consequence, the exercise imposed by solutions to the mapping problem in the context of semantic network $X \rightarrow S$ projections consists in the association of structural and regular patterns in the semantic graph to sociologically relevant phenomena.
+%
+% Note that the relevant aspect of this issue for the purposes of this dissertation revolves around the definition of the mapping function, and \emph{not} around the choice of a subset $W \in L$:
+% At this point, I am concerned with evaluating the available alternatives for the construction of this function, rather than determining a way in which its arguments should be chosen, because this decision is highly domain-specific, for obvious reasons.
+% In practical terms, the choice of a relevant subset of terms (or even one term, like \term{prosecutrix} in the ego nwtworks above) is not strictly part of the methodological framework, since it is obviously a theoretical question that needs to be decided upon over the requirements imposed by a given theory $\Theta$ and its associated conceptual repertoire $\Sigma$, so an evaluation of the merits of one or another strategy for this choice is out of scope for this work.
+%
+% There are however, three general ways in which it seems possible that this exercise could proceed that do have methodological implications, so it makes sense to at least enunciate them here:
+% First, this choice could be taken exogenously, that is, without any consideration for the corpus data produced as input or output to the $X \rightarrow S$ projection.
+% This is equivalent to the imposition of external structure over a corpus as in e.g. the use of a theasurus for coarse-graining, and is also equivalent to \citeauthor{evans2016}'s ``confirmatory'' uses of machine translation for socioloical research.
+% Second, this choice could be taken on the basis of some characteristic of the data used as input for the $X \rightarrow S$ projection.
+% This would be equivalent to the imposition of some structure endogenous to $X$ but external to $S$ in order to provide a manner of validation of any patterns observed in $X$ from a given $X \rightarrow S$ projection.
+% Finally, the choice could be taken on the basis of purely endogenous characteristics of some $S$, either produced as a result of the same $X \rightarrow S$ projection \emph{or as the result of an independent projection}.
+% In this last case, the mapping function is not strictly an $S \rightarrow \Sigma$ mapping, but an $S \rightarrow S'$ mapping.
+% The last alternative in particular offers some very interesting possibilities, so I will return on this point in \autoref{chap:conc}, after having discussed both semantic networks and metric vector spaces.
+%
+% For the demonstration in this section, I will follow the first and second of these approaches.
+% First, we will look at the structural locations of the term \term{woman} as an example of the mapping procedure for $W \in L$ sets of cardinality $1$, from a term that can be reasonably expected to represent, to some extent, the operation of a principle of social differentiation that we designate as ``gender'', in a completely exogenous way.
+% Second, we will use the results from the previous chapter in order to define a set of terms $W_{violence}$ as an example of the mapping procedure for $W \in L$ sets of cardinality larger than $1$, in an attempt to approximate a particular type of social interaction, from the endogenous patterns observed in the analysis of the marginals of $X$ presented in the experiments of the last chapter.
+% This will afford us an opportunity to look more closely to the difference in results between my analysis and \citeauthor{klingenstein2014}'s that we obtained from the analysis of the divergence between $C_{violence}$ and its complement.
+%
+% [TODO]
+%
+\section{Summary}
+
+This chapter has discussed one of the two generally available strategies for constructing useful $X \rightarrow S$ projections: graph based projections that we call semantic networks.
+
+Theoretically, the semantic networks that we are interested in are always uni-modal graphs in which the strength of association between the vertices corresponding to different terms in a corpus' lexicon is given purely by their associated distributional information, as this imposes no additional assumptions about the machinery of human language beyond the distributional hypothesis, a requirement in order for any $X \rightarrow S$ projection to provide pictures of states of affairs that are independent of narrative accounts.
+
+Mathematically, semantic networks are graphs, and graphs are fundamentally (1) set-theoretic objects with additional structure and (2) non-metric topological spaces.
+The first point indicates the range of solutions that are available in semantic network $X \rightarrow S$ projections for solution of the methodological problems that we require of them: mapping their features to sociological concepts and alignment of representations built from different corpus samples, segmented or not.
+The second point indicates their full independence from \emph{any} assumption about human languages beyond the distributional hypothesis, even the geometric metaphor: graphs don't care about geometry.
+
+The solutions to the methodological problems from set-theoretic operations mean that in the analysis and comparison of semantic networks we will deal mostly with a process of defining term sets, ordered or not, from the features obtained in the structural configuration of the resulting networks, and constructing similarity measures from the consideration of their membership lists.
+
+The identity of the elements in these sets is generally of secondary concern from a theoretical point of view, to the extent that terms are only observation units in my proposed methodology.
+However, they are relevant in a practical sense, to the extent that the alignment of sets is still ultimately based on the identity of their elements.
+This imposes serious constraints to the granularity of corpus partitions available for semantic network construction, as the necessary operations require lexical overlap between different partitions, though there are several strategies to minimise this problem.
+An alternative solution is given by the exploitation of motifs, recurrent sub-graphs with similar topology, but this would require a solution to the graph isomorphism problem for its application to the unbounded problems we generally face in semantic network analysis (i.e. we would need to be able to \emph{search} for motifs).
+
+In terms of the way in which semantic networks capture different notions of semantic relatedness, this is primarily associated to their modality, such that the connectedness relation on different semantic networks will capture the notions of relatedness that are measured by different similarity functions.
+We are primarily interested in paradigmatic similarity, which is associated to higher-order similarity functions (i.e. similarity of similarities).
+I claimed that lower-order networks and higher-order networks are fundamentally related by the functional relationship between the functions that are used for constructing higher-order measures from lower-order ones.
+This connection between the structures in networks of different orders is deduced purely from the observation that higher-order similarities correspond to the same operation through which we define structural equivalence from an operational point of view.
+This suggests that there should be a connection between the structural equivalence relation in lower-order networks and the connectedness relation in higher-order networks.
+
+I have provided some evidence for the ways in which the semantic networks corresponding to different orders of similarity capture different notions of relatedness by looking at the projection of a single trial, and then comparing the patterns of vertex strength and significance across the projections for the full POB corpus.
+I have also provided some evidence for the hypothesis about the connection between structural equivalence and connectedness, which we can call duality.
+Much more work is required in order to provide some bounds to establish the significance of these findings.
+
+From a broader point of view, semantic networks present several advantages.
+First, even though we are still using them for distributional semantics, and distributional semantics always require enormous amounts of data (in contrast to e.g. concept map construction), semantic networks are capable of producing meaningful representations of text even with very few observations, like the ones that can be derived from the mere 18 paragraphs in the Crouch trial.
+Second, and particularly for their application to sociological problems, semantic networks are, well, networks.
+This means that they are a data structure with which sociologists are profoundly familiar, making them more or less immediately available as a methodological strategy for practitioners in our discipline (unlike e.g. metric vector spaces, which require mathematical techniques we are usually not so familiar with)\footnote{
+    Until now I had not realised the provinciality of the available literature on graphs.
+    It seems to be the case that the notion of ``structural equivalence'' is only of interest to sociologists, as every reference I could find about this issue was found in social-scientific literature, in contrast to other operations on graphs, which have received enormous attention from other disciplines; most notoriously, community detection and network specialisation.
+    This is somewhat curious, considering that structural equivalence can work as an alternative to problems that are normally reduced to the graph isomorphism problem, which receive tremendous interest and we know to be \emph{hard}.
+}.
+Third, as the projection of the Crouch trial demonstrates, semantic networks are generally easy to appreciate intuitively and lend themselves readily for the construction of a qualitative characterisation of different phenomena, at any level of analysis (see table \autoref{tab:tiny_k} to appreciate this), as well as providing relatively easy to construct visualisations of the data in the form of network maps.
+
+Semantic network analysis presents several relatively important limitations, though.
+
+First, and also due to their mathematical structure, operations on semantic networks are primarily combinatorial problems and this tend to be enormously expensive from a computational point of view, and generally don't scale very well.
+It is from these costs that we require some questionable decisions like lexical sampling or edge pruning, but in addition to these practical concerns and even if we had ways around this rather violent hacking away of some segments of the available primary data, there is no way around the costs associated to set-based operations, as intuitive as they are to understand\footnote{
+    Though there is probably ample space for optimisation of these operations, using more specialised data structures.
+    I have not explored this thoroughly.
+}.
+An alternative to this is given by the spectral analysis of graphs, but this is far from simple, and particularly complex in the case of directed networks, which arise naturally from the notions of similarity that we are primarily interested in\footnote{
+    Note that paradigmatic relatedness is basically an issue of substitutability, and substitutability is notoriously asymmetric.
+}.
+This makes a systematic assessment of semantic networks a tremendously costly exercise.
+This is further complicated by the fact that semantic networks occupy an order of complexity far beyond the graphs that arise in traditional social network analysis.
+
+Second, there is a major issue of robustness.
+Given the procedures used for semantic network construction, there are several parameters that need to be determined in order to produce a semantic network, particularly if one is interested in minimising the amount of discretion in the analysis (an issue that I will discuss in more detail in \autoref{chap:conc}).
+These include: (1) defining a criteria for inclusion of terms in the relevant population (i.e. which lexical classes to include?); (2) defining a sampling strategy from the selected lexical population (i.e. coverage threshold? k-highest frequency terms? minimal term frequency across all corpus segments?); (3) defining a pruning strategy for simplification of the saturated adjacency matrix (i.e. connectivity thresholds? absolute or relative? over which connectivity criteria?) in addition to the questions about which similarity measures to use (metric? symmetric? difference-weighted or additive?), and about which algorithms will be used to detect the relevant second order units of analysis (i.e. community detection algorithms, block modelling procedures).
+All of this decisions have \emph{tremendous} impact on the resulting networks.
+The semantic networks I have built over the POB corpus were initially constructed with a choice of parameters that sought to minimise the level of analyst's discretion, defining lexical sampling and pruning exclusively through endogenous means, using the largest lexical samples that my main research computer could handle and setting particularly strict connectivity thresholds.
+The results presented in this chapter were built following this general approach, but it turns out that any slight deviation from these parametric choices will yield very different results, and the manner in which each of the different parameters will impact different aspects of the resulting networks is largely an open question.
+This means that much work is required in order to (a) acquire a more systematic understanding of the effect of each of the choices that will necessarily need to be taken in the construction of semantic networks and (b) produce some notion of standardisation in the procedures used for their construction.
+I hope my proposed methodology will be particularly useful for the second of this requirements\footnote{
+    Which I can reveal to be the ultimate objective pursued through the work presented in this dissertation, and partly explains the ostensible obsession with technical detail.
+}.
+
+Finally, we can point out that the main feature of semantic networks is that they facilitate an style of analysis characterised by structures and operations from discrete mathematics, dominated by combinatorial problems.
+
+\clearpage
+\begin{figure}
+    \centerfloat
+    \input{figures/c3_global_ppmi}
+    \caption[Global direct co-occurrence network]{
+        Direct co-occurrence network for the entire POB corpus ($S90$, nouns only)
+    }
+    \label{fig:global_ppmi}
+\end{figure}
+
+\clearpage
+\begin{figure}
+    \centerfloat
+    \input{figures/c3_global_difw}
+    \caption[Global difference weighted network]{
+        Difference weighted network for the entire POB corpus ($S90$, nouns only)
+    }
+    \label{fig:global_difw}
+\end{figure}
+
+\clearpage
+\subsection{Vertex attributes for terms in tiny clusters}
+
+\begin{table}[ht]
+    \centering
+    \begin{tabular}{rcrrrrccrr}
+        \hline
+        Index & Term                 & K & TF    & DF    & Rank class & POS & Lexical & $\varphi_{v \rightarrow k}$ & $\varphi_{v \leftarrow k}$ \\
+        \hline
+        631   & \term{fowl}        & 3 & 4424  & 3114  & 3          & NN  & Yes     & 0.26                        & 0.20 \\
+        878   & \term{duck}        & 3 & 2581  & 1923  & 3          & NN  & Yes     & 1.15                        & 0.23 \\
+        1003  & \term{goose}       & 3 & 2006  & 1430  & 4          & NN  & Yes     & 1.02                        & 0.21 \\
+        1085  & \term{rabbit}      & 3 & 1723  & 1258  & 4          & NN  & Yes     & 0.50                        & 0.05 \\
+        1316  & \term{hen}         & 3 & 1200  & 957   & 5          & NN  & Yes     & 0.50                        & 0.04 \\
+        \hline
+        1153  & \term{rogue}       & 4 & 1568  & 1387  & 4          & NN  & Yes     & 0.72                        & 0.14 \\
+        1313  & \term{villain}     & 4 & 1204  & 1091  & 5          & NN  & Yes     & 0.50                        & 0.15 \\
+        1452  & \term{rascal}      & 4 & 946   & 878   & 6          & NN  & Yes     & 0.40                        & 0.15 \\
+        1629  & \term{scoundrel}   & 4 & 672   & 607   & 7          & NN  & Yes     & 0.50                        & 0.10 \\
+        \hline
+        1318  & \term{volume}      & 5 & 1196  & 885   & 5          & NN  & Yes     & 0.25                        & 0.25 \\
+        1369  & \term{edition}     & 5 & 1110  & 1038  & 5          & NN  & Yes     & 0.50                        & 0.25 \\
+        \hline
+        1087  & \term{writer}      & 7 & 1717  & 1589  & 4          & NN  & Yes     & 0.28                        & 0.25 \\
+        1457  & \term{shorthand}   & 7 & 936   & 791   & 6          & NN  & Yes     & 0.50                        & 0.25 \\
+        \hline
+        1338  & \term{fur}         & 8 & 1165  & 951   & 5          & NN  & Yes     & 0.50                        & 0.12 \\
+        1626  & \term{muff}        & 8 & 676   & 506   & 7          & NN  & Yes     & 0.34                        & 0.25 \\
+        1678  & \term{tippet}      & 8 & 605   & 498   & 7          & NN  & Yes     & 0.50                        & 0.13 \\
+        \hline
+        215   & \term{mercy}       & 9 & 18204 & 17749 & 1          & NN  & Yes     & 0.51                        & 0.32 \\
+        706   & \term{sake}        & 9 & 3807  & 3506  & 3          & NN  & Yes     & 0.07                        & 0.06 \\
+        809   & \term{pardon}      & 9 & 2960  & 2581  & 3          & NN  & Yes     & 0.34                        & 0.13 \\
+        1679  & \term{forgiveness} & 9 & 603   & 583   & 7          & NN  & Yes     & 0.78                        & 0.20 \\
+        \hline
+    \end{tabular}
+    \caption[Vertex list for tiny clusters]{Vertex attributes for members of tiny clusters in the difference weighted network.}
+    \label{tab:tiny_k}
+\end{table}
+
+These are the full membership lists for the six smaller clusters in the version of the difference weighted network used for the results in this chapter.
+Together they account for only 20 of the $1,736$ vertices in the network.
+Slight variations of the parameters used for constructing different versions of this network always yielded distinct, semantically related term sets as compact tiny clusters, like terms related to piracy, navigation, etc.
+Why different compact paradigmatically related classes are located in distinct communities when the network is constructed with a slight modification to its parameters, and more importantly, \emph{which} classes, is an open question that would require a much more thorough exploration of the configuration space \citep{stephenson2011} of the parameters for network construction, as well as the results obtained from different clustering algorithms, particularly taking into account that we are throwing away edge directionality in the detection of clusters.
+Looking at their members though, it seems to be the case that the clusters are always composed by \emph{less prevalent terms} in \emph{highly domain-specific classes} (i.e. ``less common names for small farm animals'' for cluster 3, ``quaint nouns for describing persons of ill repute'' for cluster 4, etc.), but this is mere speculation.

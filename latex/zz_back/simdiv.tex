@@ -1,0 +1,56 @@
+\chapter{Similarity functions}
+\label{app:simdiv}
+
+There are fundamentally three broad approaches to produce similarity/dissimilarity measures over lexical distributional vectors: geometric, probabilistic and information-theoretic.
+Each of them will impose some requirements for the computation of the distributional vectors and will have different properties.
+
+The \code{simdiv} function in the \code{wspaces} R package produced for this dissertation implements all of these measures as options. See the \code{wspaces} documentation for details.
+Note that all functions marked with a $D$ symbol are dissimilarity measures, and all functions marked with an $S$ symbol are similarity measures.
+Conversion from $S$ to $D$ and vice-versa is in general as simple as taking the multiplicative inverse of the respective values, but details vary given the possible ranges and slopes of the different measures.
+Divergence measures are called distances $iff$ they are proper metrics; i.e. they can be used to induce a topology.
+Non-metric divergence measures that are not proper metrics are never called distances in the following discussion.
+Proofs of the properties of the different functions discussed in this section can generally be found in the provided references.
+
+\section{Geometric measures}
+
+Geometric approaches exploit the geometric metaphor directly\footnote{
+    See the discussion in section \ref{sec:method}.
+}, treating the term vectors as proper vectors $v, u \in \mathbb{R}^N$ and computing a distance measure between them as a dot product, usually the Euclidean distance
+    $$D(v,u) = \sqrt{ \sum_{w=1}^N( v_w - u_w )^2 }$$
+or the cosine similarity
+    $$S(v,u) = \frac{ \sum_{w=1}^N( v_w u_w ) }{ \sqrt{ \sum_{w=1}^N v_w } \sqrt{ \sum_{w=1}^N u_w } }$$
+See \citet[chap. 6, pp 110ff]{salton1988,manning2008} for a more in-depth discussion of dot-product based measures.
+Geometric approaches are computationally inexpensive, but particularly sensitive to the total magnitude of the distributional vectors, making weighting (or at least normalisation) necessary.
+
+\section{Probabilistic measures}
+
+Probabilistic measures treat the distributional vectors as empirical samples from probability distributions $P$ and $Q$ and test against the null hypothesis that these distributions are the same using one of the many available measures for this purpose.
+Measures based on the Kullback-Leibler divergence
+    $$D_{KL}(P||Q) = - \sum_{w=1}^N\:P(w)\:log\:\frac{Q(w)}{P(w)}$$
+including the Jensen-Shannon divergence
+    $$D_{JSD}(P||Q) = \frac{D_{KL}(P||M)}{2} + \frac{D_{KL}(Q||M)}{2} : M = \frac{( P + Q )}{2}$$
+are undefined on vectors containing $0$ valued entries (because of the product in the denominator), but generally well behaved under coarse-graining, application of a Dirichlet prior or convolution with a known distribution.
+Measures based on the Bhattacharya Coefficient
+    $$BC(P,Q) = \sum_{w=1}^N \sqrt{ P(w) Q(w) }$$
+like the Bhattacharya Divergence
+    $$D_{Bha}(P,Q) = - log( BC(P,Q) )$$
+or the Hellinger Distance
+    $$D_{Hel}(P,Q) = \sqrt{ 1 - BC(P,Q) }$$
+are generally more robust \citep{dedeo2013}; all of them are somewhat computationally expensive, since they require several vector products to be computed separately.
+
+\section{Information-theoretic measures}
+
+Information theoretic measures treat each of the term vectors as weighted feature sets $A$ and $B$ over the words in the lexicon in order to produce a measure of precision and recall of one of the sets from the values contained in the other.
+This is an approximation to the ``substitutability'' or total information loss/gain from replacing whatever is represented by one of the term vectors by whatever is represented by the other.
+They require the definition of an ``extent'' function to produce the weights contained in both sets.
+Any of the functions discussed in \ref{app:weighting} can be used for this purpose.
+A function of the weights of entries in both feature sets is then summed over the intersection of both sets and one of them.
+A ratio between these two values is considered as a measure of the ``extent'' to which both sets share each other features.
+Precision and recall then correspond to choosing one or the other as denominator in this ratio.
+The actual function to be summed can be either ``additive''
+    $$S_{A,B} = \frac{\sum_{ w \in A \cap B } A_w}{\sum_{ w \in A } A_w}$$
+or ``difference weighted''
+    $$S_{A,B} = \frac{\sum_{ w \in A \cap B } min( A_w, B_w )}{\sum_{ w \in A } A_w}$$
+See \citet{weeds2005,rule2015} for additional details.
+Additionally, replacing the denominator with the union of both sets will produce the Jaccard distance, a proper metric.
+Since these measures are computed as set-ratios of sums, they are completely insensitive to both skewness or the presence of singularities; they are, however, extremely intensive from a computational point of view, as treating the vectors as sets the intersection of which needs to be summed over requires iterating over the entries in each of them in order to determine their inclusion in the computation of the numerator.

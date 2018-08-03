@@ -1,14 +1,11 @@
 #!/usr/bin/Rscript
 
-source( 'c4_epochs_data.R' )
 require( euclid )
 
 PROJ_NAME   <- 'c4_epochs'
 DEVICE      <- 'tikz'
 TERMS       <- c( 'woman', 'man', 'lord', 'servant' )
-EPOCH_NAMES <- gsub( 'part_', '', names( epochs ) )
 K           <- 30
-BASE        <- epochs[[20]]
 
 epoch_term_ws <- function(
     term, epochs, base=epochs[[length( epochs )]], k=30, term.filter=rownames( base ),
@@ -29,6 +26,10 @@ epoch_term_ws <- function(
     return( term_ws )
 }
 
+source( sprintf( 'inc_%s_data.R', PROJ_NAME ) )
+
+EPOCH_NAMES <- gsub( 'part_', '', names( epochs ) )
+BASE        <- epochs[[20]]
 S95_n <- lexical_sample( td$tf.x, filter=( !is.na( td$pos ) & td$pos == 'NN' ), theta=ut$SAMPLE_THETA )
 S95_n_terms <- rownames( global )[ S95_n ]
 filter <- rownames( BASE )[ rownames( BASE ) %in% S95_n_terms ]

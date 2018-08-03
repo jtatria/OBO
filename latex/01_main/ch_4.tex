@@ -1,0 +1,580 @@
+\chapter{Semantic Vector Spaces}
+\label{chap:wspaces}
+
+This chapter discusses the other of the two general strategies available for projections of $X $ into $S$: the derivation of a dense, lower-dimensional metric space from the sparse and extremely high-dimensional representation of a distributional space contained in the co-occurrence matrix $X$.
+Since we have already discussed the strategy relying on semantic networks, this chapter will not touch on some of the more general aspects that arise in the analysis of $X \rightarrow S$ projections, but I will indicate the necessary differences between the approach described in the previous chapter and the one described in this chapter as necessary.
+
+Analytically, vector space construction always implies some process of dimensionality reduction in such a way that some of the structures contained in $X$ are preserved in its lower dimensional representation.
+As I will discuss in more detail in the next chapter, the rationale for this is related to the general strategy that characterises the underlying exercise that makes possible the techniques discussed in this work: the idea that there is an unknown semantic space whose topology can be approximated from its empirical consequences.
+Unlike semantic networks, vector spaces rely primarily on the second idea from our minimal linguistic theory: the geometric metaphor that postulates that meaning can be understood as being organised along semantic dimensions; that there is a linear relationship between these dimensions; and that the source of the semantic content of linguistic particles (e.g. words) is given by their position along these dimensions, such that the observed similarities between different semantic units are explained by their close proximity in the semantic space determined by these unobserved (``latent'') dimensions.
+
+Vector spaces exploit this idea from the notion that the distributional space described by $X$ can be understood as being the projection of the latent semantic space into a higher dimensional space of dimensionality equal to the number of contexts in which we observe words to occur, such that the reconstruction of the underlying, unknown semantic space will correspond to the result of some mapping between these two spaces.
+This is why I have referred to this exercise throughout with the notation normally used to describe linear mappings: $X \rightarrow S$.
+Unlike semantic network construction, though, this understanding of vector spaces is particularly general: there is no further qualification about either the properties of this mapping or the procedure used to compute its value, which means that, in principle, anything goes.
+
+This is what explains the point I made in the opening paragraphs of \autoref{sec:method} about the empirical origins of most distributional semantic models: they do not, in general, have any theoretical support beyond the distributional hypothesis and the geometric metaphor, and their suitability to actually represent language is given exclusively by their \emph{performance}.
+In my understanding of distributional semantic techniques, this is what makes them attractive: they don't depend on any particular interpretation of the world in order to represent it.
+
+This can be easily appreciated in the consideration of the recent history of vector space models: until very recently, the most successful models in the field were not properly understood, even by their creators.
+I'll explain what I mean by this below.
+
+From a more practical point of view, vector spaces are fundamentally different from semantic networks, in as much as they are mathematical and algebraic structures of a different class\footnote{
+    Though there are many subtle connections between metric spaces and graphs when considered in topological terms that offer additional analysis options.
+    This is what makes spectral graph theory possible, for example, but this is a level of abstraction that is beyond our more immediate concerns, as mentioned above in \autoref{foot:dracones} from the previous chapter.
+}.
+This means that the operations that are available on them for solution of the mapping and alignment problems are particularly distinct from the operations that are available on graphs: vector spaces are metric spaces, which means that they come equipped with a number of structures that can be used to locate points or regions in them, establish axes across or between them and generally construct measures of distance, closeness, angle and (when endowed with additional geometric algebras) orientation in a completely endogenous way, through nothing more than simple linear operations between the vectors that describe them.
+The power implied by these possibilities should be immediately apparent, but to make it clear: many if not all of the problems present in semantic networks from their set-theoretic nature simply \emph{vanish} when we try to come up with solutions to similar problems in the context of metric vector spaces.
+However, the fact that these mathematical structures are \emph{available} in the algebras of metric spaces is, in itself, of purely mathematical interest.
+These operations are not, in themselves, of any interest, unless they can be exploited as avenues for solution of concrete problems (ostensibly for my purposes, the mapping and alignment problems).
+It happens to be the case that a particular specification of vector space models actually has this feature, as I will discuss in a moment.
+
+The other tremendous advantage of vector spaces is that, as it has now been established, they do not require the instantiation of a full distance matrix.
+This has profound implications in terms of their computational complexity, as it means that their time cost increases \emph{linearly} on the number of words in the lexicon and on the dimensionality of the output vectors (which in this context are sometimes called ``embeddings''), and not quadratically\footnote{
+    Their storage requirements are also invariant on corpus size, though they are evidently associated to the dimensionality of the target vectors.
+    This cost is negligible: hard disk space is cheap; storing a final value for a vector model using vectors with 50 dimensions is not much cheaper than storing a similar model with vectors of dimension 300, 500, etc.
+    In case you are wondering: the models for the full POB corpus and its $77,610$ term lexicon discussed below, using rather onerous $300$-dimensional vectors stored as double precision IEEE floating point numbers occupy \emph{exactly} $373,148,880$ bytes of hard-drive space, or $356MB$ in human units.
+    This is negligible in contrast to the $48,186,496,800$ bytes ($\sim45GB$) of \emph{memory} that would be required for a live instantiation of the distance matrix.
+} eliminating the need for lexical sampling that is a practical requirement in the construction of semantic networks\footnote{
+    Note that unlike very early techniques for distributional semantics, the currently available strategies for the construction of both vector spaces and semantic networks do not depend in any meaningful way on the total size of the corpus, beyond the time costs associated to the production of values of $X$ from it (i.e. the collection of co-occurrences counts from longer token streams) but this is a data acquisition issue, not a modelling issue.
+}.
+
+On the other hand, their main limitation is given by what is also their most interesting methodological advantage: semantic vector spaces are particularly sensitive to small variations in the underlying source of data, making them particularly suitable for the study of change in language use, or the equivalent exercise of construction of detailed pictures of the state of affairs across different contexts\footnote{
+    In the non-linguistic sense of the word.
+}, possibly across different points in time.
+Unfortunately, this means that they require even larger amounts of textual data than the amounts that are sufficient to produce a useful representation of text in a semantic network.
+Unlike the practical problems seen in the construction of semantic networks, this is not something that can be avoided: there is no strategy around these requirements comparable to the role played by lexical sampling and edge pruning in dealing with the practical aspects of semantic network construction: we just need moar data, and this is always an unsatisfactory solution to any methodological problem, as it is no solution at all.
+
+The first section of this chapter discusses some general aspects of vector spaces from a review of their history and the incremental improvements that characterised their study in the early decades until the more or less groundbreaking work of \citet{mikolov2013,mikolov2013a,pennington2014} and most importantly, \citet{levy2014}.
+The second section will discuss the linear operations that make it possible to solve the mapping problem in vector spaces, and the fundamental problems in need of solution when dealing with the alignment problem.
+The third section will present some general features of the semantic vector space that can be constructed over the POB corpus along a few experiments that can be carried out over this representation of the textual data in the POB and that illustrate the different solutions to the mapping and alignment problems as discussed in the previous section.
+Finally, I'll close this chapter with a summary of its main ideas and an assessment of metric vector spaces for the purposes of my proposed methodology.
+
+\section{A brief history of semantic vector spaces}
+\label{sec:wshist}
+
+The field that we can today describe as distributional semantics emerged out of the combination of two distinct but related areas of work: information retrieval and computational linguistics\footnote{
+    The distinction between these fields is given by their different scopes: computational linguistics is an academic discipline proper, while information retrieval can be considered its associated technological field.
+    The connection between the two fields is more or less straightforward, but it can be shown by a simple fact: the most prominent current practitioner in both fields is actually the same person: the head of Stanford's NLP group, prof. Christopher Manning.
+}.
+The specific combination of these two fields that determined the general coordinates of what distributional semantics are today is the result of a more or less foreign inversion of the logic prevalent in one of these fields (information retrieval) that turned out to have broad applications for the solution of problems in both of them\footnote{
+    And also to psychology, see \autoref{foot:lingua_warz}, infra.
+}.
+
+From a purely operational point of view, the first attempts at applying vector-based measures of similarities to the modelling of \emph{words}, were derived more or less directly from their already established application to the production of scoring systems in information retrieval.
+As already discussed in \autoref{sec:method}, the problem in need of solution in information retrieval is the location of a document that will satisfy a user's information need expressed as a query.
+A vector space model works for this purpose by creating term vectors for both documents and queries and then leveraging some measure of similarity to determine which documents best satisfy the information need as represented in the query (usually the cosine similarity, etc).
+This requires the construction of ``the other kind'' of term-frequency matrix than the kind to which $X$ belongs: a term-document matrix, in which entries in a lexicon are associated to document-vectors (or postings lists), or what is the same, documents are represented as term vectors, not entirely unlike the vectors we used for lexical comparisons in the experiments in \autoref{chap:pob}\footnote{
+    From this point of view, that exercise can be interpreted as constructing ``documents'' out of the POB segments corresponding to a whole year.
+    I.e. a whole volume of the POB, containing around 10 of the $2,163$ surviving issues of the POB.
+}.
+This understanding of ``vector space models'' has a venerable and tremendously successful history in its application to the information retrieval problem \citep{salton1975,salton1988,manning2008} and was fairly well established by the time of the first attempts at using the same ideas for the different and much more ambitious problem of modelling language.
+
+The derivation of semantic vector space models from information retrieval vector space models is based on the brilliant yet remarkably simple\footnote{
+    And in hindsight, fairly obvious; but brilliant simple ideas are always obvious in hindsight.
+} idea of just \emph{transposing} the term-document matrix, in order to use the information contained in it to characterise terms instead of documents.
+That's it.
+This is the origin of \emph{semantic} vector space models.
+As simple as this idea is, it turns out that there are a few practical issues in its execution.
+It took 20 years to find viable solutions to them.
+However, it was in the solutions to these practical problems that the full power of the geometric metaphor to actually represent the machinery of natural languages became apparent.
+I'll explain.
+
+The basic problem that comes up when one tries to naively apply the idea of simply transposing an information retrieval index's term-document matrix to characterise terms instead of documents, is given by the fact that, beyond their superficial connection as mathematically similar entities (i.e. vectors), term-vectors and document-vectors are in fact very different, because they tend to have different characteristics in terms of their dimensionality and sparseness.
+It shouldn't be necessary at this point to explain why this is the case; in practice, document vectors are (1) too large, in the sense that the term-document matrix is hard to analyse as a unitary object\footnote{
+   Per opposition to the pair-wise comparisons that are prevalent in their use as an index in information retrieval.
+}, (2) noisy, as they contain several spurious occurrences of terms and (3) extremely sparse.
+Hence, a practical implementation of the idea of simply transposing the term-document matrix to model terms instead of documents requires solutions to these problems.
+Earliest attempts came in the form of applying a process of dimensionality reduction to the term-document matrix through principal component extraction.
+Note that at this point this was formulated as a necessary, unfortunate, and unavoidable loss of information out of a practical requirement.
+
+This yields the first viable semantic vector space model: Latent Semantic Analysis \citep{landauer1997,landauer1998}\footnote{
+    \label{foot:in_it_for_the_money}
+    The story is slightly more complicated than this.
+    The seminal paper about ``latent semantic indexing'' is from 1989 \citep{deerwester1988}, but this was still proposed as an improvement to information retrieval systems.
+    This resulted in two patents \citep{deerwester1989,landauer1994}, and it was not until the landmark paper by \citet{landauer1997} that its implications for semantic modelling in general were more thoroughly presented.
+}, which is the result of applying a singular value decomposition (SVD) to the term-document matrix in order to produce a variance-maximising rotation of the term document matrix and then choosing an arbitrary number of bases from it; i.e. what in sociology we know as ``factor analysis''\footnote{
+    This explains, in part, the connection to sociological field theory that I mentioned in passing in \autoref{sec:background} as this is the same technique that is used in the correspondence analyses that are prevalent in that field.
+    To be honest, this entire dissertation could be completely rewritten as a generalisation of field theory (something that renders the very notion of ``field'' moot, but I digress).
+}.
+
+The second critical insight in the development of modern distributional semantics was the realisation that we can do away with documents entirely, because in reality we only need to collect the distributional patterns of terms with respect to other terms.
+This idea emerges naturally from the manipulation of term-document matrices, either in full or in their reduced form as in LSA, but its original development required a complete break with information retrieval applications and the introduction of the idea of collecting distributional patterns directly around term-contexts via moving windows (which eventually became the standard approach).
+This is \citeauthor{lund1996}'s Hyperspace Analogue to Language \citep{lund1995,lund1996}, produced more or less around the same time as LSA started to receive more attention from the linguistics academic community\footnote{
+     Per opposition to the attention it received from its industrial application since its original formulation in 1988 and its publication as a \emph{patent}.
+     See \autoref{foot:in_it_for_the_money}.
+}.
+Unlike LSA though, dimensionality reduction was considered \emph{optional} in HAL, because the term-term document matrix that it produces does not present the prohibitive costs associated to its analysis as a unitary object as the term-document matrix.
+HAL's term-term matrix is, of course, our good friend $X$.
+
+At this point, the prevalent understanding of distributional semantics was that LSA-like models were a ``more correct'' approximation of the semantic space, and that the term-term matrix typical of HAL was merely a convenient way of avoiding the costly SVD operation required by LSA-like models with linear dimensionality reduction.
+The logic was that collection of distributional patterns in the form of a term-term document matrix implied a loss of information, and this loss of information was considered to necessarily limit the capacity of such representations to model the hypothetical semantic space.
+The comparable results obtained via one or the other strategy were attributed to the inevitable and somewhat equivalent information loss from either folding term-document vectors on themselves\footnote{
+    See \autoref{foot:xddt} in \autoref{chap:frame}.
+} or from the application of a dimensionality reduction technique.
+
+This view of distributional semantics dominated the discussion for the next ten years or so.
+A particularly illuminating review of the state of the art up to this point can be found in \citet{sahlgren2006}.
+Back then, the discussion seemed to be centred around two major concerns: the question about how different notions of context were related to different forms of semantic relatedness, and the search for alternative strategies to the SVD for the dimensionality reduction process, particularly if they did not require the instantiation of the term-document matrix, as this severely restricts the potential of these techniques for the analysis of the larger electronically available corpora that started to become available at the time\footnote{
+    Incidentally, this is the time at which the first partial versions of the OBO edition of the POB became available.
+    Note that the practical limitation associated to the static factorisation of the full term-document matrix implies that, up to this point, distributional semantic models were primarily restricted to their application to smaller, domain-specific corpora, which were, in any case, the only corpora that were generally available at the time.
+    For reference, the Wikipedia project started in 2001, while the Google News service was launched in 2002.
+    It would be several years until either of these now standard sources of electronic text became stable enough to be subject to computational text analysis techniques.
+    Until then, the gold standard corpus for computational analysis was the Brown Corpus \citep{francis1979}, a curated selection of 500 samples of English text of $\sim2000$ words each, i.e. $1,000,000$ words; cfr. the $127,000,000$ words in the POB.
+}.
+
+With regards to the context definition issue, as presented in \citeauthor{sahlgren2006}'s review, the debate eventually settled on identifying document-based contexts with syntagmatic relatedness, and term-based contexts with paradigmatic relatedness, in an effort to make sense of the results produced by LSA and HAL within the standard structural linguistics framework.
+In a similar fashion to the dimensionality issue, the general understanding was that these were basically good-enough proxies for more sophisticated notions of context, associated to higher-order linguistic phenomena, like syntax relations or dependencies and constituencies as suggested from classic linguistic theory.
+See \citet{turney2010} for a thorough review of the field from this point of view.
+This debate yielded several different models that were characterised by idiosyncratic context choices, typically for more specific purposes than the general ``solution to Plato's problem'' that LSA and others were supposedly designed for\footnote{
+    See \autoref{foot:lingua_warz}, infra.
+}\footnote{
+    See \citet{lin2001} for exploitation of dependency paths for automatic construction of question-answering systems.
+    See \citet{pado2003} for a more general application of parse trees for semantic space construction and \citet{pado2007} for a review of dependency-based approaches.
+    See \citet{erk2008} for an attempt at exploiting middle-level syntax patterns for sentence meaning recovery.
+    See \citet[op. cit.]{turney2010} for an example of ``pair-pattern'' contexts, reminiscent of the syntax patterns that are used as relation extraction as applied to concept map construction.
+    Alternatively, see \citet{grefenstette1994} for an earlier approach that combines syntactic analysis with co-occurrence windows.
+}, and several attempts at combining a range of available techniques for high-dimensional data analysis\footnote{
+    See \citet{purandare2004} for a rather extreme example of a combination of two different clustering procedures and two concurrent context definitions for word sense disambiguation (a 4-models-in-1 approach, in a sense).
+}
+
+With regards to the computational aspects, the general approach revolved around the development of incremental procedures for computation of the dimensionality-reduced matrices, in an effort to (1) avoid the need to produce an instantiation of the full term-document matrix that was still the reference implementation, and (2) in order to enable the construction of incremental models that are capable of updating themselves as new observations come along, an operation that requires recalculating the SVD in the traditional LSA-style approach.
+The most promising solution to this problem consisted in the use of random indexing, the accumulation of random, pseudo-orthogonal vectors associated to each different context \citep{sahlgren2005,baroni2007,jurgens2009,cohen2010}.
+A secondary concern revolved around the issue of preserving order in the resulting vectors, which in the context of the random indexing approaches that quickly became dominant was generally solved by the application of permutations of the indexing vectors \citep{jones2007,sahlgren2008}.
+
+Finally, a third broad area of attention was given by the potential application of vector space models to the construction of what I described in the previous chapter as ``concept maps'' in the context of their contrast to semantic networks, but which in this context is better described by reference to their broader field: ontology construction and automatic thesaurus generation \citep{grefenstette1994a}.
+One of the earliest efforts at combining both fields can be seen in \citet{rohde2006}.
+Also, see \citet{gabrilovich2007} for the opposite exercise: informing the construction of vector space models from pre-existing ontologies\footnote{
+    Something that doesn't seem to have gathered much attention beyond the proof of concept presented in that work.
+    \citeauthor{gabrilovich2007}'s work in particular uses the English Wikipedia as a publicly available ontology.
+    Given the origin of the ideas that eventually resulted in this dissertation, this paper would have been of central importance in the original version of what eventually became this project, which revolved precisely around this exercise \citep{atria2009}.
+    I will come back to this in \autoref{chap:conc}.
+}
+
+The point of this review is to show in a little more detail the state of affairs that explains the disciplinary confusion that I have referenced throughout, given by a separation of concerns between computational (incremental strategies; alternatives to the SVD) and methodological (impact of different context definitions, etc.) questions, and a rather clear transition from models predicated on fat theories of cognition and language to models that had little basis beyond \citeauthor{firth1957}'s distributional hypothesis \citep{harris1988,harris1991}\footnote{
+    \label{foot:lingua_warz}
+    This is partly explained by disciplinary dynamics, the consideration of which offers additional insight:
+    The technical development of LSA came from industrial applications to information retrieval, but its theoretical formulation was carried out in the context of psychology: \citeauthor{landauer1997}'s paper is titled ``A solution to Plato's problem''; i.e. LSA was predicated to offer a solution to ``[the] problem that has plagued philosophy and science since Plato 24 centuries ago''
+    , via its provision of
+    ``a theory [of the] acquisition, induction, and representation of knowledge''.
+
+    Just slightly more modestly, \citeauthor{lund1995}'s HAL was designed as a model of human memory, and actually applied to its empirical study.
+    Linguistics was mostly uninformed by this work, and computational linguistics in particular was, until then, mostly concerned with producing better parsers: \citeauthor{rohde2006}'s work is illustrative, as it shows that as late as \citeyear{rohde2006}, publications for the computational linguistics crowd still required a clarification of what HAL and LSA were as examples of ``a new vector-space method'' ten years later.
+
+    The fact that \citeauthor{sahlgren2006}'s \citeyear{sahlgren2006} dissertation in computer science became the canonical version of the state of the art and that \citeauthor{turney2010} saw the need to produce a more theoretically informed review geared towards linguists four years after its publication (not unlike the role that \citeauthor{evans2016}'s \citeyear{evans2016} review is now playing for sociology) are even clearer indication of this.
+    Hence, generalised confusion mostly from crossed talk between completely different communities of practice.
+
+    This did not help in the exercise of making sense of ``distributional semantics'' in order to use it as the basis for a general methodology in the social sciences.
+},  mostly restricted to domain-specific questions.
+
+In this context (and as the computational infrastructure started to allow for the comparison of the performance of dimensionality reduction models to the performance obtained from using the raw un-reduced version of either the term-term or term-document matrix), it started to become apparent that models suffering from the alleged information loss induced by dimensionality reduction (or compression in the form of a term-term matrix) actually produced \emph{better} results than full information models.
+In addition, the rather generalised confusion around (and proliferation of) different context definitions was further complicated by a similar realisation that more sophisticated (or theoretically informed) context definitions tended to produce \emph{worse} results.
+Both of these findings were more or less in direct contradiction with established notions from both linguistic and information theory.
+
+In consequence, and as late as 2013 the state of the art in distributional semantics can be summarised as: ``vector space models (kinda) work, but we have no idea why''.
+
+Then someone came along with the proverbial bigger boat.
+
+\subsection{$\term{king} - \term{queen} + \term{man} = \term{woman}$}
+
+It must be emphasised here that, up to the point covered by the review presented above, most empirical research on distributional semantics was carried out over delimited textual sources that are not particularly massive by the standards of the usual sources used for similar purposes in 2017\footnote{
+    This does not take into consideration the proprietary models that were most likely developed in opaque corporate or military environments, but those do not participate, because they are not published.
+}.
+The drive towards incremental models was partly motivated by the increasing interest of applying these models to the study of text from the internet (e.g. twitter \citep{deboom2015}), but the costs associated to this exercise meant that this was generally limited to one-off attempts and proof of concepts that failed to provide a unified view of how these models operate.
+
+It was around this time that Google began its transition from a search engine company to an artificial intelligence company\footnote{
+    This transition can said to have been complete in 2015, after Google's acquisition of DeepMind Technologies Ltd, a British company founded in 2010 that is credited with the development of what can be considered to be the first instance of ``general AI'', and with Sundar Pichai's appointment as Google's CEO \citep{hacket2016,mccracken2016}.
+    DeepMind was founded in 2010, and acquired by Google in 2014.
+    Pichai was appointed as Google's CEO in October 2015, the same month that DeepMind's AlphaGo became the first machine to defeat a human go player (which is a \emph{big deal} in AI).
+    On the other hand, IBM's Watson (which makes extensive use of vector-space based methods for its unstructured information heuristics) won the \emph{Jeopardy!} quiz game show for the first time in 2011.
+} and started applying neural networks to the challenges found in the development of its automatic language translation services, the first instance of a systematic application of neural networks to the study of unbounded textual sources\footnote{
+    Though the general idea of applying neural nets for semantic modelling had already been proposed as far back as 2008 \citep{collobert2008}.
+}.
+
+From these efforts, in \citeyear{mikolov2013} a team of engineers from Google's AI research division published a model that had been developed as a side effect of their work on automatic translation systems that they called ``word2vec'' \citep{mikolov2013,mikolov2013a} and that was fundamentally the result of taking the internal representation of terms in a neural network's intermediate layer and using it directly as a semantic vector representation.
+
+Unlike previous models that had been developed, tested and applied to issues of sense-disambiguation dominated by pair-wise similarity tasks, word2vec was capable of producing \emph{analogies}; i.e. given a relationship between a term pair and a third single term, the model was capable of producing a term that, when combined with the third term given, would produce \emph{a similar relation} to the one seen between the first two terms: given the tuple [\term{king},\term{queen}] and the query term \term{man}, word2vec would produce \term{woman} as a result.
+
+This basically changed \emph{everything}.
+
+Previous models were not capable of carrying out a similar exercise, and it has far-reaching implications.
+As I explained in the introduction, prior models were metric models, in that the norms and distances that they are equipped with happen to approximate some notion of semantic relatedness: words that are close to each other are more similar.
+As per the review above shows, we did not have an understanding of why this was the case but this operation is sufficient to construct pair-wise comparisons between words.
+Analogy reconstruction indicates the presence of \emph{additional} meaningful algebraic structures, which make it possible to exploit not merely the distance between words to approximate similarity, but the linear relationship between words induced by the \emph{geometry} of the model to approximate a word's sense.
+The implication here is that this allows for the application of the rest of the structures present in metric vector spaces not only as a mathematical exercise, but as means for recovering \emph{significant} associations between words\footnote{
+    In very simple terms: prior models have significant \emph{points} which yields significant distances, such that the only meaningful part of a vector between the two points is its magnitude, with its direction being an artefact of e.g. the SVD or the convolution of random index vectors.
+    Geometric models also endow the \emph{directions} in the resulting vector space with meaning, such that it has significant \emph{lines} and a significant \emph{orientation}.
+}.
+
+This is demonstrated more concretely by the actual operation that facilitates the production of \term{woman} as the correct response to the tuple-term pair  ([\term{king},\term{queen}],\term{man}): in \emph{geometric} vector spaces: $v_{woman} - v_{man} = v_{queen} - v_{king}$.
+I.e. the dimension traced across the semantic space in a geometric model between the location of the point corresponding to the term for \term{king} and the location of the point corresponding to the term for \term{queen}, represented as the difference between their associated vectors will be similar\footnote{
+    In the formal mathematical sense of ``parallel''.
+} to the dimension that can be traced between words that share a similar relationship between them as the relationship between \term{king} and \term{queen}, which is what is represented by the equation above.
+In fact, the same relationship will be observed between other vector pairs: [\term{father},\term{mother}], [\term{brother},\term{sister}], [\term{uncle},\term{aunt}].
+This has notorious implications for semantic modelling, as explained better by the following quote from \citet{pennington2014}:
+\begin{quote}
+    % TODO: single space in block quotes?
+    The similarity metrics used for nearest neighbour evaluations produce a single scalar that quantifies the relatedness of two words. This simplicity can be problematic since two given words almost always exhibit more intricate relationships than can be captured by a single number. For example, \term{man} may be regarded as similar to \term{woman} in that both words describe human beings; on the other hand, the two words are often considered opposites since \emph{they highlight a primary axis along which humans differ from one another}.
+
+    In order to capture in a quantitative way the nuance necessary to distinguish man from woman, it is necessary for a model to associate more than a single number to the word pair. A natural and simple candidate for an enlarged set of discriminative numbers is the vector difference between the two word vectors.
+\end{quote}
+No prior model was capable of producing comparable results.
+As it should be immediately apparent from consideration of the emphasised passage, this provides a direct, natural and immediate solution to the mapping problem, as I will discuss in the next section.
+
+In terms of prior work in the field, the relationship between word2vec and the disciplinary context described above can be shown by a simple metric: \citeauthor{mikolov2013}'s original paper describing word2vec cites exactly $0$ of the works discussed in the previous section.
+It wouldn't be until their second paper several months later \citep{mikolov2013a} that an effort to place word2vec in the context of prior work in the field would be attempted, but it is fair to say that the Google team had little if any familiarity with the state of the art in vector space construction (or at least they didn't consider it worth mentioning).
+As such, it is hard not to think that word2vec's discovery was fundamentally an accident: at some point someone at Google decided to peek into their translation service's neural net and play around with the values of its intermediate layers and discovered that the neural network actually understood English (or any language) much better than anticipated.
+Out of this came the alchemy that is word2vec.
+
+I call it alchemy because word2vec is honestly \emph{incomprehensible}, which is not surprising considering that neural nets are the epitome of what I have called ``empirical'' validation\footnote{
+    A more elegant name for the ``throw everything at the wall and see what sticks'' approach.
+}.
+Our current understanding of how these models operate came not from reading the papers describing them (which clarify how they were computed, procedurally, but offer little insight into what is actually going on), but from looking at its \emph{source code} and running it inside a debugger \citep{goldberg2014}.
+It wasn't until this exercise was carried out that a candidate explanation was produced\footnote{
+    The story of how \citeauthor{goldberg2014,levy2014} figured out how word2vec works is the reason why this dissertation seems obsessed with minute technical and computational detail:
+    I must doubt my own interpretation of the techniques discussed in this work, and the only way to ensure that any aspect of them that fails to be captured by my poor understanding of the world is not lost to more capable minds is to thoroughly document and explain every procedure involved.
+    This is also the reason why I decided to implement the methodologically relevant parts of the software used in this dissertation from scratch and make it available publicly under a free license (though my therapist would probably disagree with me).
+    This was the only way I could come up with to make positively sure I understood what I claimed to be doing.
+}.
+
+\citeauthor{goldberg2014}'s hypothesis about how word2vec works the way it does is based on recognising that the internal representation of terms that are produced as intermediate layers in a neural network trained to predict either the terms that will appear in the context of a given term, or the term that best matches a given context represented as a tuple of terms (i.e. the kind of operations that are necessary in order to implement bi-directional machine translation) will have a precise relationship to the values contained in the co-occurrence matrix: $X_{i,j} \sim f( v_{i} \cdot v_{j} ) + \alpha$, the inner product between the vectors for the two terms will approximate the value of (some function of) the $PMI$ between the two terms, plus a constant\footnote{
+    The $PMI$ value of $X$ and not the raw co-occurrence count value of $X$, accounting for disparities in word frequencies, etc.
+} \citep{levy2014}.
+Note that this endows the values \emph{of the inner product} that will be found in the resulting vector spaces with semantic properties beyond their association of semantic similarity to the distance that it induces, and it is through this mechanism that linear operations in these spaces magically produce semantically meaningful results, like analogy reconstruction.
+
+This provides the missing piece in order to make sense of prior models like HAL, and LSA: it turns out that the machinery of human languages is captured in surprising \emph{detail} in the values obtained from the computation of a co-occurrence matrix, such that what was previously considered to be an unfortunate information loss turned out to be a particularly efficient de-noising of the information contained in values of $X$.
+It just happens to be the case that the relationship between $X$ and $S$ is not linear if $X$ is considered to contain a ``distributional'' space, because it turns out that it is apparently, a quadratic bi-linear form of $S$ itself, which explains (1) why linear dimensionality reduction like the SVD generally fail to capture most details of $S$'s actual structure and (2) why it can be used to produce arbitrary approximations of $S$: it is in itself a ``distance'' matrix\footnote{
+    Another instance of a brilliant idea that seems obvious in hindsight.
+}.
+
+The consequence of having this knowledge, is that it allows for the exploration and development of new models outside the original word2vec; in particular, models in which their functional specification is separate from the procedure used to compute their value, something that is not possible when we use neural networks and that allows for the exploration of different computational approaches, in the knowledge that they will work to the extent that they minimise their divergence against the empirically derived $PMI$ values in $X$.
+This basically transforms word2vec's esoteric AI-informed alchemy into (something like) multi-variable regression.
+And we have \emph{many different ways} of solving the matrix factorisation problems that arise in this domain\footnote{
+    Which is why I also made this connection explicit in \autoref{chap:frame}, and why my interpretation of computational text analysis basically comes down to ``you are gonna need a bigger boat'': for the most part, it is correspondence analysis with thousands of categories, based on the factorisation of co-variance matrices with thousands of dimensions, there are no operations besides the ones that are necessary for that exercise, and the practical challenges associated to the exercise are merely the problems that arise when one scales those procedures a couple of orders of magnitude.
+}.
+
+\section{Operations over vector spaces}
+\label{sec:wspace_ops}
+
+The first and most widely used instance of a geometric model developed directly following this procedure and not as the side effect of training a neural network is GloVe: Global Vectors for Word Representation \citep{pennington2014}.
+
+In practical terms, the value of these models is a vector space: a collection of points in an euclidean space of arbitrary dimensionality that captures semantic information from the linear relationships that can be induced between the points that describe this space, each of which will be associated to a term from the lexicon in a corpus.
+The actual location of the points for each term in the lexicon in this vector space will correspond to a vector computed in such a way as to minimise the difference between the inner product of this vector with all other vectors, and the corresponding values in $X$, but there are several details to this process that imply references to additional entities\footnote{
+    More specifically, GLoVe at least produces not one but \emph{two} sets of vectors: ``word'' vectors and ``context'' vectors.
+    These correspond to the vector that represents a term as a member of other terms' context's and the vector that represents the term as a context for other terms (i.e. as the value of the $w$ and $c$ arguments to the function describing the moving windows context definition as presented in \autoref{sec:method}; remember that $w$ and $c$ were said to be interchangeable in that context, which implies that the vectors corresponding to each are also interchangeable. Further exploration of their relationship could reveal additional elements to this).
+    GloVe also includes a scalar bias for each word and context vector that is used to ensure the symmetry between $w$ and $c$.
+    All vectors in GloVe are unit vectors, such that the degrees of freedom for each of them is the dimensionality of the resulting vector space - 1: i.e. the resulting vector space is an hyper-dimensional n-sphere, a Riemannian manifold that can be immersed in euclidean space, etc.
+    In the original version of GloVe, there are a number of parameters to the procedure used for construction of the final vectors related to the shape of the moving windows and the weights used for incorporation of positional information, but since these are related to the computation of values of $X$, in my implementation they are removed from the model specification and implemented as parameters to the co-occurrence counting functions as part of the index module in the \code{wspaces} package.
+    Because of this, they affect all $X \rightarrow S$ projections including the construction of vector spaces and of semantic networks, in the hopes of offering a modicum of consistency and to reduce the parameter space of the resulting models.
+}.
+There are some additional complications related to the significance of the bases used to determine the actual value of the matrix representation of the space, and some additional considerations that need to be taken care of when trying to carry out operations between two different semantic spaces, but these are trivial compared to the similar challenges faced by semantic networks (i.e. we can dispense with membership lists and set-based operations).
+
+In consequence, the range of operations that are available for solutions to the mapping and alignment problem are linear operations: vector addition, scalar multiplication, inner products and most importantly, vector difference as a means to induce dimensions across the vector space from the positions of relevant terms.
+
+In terms of their dimensionality, GloVe is known to produce good results with as little as $50$ dimensions, and these tend to improve up to the $100-300$ range.
+Beyond this, there doesn't seem to be much benefit in using longer vectors, and this becomes counterproductive at some point, as the sparseness of the resulting space is associated, at least theoretically, to the ratio between the number of observations and the number of dimensions in the word vectors, but this relationship is not entirely clear\footnote{
+    To me, at least.
+    High dimensional spaces then to become very counter-intuitive with respect to our low-dimensional experience of the world.
+}.
+
+Also note that, given the way in which vector spaces are constructed, in which we lose all notion of a ``modality'' beyond the way this is captured in the values of $X$ (i.e. the now byzantine discussion about syntagmatic and paradigmatic \emph{contexts}) there is in principle no direct connection between different forms of semantic relatedness and the linear relationships between points in the vector spaces that could be produced from different similarities, as there are no similarities being computed\footnote{
+    Though it seems clear that different functional specifications of the function of the vectors' inner product that is used as an error function for factorisation may be used to emphasise different forms of relatedness, but (1) it is easier to produce different relatedness measures internally in a given vector space and (b) the lack of progress in understanding the role played by different contexts also applies here: we have a very rudimentary understanding of how grammar translates to different functional specifications (see \citeauthor{pennington2014}'s discussion of the derivation of their error function for additional details).
+}.
+However, given the significance of the geometry of the resulting space, different notions of relatedness may be constructed via the consideration of higher order relations between points: the analogy exercise can be used to observe paradigmatic relations.
+This requires an additional (theoretical) exercise of trying to come up with suitable analogies, but this belongs to the same class of problems that is associated to the definition of the elements in the $W \in L$ sets that are needed for the mapping functions in semantic networks as anchors for the definition of the $\sigma \in \Sigma$ that we take to represent theoretical concepts.
+In this sense it is strictly a theoretical issue, not a methodological issue.
+
+In some cases, however, this is rather straightforward: tracing a dimension across the semantic space from the difference in the location of $v_{woman}$ and $v_{man}$ can be reasonably expected to correspond to a ``gender'' dimension, but other socially relevant phenomena do not lend themselves to this exercise so easily\footnote{
+    At least to my own limited sociological imagination.
+}.
+In the end this turns into the kind of questions that were raised with regards to the uses of concept maps to induce qualitative associations, and are thus out of scope in the current discussion.
+However, vector spaces constructed following the proposed methodology offer an opportunity to explore these questions empirically, from the systematic exploration of the value of empirically grounded vector spaces.
+
+\subsection{Mapping}
+
+As per the discussion above, solutions to the mapping problem are readily available when dealing with metric vector space $X \rightarrow S$ projections, exploiting the linear structures that are contained in them.
+This yields basic means for characterisation of single terms from their location, and their direct association to other terms from the consideration of the points that are contained in their neighbourhood (i.e. the open sets that can be defined as n-spherical sub-spaces around them).
+
+This level of operation is available in all vector spaces, including LSA, HAL and random indexing models, as it relies on nothing more than distances, though in these models the relationship between the elements in the neighbourhood of a focal term carries no semantic information\footnote{
+    cfr. the structure that is present in the internal connections of a term's neighbourhood or containing community in a semantic network.
+}, beyond their distance to the focal point, which can be used to induce an ordering much in the same way as the distance of points to a cluster's centroid can be used as an indication of their eccentricity within the cluster.
+
+The significance of distances also works for aggregation of a given set of points: the groups of terms that are studied through structural features in semantic networks have thus a direct analogy in the neighbourhoods induced by semantic spaces, but unlike network features, no membership list comparison is necessary as the metric nature of these objects means that we can always establish a measure of association between sets of points from the distance between their centroids\footnote{
+    And associated measures like their radius, relative density, etc.
+}.
+
+This has computational advantages, since it allows for the solution of problems that would otherwise require the computation of a distance matrix (which we have already established to be prohibitive), through the kind of approaches that are available for solutions to the n-body problem, like the Barnes-Hut approximation \citep{pfalzner1996}.
+
+Things get interesting when we move beyond distance-based operations:
+The presence of additional geometric structures provides means for detaching the mapping of significant theoretical entities from the identity of terms via the direct generalisation of the centroid approach, but applied in combination to the mechanism that allows for the discovery of analogies.
+
+In brief, the example provided above about the connection between [\term{king},\term{queen}] and [\term{man},\term{woman}] relies on the computation of a vector difference between \term{king} and \term{queen} and between \term{man}\term{woman}.
+This works because the vector that connects the elements in each of these pairs can be interpreted to represent the relevant semantic dimension along which these terms differ: i.e. a ``gender'' dimension.
+This ``dimension'' is itself also a vector.
+This means that we can project other vectors over it in order to measure to what extent they incorporate this particular dimension into their meaning, and that we can reject vectors from it in order to remove the effect of this dimension from the vectors corresponding to other terms\footnote{
+    This exercise (minus the grandiose theoretical claims) has been applied to study the differences in student evaluations of teachers \citep{schmidt2016}.
+}.
+
+Combining both ideas yields a third level of operations: term vectors, neighbourhood clusters and dimensions across the vector space \emph{are all vectors themselves}, such that they can in turn be combined.
+This presents myriad possibilities for the construction of indicators for several distinct phenomena.
+For example, it becomes possible to accumulate vectors corresponding to a given semantic dimension in order to release the definition of this dimension from a specific set of words:
+Construct a tuple like [\term{king},\term{queen}], and use this analogy to \emph{search} for pairs of vectors that present a similar linear connection.
+Vectors across all found term-pairs can subsequently be combined into a gender dimension that incorporates the aspects of gender that are present in different contexts\footnote{
+    In the Searlean sense of the term $C$ in the formula for agentive functions $X \rightarrow Y | C$, not to be confused with either the $C$ used for designating corpus samples or the linguistic sense of context as vicinity in the token stream, generally indicated as $c$.
+}, beyond royalty, marriage, etc.
+
+Finally, the relationship between the pairs of terms that determine different analogies can in turn be combined, such that e.g. a measure of the connection between the gender dimension and some other relevant dimension can be constructed from the comparison of the analogy vectors themselves; i.e. if we had a convincing analogy for a ``power'' dimension, it would be possible to determine the extent to which this dimension ``aligns'' with the gender dimension, by looking at the angle between them, etc.
+
+The same mechanisms used to avoid direct dependence with specific terms are also available here: the same exercise can be carried out with dimensions constructed from vectors, dimensions between vectors, centroids of groups of vectors, etc.
+In the end this is all possible because vector spaces are closed groups under linear operations, which means that the result of any linear operation between two elements in the groups (i.e. vectors in the space) will yield an element of the group (i.e. another vector), which means that any combination of these operations will yield values that are also valid inputs for any of these operations.
+
+\subsection{Alignment}
+
+Unlike the simple and elegant solutions to the mapping problem presented by the linear structures present in vector spaces, their alignment is a bit more involved, as it is somewhat dependent on the properties of the process used for their construction.
+
+This is related to two mostly independent issues, which are determined by the properties of the functional transformation of $X$ that is involved in the determination of their value and that will impact the two general operations that we want any $X \rightarrow S$ projection to sustain: comparison along a longitudinal axis usually determined by time, and comparison between complementary corpus segments in order to asses the significance of some cross-sectional dimension of comparison, like the ones that were used in the experiments in \autoref{chap:pob}.
+
+\subsubsection{Basis alignment}
+
+The first issue is the problem of finding a common basis set for two independent vector spaces.
+Note that this problem only arises in \emph{absolute} comparisons, i.e. when the exercise requires determining the amount of movement experienced by a term (point) in the semantic space without reference to any other point.
+This is what is needed for e.g. the diachronic analysis of vector spaces in order to measure language use change \citep{hamilton2016}, but given the solutions to the mapping problem discussed above, it is not generally necessary when the measures of significance that can be constructed can be defined in relative terms (e.g. when the mapping of relevant entities proceeds along the strategy discussed for the comparative analysis of two dimensions of comparison like gender and power) as in this case the differences across the axis of comparison can be observed from the scalar value of some divergence measure (i.e. endogenously).
+Remember that in general we are dealing with normalised vectors, such that scale is usually not a concern\footnote{
+    Different algorithms for computation of vector spaces could, in principle introduce some variation on the magnitude of the vector spaces, just as numerical errors could accumulate to introduce some noise (this is related to a given matrix factorisation procedure's ``condition number'' \citep[ch. 1] {golub2012}), but this can be solved trivially by normalising the vectors to unit vectors: form an information theoretic point of view this removes one dimension from the available degrees of freedom, but the dimensions themselves are arbitrary: just add an extra dimension if this is a concern.
+}.
+
+Alignment in this sense is equivalent to finding a common basis set, by producing an orthogonal matrix $R$ that will most closely map the matrix for a vector space $A$ to the matrix for a vector space $B$.
+$A$ and $B$ in the context of my methodology correspond typically to the vector spaces that are induced from the values of $X$ derived from different corpus segments.
+The general version of this problem is known as the orthogonal Procrustes problem, and it is known that a solution to it can be obtained from the SVD of a matrix $M = A B^T$, $M = U \Sigma V^T$ to obtain a rotation matrix $R = U V^T$ \citep{schonemann1966}\footnote{
+    The mathematical problem is known as the orthogonal Procrustes problem.
+    The solution proposed by \citeauthor{schonemann1966} is known as the ``generalised solution''.
+    The standard implementation of this solution as a computational procedure is known as ``Kabsch's algorithm''.
+    The version of the problem using weighted vectors is known as ``Wahba's problem''.
+    The application of these techniques in statistical analysis is known as ``shape analysis''.
+    Care must be taken not to confuse the procedure for alignment of two matrices, relevant in this context, with the more general procedure of aligning an arbitrary number of matrices, which is generally not distinguished in the statistical literature.
+    It must also be noted that we do not have any need for the scaling and translation components usually included in applications.
+    Procrustes analysis writ large has had widespread application in the comparison of e.g. molecular structures.
+    This last bit should also be taken in consideration when attempting to look for sources in the available literature.
+}.
+
+\subsubsection{Additive composability}
+
+The second problem has to do with the relationship that exists between the values of $X$ derived from different corpus segments and how this relationship is preserved in the values of $S$ derived from them \emph{after} the functional transformation that is used to compute them.
+This introduces an important consideration that distinguishes different strategies for semantic vector construction.
+
+The issue is whether the resulting vector spaces are ``additively composable'' \citep{shorrocks1980}, i.e. whether the addition of the vector spaces derived from two complementary samples of the corpus will be equal to a vector space computed from their union, e.g. $S( X(C_{violence}) ) + S( X(\sim C_{violence}) ) = S( X(C_{violence} \cup \sim C_{violence}) )$.
+
+This is obviously dependent in the first place on the value of $X$ being additively composable, which depends on the function used for its weighting (the $PMI$ usually is not but it can be coerced to be), but after this, it depends on the strategy used for computing the value of $X \rightarrow S$.
+SVD-based methods generally do not have this property.
+Random indexing based methods, consisting in the accumulation of random vectors, do have it, as long as the random vectors used for indexing come from the same source.
+Determining whether word2vec and other methods inspired by neural networks (or predictive modelling in general) have it would require a more thorough understanding of neural networks, but my inclination would be to say that they most certainly do not.
+GloVe and all methods depending on inner product factorisation do have it at least in theory, because the inner product is associative under addition such that the results will be composable as long as the error function used in the factorisation does not include any operations that are not associative under addition.
+The pervasive use of logarithms in these functions would indicate that this is not the case.
+
+The advantage of having additively composable vector spaces is given because this allows for the construction of complementary samples directly from the inversion of the operation (which is, incidentally, the rationale provided by \citeauthor{shorrocks1980} in the original formulation of the idea): i.e. we do not need to compute and store a vector space for $X(\sim C_{testimony})$ as this can always be obtained from subtracting $X(C_{testimony})$ from the vector space corresponding to the full corpus.
+Likewise, the vector space for the full corpus can in turn be constructed from the addition of all partial vector spaces, etc.
+
+This makes two operations possible:
+First, it provides an internal measure of numerical validation that can be used to assess the impact of numerical errors, from the comparison between the fully computed vector spaces for different samples and the results that can be obtained from subtraction of partial samples from the global sample\footnote{
+    Each floating point operation (``flop'') outside addition has some error.
+    Computing the value of $S$ from a value of $X$ using the GloVe model requires computing an inner product between the vector for each term and the vector for all the terms with which it co-occurs, for both the word vector and the context vector, as well as a loss function and, in the usual gradient-descent method used for factorisation, a gradient.
+    This is equal to $|L|*|C|*D*E*4$ flops, where $L$ is the lexicon, $C$ is the set of all non-zero entries in $X$, $D$ is the dimension of the resulting vectors, $E$ is the number of iterations (at least 25, usually more like 100, and in industrial applications, whatever money and time can permit) and four comes from the word vector, the context vector, the loss function and the gradient.
+    For the POB, with the money and time usually available for doctoral research, this is around $3.9Gflops$.
+    Hence, numerical errors are a concern.
+    Computing a value of $S$ from the addition between two partial values of $S$ requires merely $L*D$ operations, and these are all additions, which in most modern platforms are exact (i.e. they have no error when done using IEEE floating point numbers).
+    Thus, comparing both values can be used to determine the impact of numerical errors in the full computation (the bounds for which are given by the condition number, \citep[op. cit.]{golub2012}).
+}.
+
+Second, and more interestingly, it provides some space around the formidable data requirements of vector spaces, particularly for longitudinal comparisons.
+This is better explained concretely: the $127,000,000$ words in the corpus are more or less at the lower regions of the amounts of data that are necessary to produce meaningful word spaces.
+This means that a value of $S$ for the full corpus is actually capable of capturing meaningful patterns, but the same can not be said with so much confidence about the partial corpus partitions that we would need in order to produce fully focused pictures of the state of affairs for fine grained comparisons (i.e. we can still use these partitions to construct aggregate measures of divergence like for example the level to which the space is organised along a dimension, as discussed below).
+However, if the word spaces are additively composable, we can treat each corpus partition as if they were sub-spaces of the global space.
+In short, this means that we can treat them in precisely the same way as we treat any other linear structure, like the ones we use for solution of the mapping problem.
+This means that we don't need to construct a full vector space to look at the effect of change across different years, for example, for which we would need to have an amount of text similar to the full POB token stream \emph{for each of the 240 years}, we can basically construct the ``vector'' corresponding to say, 1894 and deal with it in the same way as we deal with the vector for [\term{man},\term{woman}], etc.
+This is not generally possible with other model specifications\footnote{
+    Unless one were to produce some mapping between the results obtained from different values in non-additive models.
+    I do not know this to be possible, and my understanding of stochastic methods of matrix factorisation lead me to believe that this is not the case, but this issue is beyond the things over which I feel qualified to offer a definitive opinion.
+}, and most importantly for the discussion in this dissertation, definitely not possible to do with any specification of semantic networks\footnote{
+    Except maybe ones that are induced as k-nearest neighbour graphs (see \autoref{foot:knn_graphs} in the previous chapter), but even in this case it is not clear that the resulting graphs can be simply added to yield a graph that would be equivalent to the one induced from the addition of the spaces in which their modality is determined.
+    Note that this would require settling on a notion of graph addition; this is not so straightforward.
+}.
+
+\section{The vector space projection of the POB corpus}
+
+I can illustrate some of the operations discussed above using the vector space projection of the entire POB corpus.
+The results reported in this section have been produced using the same rules as the results in previous chapters for construction of the lexicon, using $C_{testimony}$ as corpus sample, but with no lexical sampling.
+The vector space itself was computed using the GloVe algorithm with $256$ dimensions\footnote{
+    This is mandated by computational considerations: $256$ is a power of $2$, which means that the vectors will be aligned in memory, greatly reducing the costs associated to memory traffic.
+    Using larger vectors in powers of $2$ was always faster than using shorter but unaligned vectors (this was tested up to $1024$ dimensions).
+    Note that this is very specific to the hardware architecture used in all computations.
+}; the final term vectors correspond to the normalised addition of the two vectors produced by the model: the ``context'' vector and the ``word'' vector.
+
+\autoref{fig:glove_tsne} presents a projection of the resulting vector space using stochastic neighbour embeddings, a non-linear dimensionality reduction technique that is designed to emphasise local structure\footnote{
+    Unlike semantic networks, vector spaces are much harder to appreciate in full given the challenges presented by high dimensional spaces for, among other things, visualisation.
+    There are fundamentally two approaches to dimensionality reduction at this point: linear techniques like PCA or simple projection, and non-linear techniques, of which t-SNE has become the standard approach.
+}.
+In order to better appreciate the general structure of the resulting vector space, I have only plotted terms that are also contained in the direct-co-occurrence network reported in the previous chapter, using the communities detected by the Louvain algorithm to colour the terms.
+Hopefully this offers some insight into the relationship between the two projections.
+It is clear that some of the structure captured by the semantic network projection is captured in similar ways by the vector space projection, but not all.
+It is also worth noting that the extent to which semantic networks communities are located in compact regions of the vector space is not evenly distributed across all clusters.
+
+\begin{figure}
+    \centerfloat
+    \input{figures/c4_glove_tsne}
+    \caption[t-SNE reduction of the vector space for the POB]{
+        t-SNE reduction of the vector space for the full POB showing terms present in the direct co-occurrence network.
+        Colours indicate community membership in the semantic network as in \autoref{fig:global_ppmi}, size indicates the term's $\varphi_{v \rightarrow k}$ score.
+    }
+    \label{fig:glove_tsne}
+\end{figure}
+
+The centroid approach discussed above as the basic strategy for characterisation of a term's location in the vector space for all metric spaces is illustrated in \autoref{fig:glove_nns}, the neighbourhood for \term{prisoner} and \term{prosecutor}.
+This also offers a picture of the counter-intuitive nature of high dimensional spaces: \term{prisoner} and \term{prosecutor} are surprisingly very close to each other in the vector space, yet the projection of their local neighbourhood in two dimensions shows very different structure.
+Note that this is partially an artefact of the dimensionality reduction used for visualisation, but both linear and non-linear dimensionality reduction techniques produce similar differences.
+
+\begin{figure}
+    \centerfloat
+    \input{figures/c4_glove_nns}
+    \caption[Vector space neighbourhoods for \term{prisoner} and \term{prosecutor}]{
+        Vector space neighbourhoods for \term{prisoner} and \term{prosecutor}.
+    }
+    \label{fig:glove_nns}
+\end{figure}
+
+Finally, the techniques discussed above with regards to the tracing of dimensions across the space is illustrated in \autoref{fig:glove_axes}.
+This is the exercise that I'm proposing as the basic strategy for constructing $S \rightarrow \sigma \in \Sigma$ mappings, as it is (1) entirely endogenous and (2) not dependent on the absolute location of each term in the vector space.
+More concretely, the image in the figure was constructed by tracing two axes across the vector space from the locations of terms that we can expect to be associated to sociologically relevant dimensions.
+In this case I defined a first axis using the vector difference between $v_{man}$ and $v_{woman}$, i.e. a vector pointing to the location of \term{man} from the location of \term{woman} and a second axis using the vector difference between $v_{lord}$ and $v_{servant}$, i.e. a vector pointing to the location of \term{lord} from the location of \term{servant}, and then projecting all other vectors over these two in order to obtain the extent to which other terms fall along these two ``dimensions''.
+Formally, the geometric interpretation of this exercise is that it is equivalent to projecting the high-dimensional vector space onto a two-dimensional plane spanned by the the two axes defined above.
+
+\begin{figure}
+    \centerfloat
+    \input{figures/c4_glove_axes}
+    \caption[Projection over the plane spanned by $v_{woman} \rightarrow v_{man}$ and $v_{servant} \rightarrow v_{lord}$]{
+        Projection over the plane spanned by $v_{woman} \rightarrow v_{man}$ and $v_{servant} \rightarrow v_{lord}$
+    }
+    \label{fig:glove_axes}
+\end{figure}
+
+For the sake of exposition, we'll call the horizontal axis ``gender'', defining a ``male'' region of the vector space to the right and a ``female'' region of the vector space to the left, and the vertical axis ``status'', defining a ``low-status'' region towards the bottom and a ``high-status'' region towards the top.
+The results are more or less what one could expect: \term{daughter}, \term{nurse}, \term{maid} occupy the low-status, feminised region of the vector space, while \term{boatswain} and \term{mate} tend to occupy the higher-status, masculinised region\footnote{
+    Mostly out of their use as military ranks, one would suppose.
+}.
+Note that the location of terms on both ``gender'' but specially ``status'' in this exercise are determined \emph{exclusively} by how the terms were used by speakers in the POB.
+Also note that the figure offers an additional insight into the \emph{content} of the POB: the vector space is heavily biased towards the low-status, male region; this is not surprising considering what we are looking at: many more porters, warehouse-men and other working men in need of employment appeared at the Old Bailey than, say, princesses.
+
+This bias can easily be quantified from the centroid of the point cloud resulting from the projection of the vector space spanned by the two axes: the full POB has a $0.4227$ bias on the ``gender'' axis and a $-0.2397$ on the ``status'' axis.
+This number is entirely endogenous, does not depend on the directionality of the vector space bases and can thus be used as the basis for a comparison between different vector spaces even without having to carry out the operations discussed for vector space alignment.
+These are necessary, though, if the dimensions themselves were to be validated, etc.
+
+\subsection{Alignment of diachronic vector spaces}
+
+For demonstration of solutions to the alignment problem, I trained a series of $20$ diachronic vector spaces, each of them covering a period of $24$ years, with their centres set $12$ years apart from each other starting from the end of the series in $1913$ and working backwards to the first epoch, which ends up being centred on $1683$.
+This results in $20$ overlapping epochs, such that each point in time is covered by two epochs, with its mass distributed on the two epochs such that more of it will be assigned to the epochs with centres closest to it.
+This results in a linear progression of year-weights such that at one extreme, time points falling on the same year as an epoch's centre will contribute all of their mass to that epoch, while time points falling squarely in between two epochs' centres will have their mass split evenly among the two epochs.
+
+As suggested in the previous section, \emph{geometric} vector spaces that are endowed with semantically significant orientations facilitate a strategy for ``endogenous'' alignment, using the dimensions traced across them as axes for comparison.
+\autoref{fig:glove_epochs_endo} shows the displacement of the centroid corresponding to each epoch in the diachronic vector space over the plane spanned by the two axes discussed in the illustration of the mapping problem: a ``gender'' axis and a ``status'' axis.
+
+\begin{figure}
+    \centerfloat
+    \input{figures/c4_epochs_endo}
+    \caption[Path of the centroid of the word space across 20 time periods]{
+        Path traced by the centroid of a diachronic word space built from 20 time periods over the plane spanned by $v_{woman} \rightarrow v_{man}$ and  $v_{servant} \rightarrow v_{lord}$
+    }
+    \label{fig:glove_epochs_endo}
+\end{figure}
+
+From a purely methodological point of view, \autoref{fig:glove_epochs_endo} illustrates two of the operations discussed above:
+First, it illustrates the third operation mentioned in discussion of solutions to the mapping problem: all structures in a vector space are vectors themselves, such that the centroids of epochal vector spaces may be manipulated using the exact same operations that are used to manipulate term vectors:
+This plot is analytically equivalent to the one in \autoref{fig:glove_axes}, but with epochs instead of terms.
+Second, it illustrates the endogenous alignment strategy that does not require the derivation of a common basis set, as the axes over which we are anchoring the epoch vector spaces are induced directly from the value of the vector spaces themselves.
+Note, however, that in this exercise we are throwing away a lot of the information contained in the vector space, as all dimensions of meaning outside whatever semantic dimension is being captured by the axes used to define the plane over which we are tracing the centroid's displacement are simply discarded\footnote{
+    Note that this is, at best, equal to the information loss induced by linear dimensionality reduction techniques like principal component extraction.
+}.
+
+From a more substantive point of view, this figure reveals an interesting characteristic of the bias detected in the previous section: contrary to expectation, the bias present in the global vector space is larger than the one that can be observed for any partial vector space.
+This suggests two things:
+First, semantic features like these biases do seem to enjoy a modicum of consistency and are not simply artefacts of the computation strategies used to produce a value of a vector space $X \rightarrow S$ projection, as the direction of bias is more or less the same for all 20epochs, save for the earliest ones that correspond to a time period that does not include reliable or sufficient witness testimony.
+Second, the extent to which semantic features like the gender and status biases are reflected in a vector space $X \rightarrow S$ projection seems to be dependent on the number of observations available for their construction.
+If the vector spaces in question had been computed via one of the incremental algorithms that update a term's vector value each time it is seen in a corpus, starting from randomized positions, this association between the strength of semantic features like the gender-status bias would be expected and considered an artefact of the computation strategy.
+But it is somewhat surprising to observe the same association in the case of vector spaces built via non-incremental methods, like the matirx factorization by gradient descent used by GloVe.
+
+The strategy illustrated above has two main limitations.
+First, it works only for relative comparisons based on the strength with which some endogenous semantic feature is represented in the different vector spaces being compared.
+In the example above, the semantic feature is the bias along two semantic dimensions, which assumes that the dimensions themselves are more or less stable but offers no insight into possible variations affecting the dimensions themselves or the terms used to define them.
+Second, it is only available in vector spaces that have semantically meaningful dimensions, which we have called ``geometric'' vector spaces.
+Since the dimensions traced across a vector space lacking semantically significant orientations will be artefacts of their computation strategy, any comparison that is based on the construction of higher-order linear structures (like the lines used to define dimensions) will not be available in non-geometric vector spaces.
+
+As discussed in \autoref{sec:wspace_ops}, an absolute comparison of vector spaces requires the production of a common basis set for the vector spaces being compared.
+This is required if one wants to avoid the assumption of stability that underlies the strategy of using endogenous features as anchors for a relative comparison or if one would like to have some means of validating these anchors by measuring their absolute change across vector spaces.
+It is also necesary if the vector spaces under comparison are not geometric and lack the algebras that enable constuction of higher-order features that can be used as bases for comparison, as in the previous example.
+
+As stated above, this can be accomplished using the generalized solution to the orthogonal Procrustes problem.
+In order to align all 20 diachronic vector spaces, we work sequentially starting with the vector space corresponding to the latest epoch centred on 1913 as base, and then aligning each preceding vector space to the previously aligned one: 1901 is aligned to 1913, 1889 is aligned to the aligned vector space for 1901, 1877 is aligned to the aligned vector space for 1889, and so on.
+
+This procedure ensures that the locations of terms across the vector spaces corresponding to adjacent epochs can be compared directly, the distance between the location of a term in the prior epoch and its location in the following one being indicative of changes in the usage patterns for that term across the two epochs.
+Unlike projection over endogenous axes, this comparison does not suffer from the limitations mentioned above: different locations can be compared directly in absolute terms, without reference to any other elements of the vector space, and this comparison does not require the vector spaces to be endowed with any structure beyond the ones present in metric vector spaces (i.e. meaningful pair-wise distances); this procedure has been applied to study language change using e.g. LSA-style vector spaces derived by linear dimensionality reduction techniques \citep[, op. cit.]{hamilton2016}.
+
+\autoref{fig:glove_epochs_proc} has been constructed in this way to show the displacement of the four terms used to define the endogenous axes discussed above across the 20 epochs covered by our diachronic vector spaces.
+The locations of the focal terms are obtained from their vectors in each of the 20 epochs after alignment, while the other terms in the figure correspond to all the terms that have been included in the set of 30 nearest neighoburs of the focal terms at any of the 20 epochs, according to their locations in the most recent epoch, centred in 1913.
+This means that in the figure, the locations of the neaighbours of each focal term is held constant at their most recent locations, while the location of the focal term is allowed to change according to the trajectory it traces across the 20 time periods.
+The projection onto 2 dimensions of the vector space is done by tSNE reduction.
+
+\begin{figure}
+    \centerfloat
+    \input{figures/c4_epochs_proc}
+    \caption[Displacement of terms in aligned word spaces across 20 time periods]{
+        Displacement of terms across the semantic space illustrated by orthogonal Procrustes alignment of a diachronic word space with 20 time periods.
+        Non-focal terms are fixed to their locations in the final (most recent) time period.
+    }
+    \label{fig:glove_epochs_proc}
+\end{figure}
+
+As it is clear from the figure, everything seems to indicate that the assumption of stability that is implied in the use of endogenous axes for the alignment of epoch vector spaces is rather bold, as the locations of the terms used to anchor the axes we used to define the ``gender'' and ``status'' dimensions clearly show a lot of variation across different moments in the period covered by the POB.
+However, it is not so easy to determine the significance of this variations.
+On the one hand, there seems to be no discernible pattern in the movement of the terms across time, which is indicative of random noise in whatever displacement we obtain from this exercise.
+On the other, it is very hard to tell wether the observed displacement actually corresponds to such dramatic changes in meaning, because the plotting procedure offers no reference to scale, so we don't know how large the region covered by the union of neighbours is compared to the rest of the vector space.
+Without additional validation, it is hard to offer an interpretation of the results of this exercise, but it does offer an illustration of the procedure that can be used to produce a set of compatible basis for alignment of vector spaces wihtout additional algebraic structures and without any endogenous anchor structure.
+
+\section{Summary}
+
+This chapter has discussed the other general strategy available for constructing $X \rightarrow S$ projections: metric vector spaces based projections that we call semantic vector spaces.
+
+Theoretically, semantic vector spaces work by producing a lower-dimensional representation of an hypothetical semantic space of unknown structure in a way in which the algebraic structures in the resulting vector space acquire semantic characteristics.
+The most basic models manage to endow the norms and distances in the vector spaces with semantic meaning, such that the distance between the locations of the terms in the high-dimensional space will encode the pair-wise similarity between them.
+More advanced models also endow the inner product in these vector spaces with semantic meaning, such that the geometric relationships between the vectors in the space capture additional forms of semantic relatedness between terms.
+
+Mathematically, vector spaces are metric and geometric topological spaces, which determines the range of solutions available for the mapping and alignment problems: linear operations that revolve around the manipulation of pair-wise distances and the construction of higher-order structures like dimensions, planes, etc.
+This also means that vector spaces depend on some additional assumptions about natural human languages beyond the distributional hypothesis: namely, the geometric metaphor that postulates that meaning can be organised along dimensions.
+
+Solutions to the methodological problems based on linear operations means that in the manipulation and analysis of vector spaces we are using linear-algebraic operations, based on geometric similarity and divergence measures.
+Membership lists and set-based operations are not needed in the analysis of vector spaces, which makes the operations involved much simpler and elegant than similar operations in the context of semantic networks.
+
+An additional advantage of vector spaces given by their linear nature, is that in general they make it possible to dispense with the identity of terms, as most second-order units of analysis can be reduced to geometric patterns defined in purely endogenous ways.
+On the one hand, this reduces the importance of lexical overlap between different corpus segments, but given the formidable data requirements of vector space construction, the granularity with which corpus partitions can be defined is severely limited.
+Using vector spaces constructed with additively composable procedures may offer a way around this, as they would allow the treatment of different corpus samples in similar terms as the second order units of analysis that are produced via solutions the mapping problem.
+Random indexing based procedures, based on the accumulation of random vectors, are by definition additively composable, as they don't depend on nothing by simple co-occurrence counts (they don't even use the PMI normalisation), but these models do not have geometric properties.
+GloVe and other inner-product based procedures do not currently have this feature as their reliance on the PMI and the error functions used for the factorisation process are not, in general, associative under addition, but it seems entirely reasonable to expect the development of techniques with this property to be more or less straightforward.
+
+Different forms of semantic relatedness are not captured by vector space models in their ``modality'' in any meaningful sense, as (1) no similarity measures are used in their \emph{construction} and (2) they enable more sophisticated relations to be constructed internally from their value.
+Our primary interest in paradigmatic relationships means that in the analysis of vector spaces, we are generally more interested in the geometric relations that can be established between the locations of terms in the vector space.
+This makes geometric models much more interesting for our purposes, though there are ways of querying non-geometric semantic vector spaces that could offer additional avenues for this\footnote{
+    See \autoref{foot:knn_graphs} in \autoref{chap:semnet}.
+}
+
+I have demonstrated some of the operations available for solution to the mapping problem in vector spaces with a projection of the full POB corpus constructed with the GloVe procedure.
+This offered an illustration of the relationship between the structure induced by vector spaces, and the structure induced by semantic networks; it is clear that this connection is more storied than what can be appreciated with the results presented above, indicating an area where work is needed in order to fully understand how the two strategies are related\footnote{
+    \emph{Hic sunt dracones}, etc.
+}
+
+From a broader point of view, vector spaces present several advantages:
+First, they are capable of coping with the entire lexicon and are generally invariant over corpus sizes: the complexity of a vector space scales linearly on the lexicon size, and is invariant over corpus size (token stream length), beyond the costs associated to the production of $X$ for longer token streams.
+Second, they are endowed with very simple, elegant and powerful structures that facilitate their analysis enormously in comparison to semantic networks, particularly from a computational point of view, lending themselves readily to exploratory analysis.
+Third, unlike semantic networks, and as far as I have been able to observe, semantic vector spaces do not suffer from the robustness problems found when dealing with semantic networks.
+There are clearly some issues relating suitable choices for the hyper-parameters in the models and these are generally poorly understood, but unless we are in the business of producing better results in the performance of concrete linguistic tasks, the levels of variation observed across different models is more or less acceptable; dimensions traced across vector spaces produced from different parameter specifications will tend to be more or less the same.
+
+They do present one major limitation that is not easy to overcome:
+They require formidable amounts of textual data, severely limiting their potential for the production of fine-grained pictures of states of affairs following the same strategy as in the case of semantic networks (i.e. producing values of $X$ for different corpus segments).
+Using them for these purposes would require the development of a different strategy in order to construct comparisons at the same level of granularity as the one that can be obtained when using semantic network projections.
+
+Finally, we can point out that the main feature of semantic vector spaces is that they facilitate an style of analysis characterised by structures and operations from continuous mathematics, dominated by linear problems.

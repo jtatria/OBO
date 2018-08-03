@@ -1,0 +1,23 @@
+%%% Page layout
+% Set margin to 1.5 inches on left and right, required by GSAS style guidelines.
+\setlrmarginsandblock{1.5in}{1.5in}{*}
+% Set margin to 1 inches on top and bottom, required by GSAS style guidelines.
+\setulmarginsandblock{1in}{1in}{*}
+% Apply memoir's layout fixes.
+\checkandfixthelayout
+
+% Double spacing for main text, required by GSAS style guidelines.
+\DoubleSpacing
+
+% Epigraphs.
+\epigraphfontsize{\small\itshape}
+\setlength\epigraphwidth{8cm}
+\setlength\epigraphrule{0pt}
+
+% Additional spacing between footnotes, required by GSAS style guidelines.
+\setlength{\footnotesep}{1.2\onelineskip}
+
+\def\CPP{{C\nolinebreak[4]\hspace{-.05em}\raisebox{.4ex}{\tiny\textbf ++}}}
+\def\R{\textbf{\textsf{R}}}
+\newcommand\term[1]{\texttt{#1}}
+\newcommand\code[1]{\texttt{#1}}

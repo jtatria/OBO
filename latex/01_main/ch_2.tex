@@ -1,0 +1,574 @@
+\chapter{Data}
+\label{chap:pob}
+
+\epigraph{
+    ``\textsc{Edward Rogers Faning} was indicted for stealing, on the 18th of December, at St. Andrew, Holborn, 2 coats, value 4l. 16s.; 2 shawls, value 15s., and 1 waistcoat, value 15s., the goods of Edward Faning, in his dwelling-house; to which he pleaded \textsc{Guilty - Death}. Aged 19.''
+}{
+    ---\textup{Trial record t18320105-8, January 5th, 1832.}
+}
+
+\epigraph{
+    ``\textsc{Francis Russel}, a Boy of about 8 years of Age, was Indicted for picking eleven Guineas, and seven shillings in silver out of a Gentlewoman's Pocket near St. Dunstans Church. Convicted of the same by his own Confession. \textsc{Death. See summary}.''
+}{
+    --- \textup{Trial record t16810520-6, May 20th, 1681.}
+}
+
+The previous chapter presented the theoretical and methodological bases of the approach presented in this dissertation for the application of computational text analysis to the study of material social facts.
+But a methodological strategy also establishes a specific relationship to the primary data sources it may be applied to, in two relevant senses: it imposes some constraints over the choice of primary data that will best serve its objectives, and it faces some constraints over the available modelling choices from the general characteristics of the data.
+
+This chapter addresses both questions, with particular emphasis on the second: the general characteristics of linguistic corpora data, the challenges it presents to the analysis, and the preliminary results that can be obtained from exploratory analysis of a suitable corpus in order to establish some notion of its superficial characteristics as a baseline for later comparisons.
+
+Through the exposition, I will demonstrate concretely many of the operations discussed in abstract in the previous chapter, up to the construction of the co-occurrence matrix, $X$.
+The projection of $X$ into different versions of $S$ which forms the core of the proposed analytic strategy will be presented in the following two chapters.
+
+\section{Narrative horizons}
+\label{sec:narhorizons}
+
+The discussion so far has centred on the general requirements of the proposed analytical strategy in terms of (1) a theory of text as material artefact; (2) the relationship between text and social facts that allows for its utilisation as a data source about non-discursive phenomena and (3) the emphasis imposed by this relationship on the issues that dominate the process by which agentive functions are actualised in language ---related mostly to paradigmatic semantic relations of complementarity--- rather than on the topical issues that dominate the study of discursive phenomena ---related mostly to syntagmatic semantic relationships of direct co-occurrence.
+
+In addition to these analytical requirements, the proposed approach also indicates the \emph{type} of textual sources that would best serve its objectives.
+In brief, even though the actual methodology presented in this work is applicable to any kind of text, not every textual source will be equally useful for the general objective of studying changes in material social processes; that is, some sources will bear a closer relationship to \emph{social practices} per opposition to discursive action than others.
+
+The fundamental dimension along which variations in different textual sources will determine their degree of usefulness for the purposes of the proposed approach is given by the degree to which they incorporate a narrative in the process by which the social practices that surround their production determine their content.
+In \citeauthor{danto1985}'s terms, we can think of this feature of socially produced text (i.e. all text) in terms of the distance that separates whatever account of the social world is contained in a given textual artefact from the account that we could reasonably expect to make up his ``ideal chronicle''.
+
+I will refer to this as a text's \emph{narrative horizon}, in order to highlight the theoretical origins of the idea.
+
+In a sense, by ``narrative horizon'' I fundamentally refer to the extent to which the content of a given source consists of an strategic use of language as discourse per opposition to a factual description of social practices.
+Evidently, this distinction is not easy to establish on a clear formal basis ---though it should be intuitive enough to understand what I mean--- but a decent heuristic criterion is given by a simple question:
+The extent to which knowledge about the identity of a text's author is necessary for its proper understanding.
+
+Brushing aside a large discussion around whether any text can be properly understood without knowledge about its author, the above heuristic criterion generally determines that we will be more interested in textual sources that are produced as a by-product of social practices, rather than as a social action in itself.
+In other words, and following with the idea of an archaeology of text introduced in the previous chapter, we are generally more interested in the textual ``remains'' of social facts, and generally not in text the production of which is in itself a form of social action because of their strategic discursive function.
+Legal documents, administrative records, commercial ledgers and travel logs, medical records, and in general any text that seeks to document an occurrence (particularly if it is of an institutional nature) are considered to have a ``short'' narrative horizon and are generally more interesting than personal letters, speeches, epistles, opinion pieces, and in general any text that seeks to communicate a determined point of view, however indirectly, which I consider to have a ``long'' narrative horizon.
+This is of course only a conceptual distinction, as no text can be properly disentangled from the personal characteristics of its author, just as we should consider all text to be ``socially produced'': however short a given text's narrative horizon may be, it still has \emph{some} extension.
+But it works as an intuitive notion of the criteria that will determine the type of sources that will be most useful for the type of analysis presented in this work.
+
+I will encapsulate this discussion under the conceptual label of ``narrative horizon'', and assert that the objectives pursued by this approach will be best served by sources that have a shorter narrative horizon.
+
+In addition to this theoretically mandated criterion, there is an additional practical criterion, necessitated by the more specific objective of using the techniques presented in this work for the construction of pictures of states of affairs:
+The textual sources should provide a sufficiently detailed description covering a sufficiently long period of time.
+Sufficiently detailed, because we need the corpus to be capable of sustaining time-wise partitions with enough observations (i.e. word length) to produce ``fully focused'' pictures of the state of affairs at different points in time, i.e. we need to avoid ``running out of degrees of freedom'' as this would be called in traditional statistical analysis\footnote{
+    \label{foot:freedom}
+    The perceptive reader will have noticed by now that the proposed approach, based on the analysis of co-occurrence matrices of dimensionality equal to the cardinality of the lexicon set squared, has \emph{many} degrees of freedom, particularly since, as explained in \autoref{subsec:proj}, the basic exercise is analytically similar to the factorisation of correlation matrices.
+    I.e. we need text of word lengths in the order of millions.
+}.
+Sufficiently long, because the type of processes that we are mainly interested in are slow-moving, profound yet subtle transformations, the effects of which will only become apparent when observed across long stretches of time (i.e. centuries).
+
+With these considerations, we can say that the ideal source of textual data will be given by a continuous archive of institutional, ideally bureaucratic text produced primarily as detailed documentation of a definite population of more or less stable and comparable social facts across a couple of centuries.
+
+\section{The Proceedings of the Old Bailey}
+\label{sec:pobtrends}
+
+\blockquote{
+    \label{quot:newgate}
+    News from Newgate: \textsc{or}, An Exact and true Accompt of the most Remarkable, \textsc{tryals of} Several Notorious Malefactors: At the Gaol delivery of Newgate, holden for the \textsc{city} of \textsc{London}, and \textsc{county} of \textsc{Middlsex}.
+    In the Old Baily, on Wednesday and Thursday the 29th and 30th of April, and on Friday and Saturday the 1st. and 2d. of May, 1674.
+}
+
+These are the opening words of the oldest surviving issue of \emph{The Proceedings of the Old Bailey} (POB), a serialised publication of accounts of the criminal trials seen by the Central Criminal Court of the counties of Middlesex and London, published continuously with few interruptions between the late sixteenth century and April 4th, 1913.
+The POB started out as a form of printed written entertainment, inexpensively priced and targeted to a popular audience as part of the explosion of popular criminal literature in England in the 1670s\footnote{
+    \label{foot:ona}
+    This includes a sister corpus to the POB: The Ordinary of Newgate's Accounts, documenting the biographies of criminals executed at Newgate prison.
+    Note that text in this collection has a much longer narrative horizon, as they are ``moral stories'' compiled by the chaplain (the ``ordinary'') of Newgate through interviews with those about to be executed.
+}.
+
+Early editions were fundamentally pamphlets containing a rather eclectic selection of the most notorious criminal trials, excluding many that \enquote{would be too tedious to insert}, owing to its commercial motivation.
+The earliest surviving issue dates from the court session of April 29th, 1674, but starting in 1678 issues were published for every session of the court, some ten per year, by several different publishers.
+In its origins, the POB had a sensationalist approach and were very selective about which trials were published in a summarised and highly edited version.
+The publication of trial proceedings was first regulated by the Court of Aldermen of the City in January 1679, requiring authorisation from the Lord Mayour and the other Justices of the court for publication.
+
+From 1712 on the POB started to include some verbatim witness testimony, mostly for trials that were thought to be particularly entertaining.
+Starting in the 1730s, the POB started to transform from popular entertainment to legal record of the proceedings of the court, possibly owing to its declining commercial viability.
+By 1778, the city demanded the POB should contain a \enquote{true, fair and perfect narrative} of all the trials, and increasingly became the de-facto official record of the court, even forming the basis of the Recorder's report to the King on which criminals should be pardoned.
+As a result, the length of the reports increased significantly and publication ceased to be commercially viable, requiring a subsidy for the first time in 1787.
+By this time publication had become targeted to a legal audience, and reports included an exhaustive account of every trial seen by the court, including more or less full transcriptions of the spoken words of witnesses, prosecutors, defendants and justices.
+
+The Central Criminal Court Act of 1834 changed the name of the court and expanded its jurisdiction to the whole of England.
+Accordingly, the title of the POB changed to the Central Criminal Court Sessions Papers, and it became a publicly funded publication for the use of court officials.
+From 1905 to the end of publication, the POB was published by a single publisher after a tendering process, and distributed exclusively on an annual subscription basis.
+Publication ceased in February 1913.
+By then the POB had only 20 subscribers.
+
+Ever since its original publication, the POB has been used as the single most relevant source for legal historians into the social relations, crime and policing in 18th century England. It has been studied profusely through a combination of close reading and statistical sampling, though it has been mostly ignored by historians of the 19th century or outside the legal history profession \citep{hitchcock2016}\footnote{
+    See \autoref{foot:historians}, infra.
+}.
+
+With a total of $127,146,394$ words, the POB corpus is the single largest collection of accurately transcribed historical text currently available in electronic format thanks to the efforts of the the Old Bailey Online (OBO) project; a collaboration between the University of Hertfordshire, the University of Sheffield and the Open University with funding from the United Kingdom's Arts and Humanities Research Council.
+The OBO project makes available the entire collection of the $2,163$ known surviving issues of the POB in XML format, encoded in a rather antiquated version of the TEI encoding schema\footnote{
+    \label{foot:oldtei}
+    More precisely, an extremely simplified version of the now ancient version 2 of the TEI (an incompatible version 6 is currently under review; the most widely used TEI version is version 5). %[TODO: reference to the TEI]
+    See \autoref{app:obo_proc} for the details of parsing the XML content of the OBO archive.
+}.
+
+The POB includes more or less accurate accounts of $197,752$ criminal trials, covering a more or less continuous period of 240 years (e.g. no known surviving issues exist for 1701 and 1705).
+
+The electronic version of the POB corpus made available by the OBO project also includes structured information in the form of mark-up identifying $211,203$ chunks of text describing criminal offences, $223,243$ chunks of text describing verdicts, $169,248$ chunks describing punishments, $71,172$ chunks corresponding to place names and $1,212,456$ chunks corresponding to personal names.
+The legal entities (offences, verdicts and punishments) are classified in a non-contemporary two level hierarchical categorisation, and the personal names include a categorisation of the role played by the alluded person in the corresponding trial (victim, defendant or witness), though this is far from consistent.
+Some general historical trends can be appreciated from simple tallies of the structured information contained in the POB for its covered period of 240 years as shown in \autoref{fig:histrends}, presented here for illustrative purposes on the type and evolution of the structured information contained in the OBO mark-up.
+
+\begin{figure}
+    \centerfloat
+    \input{figures/c2_pobtrends_fig1}
+    \caption[General historical trends in Old Bailey trials]{
+        General historical trends in Old Bailey trials as a proportion of all trials
+    }
+    \label{fig:histrends}
+\end{figure}
+
+It must be emphasised that these numbers all refer to ``chunks of text'', not to actual entities in the world.
+A mapping from these chunks of text to objects in the world may be more or less straightforward: it is rather conservative to expect each ``Trial Account'' to correspond to one specific trial with a known time and place, a little less so to expect each offence description to correspond to a specific occurrence of criminal activity, but it is much more adventurous to assume each person name to correspond to one specific individual.
+
+In addition, the utilisation of the structured information contained in the archive for sociological statistical analysis is highly problematic, for two reasons:
+First, the encoding of information in the electronic version of the corpus is not consistent across the entire collection and is particularly poor in the section of the archive covering the period following the passage of the Central Criminal Court Act of 1837, mostly due to a change from manual encoding to an automatic encoding strategy.
+This resulted in a large drop in the amount of available data encoded as marked entities in the text, which is in any case unreliable.
+
+But apart from this rather unfortunate loss of data due to deficiencies in the electronic encoding of the structured information in the corpus\footnote{
+    \label{foot:deficiencies}
+    It must be noted that these ``deficiencies'' refer exclusively to their usefulness for statistical analysis of long trends, as the structured information produce on the POB by the OBO project is much less reliable than its raw textual data.
+    The OBO is by far the highest quality electronic transcription of a massive, non-curated, single-source textual archive, in large part thanks to its excruciating process of manual ``double entry re-keying'' which yields an accuracy rate of $99.9\%$.
+    By comparison, a comparable corpus like the British Library's Nineteenth Century Newspaper Collection has an accuracy rate of $68.4\%$ (\citeauthor{hitchcock2016}, op. cit.).
+    It must also be noted that the encoding of structured information in the OBO version of the POB, however deficietary it may be, is only possible because of this impressive accuracy rate, and even though it may not serve to sustain the level of stability required for statistical analysis of long trends, it is extremely valuable as metadata for the textual content, as discussed below.
+}, there is an additional reason to be profoundly sceptical of data about criminality like the ones contained in the POB, related to the nature of crime.
+It has been made clear to me that this requires a brief digression.
+
+In short, the problem with criminal statistics is that ``crime'' does not constitute in itself a proper object of study.
+There is no such thing as crime as an event that happens in the world to which there may be some form of institutional reaction:
+The institutional reaction itself constitutes the crime.
+This is very often forgotten in discussions about crime in general\footnote{
+    \label{foot:criminilogy1}
+    And particularly in the criminological literature that seems to be obsessed with answering a ``criminogenic'' question
+    about the ``origins'' of crime.
+}, as it is assumed that there is a class of events that we
+can identify as criminal with independence of the operation of the criminal system\footnote{
+    \label{foot:criminology2}
+    This is partially necessitated by the requirements of the epidemiological approaches usually deployed for the study of ``crime'', mostly for policy-related reasons, like measuring the effectiveness of ``crime prevention'' policies.
+} (i.e. before the police shows up).
+
+There is no such thing. ``Innocent until proven guilty'' is not only a legal principle for the protection of the rights of citizens against the punitive action of the state, it implies that there is no crime committed until a judge determines that a given action is constitutive of a crime.
+In other words, ``crime'' is the result of three elements, each of which is intrinsically necessary for a given event to be considered criminal:
+A rule; an individual that executes an action; and an individual or institutional actor that determines this particular action to be constitutive of a transgression of that particular rule and in turn acts in the name of the rule to declare the act as a crime.
+Only after this normative sanction does the conduct in question become criminal.
+Until then, it is just some conduct.
+Or, to be more precise, it is a conduct that does not differ from any other type of conduct in itself, and in any case, it does not differ in a sociologically meaningful way from non-criminal conduct\footnote{
+    \label{foot:webercrime}
+    With the rather important Weberian caveat that, to the extent that conduct is action and action is determined by its intended meaning, the actual or expected operation of a criminal system will have an effect on some of the relevant conducts via its anticipation by social actors.
+    However, none of this enters into consideration in usual discussions about ``crime'', and it certainly does not impose a clear-cut categorical delimitation of ``crime'' as a clearly defined class of social facts that we should be sociologically interested in.
+}.
+
+The value of the POB corpus is not given by its content of criminological information, but by two elements which are generally not of criminological interest:
+First, the POB contains accounts of criminal \emph{trials}; that is, the specific moment at which a brute fact in the world of which we only know because of its facticity is brought into an institutional setting that has no reality beyond the purely symbolic forms of legal norms in order to be subsumed under a normatively defined category: ``crime''.
+In this sense, the POB contains a time-ordered record of a defined population of comparable entities across a 240 year period, namely the more or less stable and comparable instances of the process by which the Serlean imputation of agentive functions to social facts is performed.
+
+Second, and in a sense more relevant to the sceptical reader mentioned in the introduction that may have no interest in Serlean brute facts and agentive functions, the specific way in which trial accounts are recorded in the POB makes it a perfect textual source in terms of the discussion of the preceding section:
+Most of the content in the POB corpus is \emph{verbatim witness testimony}.
+That is, most of the text in this archive corresponds specifically to descriptions of social practices by first hand participants.
+Even more, these descriptions of social practices have a particularly short narrative horizon, imposed by the operational requirements of the legal system, that seeks to separate factual accounts of potentially criminal activity from their legal interpretation.
+I.e. precisely because the population of events recorded in the POB consists of the process by which agentive functions are associated to brute facts, the actual descriptions of the social practices that are associated to the brute facts in question is purposefully limited in the narrative horizon that they allow, and this was rigorously enforced by court officials, as a reading of some of them illustrates:
+
+\blockquote[Trial record t17361208-10, December 8th, 1736]{
+    \label{quot:t17361208-10}
+    Mary Eldridge told me she had a Bundle left her by the Prisoner, and she was offended with the Smell of it. I thought, as the Prisoner was a Servant to a Butcher, she might have bundled up a Joint of Meat, and so I advised Eldridge not to conceal it: So it was carry'd to Heston Church House, and I was by when it was opened. There was in the Bundle a Shift and some Aprons, and a colour'd Apron next the Child, which was a Female, and which the Prisoner own'd to have been hers. She confess'd she had given Eldridge the Bundle to keep for her, and had ordered her to let no Body see it.
+}
+
+It is not surprising that the ``entertainment value'' of the POB fell dramatically as the rigour and exhaustiveness of its coverage of court proceedings increased: in our terms, the progressive transformation of the POB from popular entertainment to legal record should be seen as a progressive shortening of its narrative horizon\footnote{
+    \label{foot:historians}
+    Trying to explain from this the relative lack of interest in the POB by historians of the nineteenth century would require a number of assumptions about what historians consider useful for their work, and the oblique relationship that this may or may not have to a sources ``narrative horizon''.
+    My own prejudices about traditional historiography work may get in the way of intellectual honesty in such an exercise, but the coincidence between the change in tone and extension in the POB and the rather complete lack of attention it has received for study of the nineteenth century per opposition of the wide attention it has received for study of the eigteenth is at least suggesting of some connection in this direction.
+}.
+
+Even though the value of the POB as a textual data source for the approach presented in this dissertation is given mostly by the actual content of the text contained in it rather than the named entities that are identified through its electronic encoding, these entities will play a fundamental role in subsequent analyses: they make it possible to define complementary document samples that run cross-sectionally across the time dimension, establishing several axes of comparison.
+The four panels in \autoref{fig:histrends} present general trends about four distinct sources of variation of the different trial accounts that we can reasonable expect to determine differences between them that are relevant from a sociological point of view and that illustrate the kind of baseline comparisons that can be constructed over a textual corpus taking into account the provenance of the documents contained in it.
+
+To clarify: by ``provenance'' of the textual sources I refer to any non-textual data that can be used to associate corpus segments to different document sets that can be taken to represent different samples of events from the stable population of comparable social facts that are contained in a corpus of the required characteristics as a whole.
+The most relevant form of provenance data for the application of text analysis to historical research is, unsurprisingly, the date of its production i.e. its location in time.
+But any distinction that can be imposed over different corpus segments from non-textual data can be leveraged to set up an axis of comparison.
+Methodologically, the date occupies no special status.
+
+For the analysis of the POB corpus, the relevant provenance information associated with the trends presented in the four panels of \autoref{fig:histrends} consist of: (1) The violent nature of the relevant social interaction, operationalised from the classification of different offence descriptions into current criminal types; (2) the corporal nature of the punishments imposed by the court; (3) the participation of women either as defendant, victim or both in a criminal trial and (4) the presence of collective action in the form of groups of either defendants, victims or both in a criminal trial\footnote{
+    \label{foot:femgrps}
+    Note that presence of women or groups in any other capacity in a trial (e.g. witnesses) does not count for the definition of either of these corpus samples.
+}.
+
+With regards to the time dimension, there are four relevant points in time that should be kept under consideration for subsequent analyses, as they introduced changes either in the form of publication of the POB, or in the operation of the court.
+The first is associated to the expansion of court dealings coverage by the POB in 1729, that greatly expanded its content of verbatim witness testimony after this had begun to be included in 1712, and is labelled as ``expansion''.
+The second is associated to the introduction of the requirement for an exhaustive account of all criminal trials in 1778 that ended the practice of editorial selection of cases by the publisher, and is labelled as ``regulation''.
+These two refer specifically to changes in the selection of cases into the POB and are marked by red lines in all time series-plots.
+The third one refers to the passing of the Central Criminal Court Act of 1837, that transformed the venerable Old Bailey court from medieval times into the Central Criminal Court and expanded its jurisdiction to the whole of England, and is labelled as ``CCC act''.
+The fourth and final relevant point in time is given by the passing of the Offences Against the Person Act of 1861 that consolidated a number of traditional criminal rules into a codified system of statutory criminal law into what was, until then, a primarily consuetudinary criminal system. It is labelled as ``OAP act''.
+These last two refer to changes in the operation of the court rather than the process by which trials were selected for inclusion in the POB and are marked by blue lines in all time-series plots.
+
+I will come back on the uses of provenance data in \autoref{sec:docsampling}, below.
+
+\section{The evolution of an historical corpus}
+\label{sec:lexstats}
+
+The publication history of the POB and its relationship with what actually transpired at court can already be appreciated with a quick glance at the sheer amount of text recorded in the corpus for each year.
+\autoref{fig:textn} shows the evolution of the number of trials, the word length of the POB, and the number of paragraphs per trial across the 240 year period.
+
+% \begin{figure}
+%     \centerfloat
+%     \input{figures/c2_pobtrends_fig2}
+%     \caption{Text data amounts in Old Bailey trials}
+%     \label{fig:textn}
+% \end{figure}
+
+As can be appreciated in the second panel, the origins of the POB as a short popular pamphlet are evident in the trial paragraph distributions in the early period prior to its 1729 expansion, dominated by brief reports of a few trials no more than one or two paragraphs in length.
+
+The long middle period between 1730 and the passage of the Central Criminal Court act in 1837 represent the most stable and consistent segment of the POB, characterised by a more detailed reporting of each trial.
+Panel one also shows the effect that the requirement of exhaustiveness introduced in 1778 had on the style of the POB, as the median paragraph length remained more or less stable, but the total number of words shows a considerable increase.
+Starting in the 1800s, the increase in the number of trials heard at the court translated into a slight decline in the number of paragraphs dedicated to each case, with the total word length remaining more or less stable.
+
+The Central Criminal Court act of 1837 enlarged the jurisdiction of the court, which can be seen by the sharp increase in the number of cases heard after a period of gradual expansion and sudden decline immediately preceding the introduction of this jurisdictional change.
+Brief reports of trials became more common starting in the 1850s, mostly due to the introduction of summary judgement for cases of petty theft with the passage of the Criminal Justice Act of 1855 (not marked).
+
+These general trends from a superficial analysis of the general structure of the POB corpus have also been confirmed by more in-depth study of the textual content of the archive.
+According to \citet{huber2007}, the expansion in the amount of text per trial in the late 1720s and 1730s is due to a more consistent attempt to represent the trial process at the Old Bailey in the form of individual first-person witness testimonies.
+
+All of this confirms the value of the POB for the purposes of the proposed analysis, though the marked differences in the style of reporting of each trial in the POB suggest that the narrative horizon of the different trial accounts was not stable, but rather became increasingly shorter as the proceedings mutated from entertaining stories ``of the most remarkable, tryals of several notorious malefactors'' to a ``true, fair and perfect'' record of the cases heard by the court.
+
+Following the discussion in \autoref{chap:frame}, the transformation of the unstructured textual information in the POB begins with the construction of a stable and normalised token stream from the definition of a suitable token-type identification rule over the results produced by a standard NLP pipeline.
+As discussed in full in \autoref{app:software}, this was implemented as a set of UIMA\footnote{
+    UIMA is the Unstructured Information Management Architecture, an OASIS standard originally developed by IBM as the basis for the analysis of unstructured information in the Watson project \citep{ferrucci2004}.
+} analysis components that coordinated the data acquisition and NLP stages of the analysis.
+Two different sets of NLP tools were tested for tokenisation, POS-tagging and lemmatisation: the Apache OpenNLP toolkit and the Stanford CoreNLP toolkit; the final version of the data was produced with the Stanford toolkit \citep{manning2014}.
+No stop-word lists were used, and the only tokens that were excluded from consideration at this point were those identified as punctuation by the POS-tagger.
+
+The normalisation of the token stream proceeded in two steps: definition of a token-type rule and conflation of certain words that do not carry much meaning by themselves but the elimination of which would remove whole classes of relevant semantic indicators: cardinal and ordinal numbers, money amounts, units of measurement, etc.
+These were substituted by a class indicator [\term{money}], [\term{length}], [\term{weight}], etc.
+Some punctuation tokens that were misclassified by the POS-tagger were also conflated in the same way into a [\term{punct}] class that was not substituted but deleted.
+Part-of-speech was recorded using a coarse categorisation of the Penn Treebank tag set
+%[TODO: citation needed]
+into 12 POS ``classes''\footnote{
+    \label{foot:posc}
+    The resulting set of POS classes has 12 possible values: adjectives (ADJ), adverbs (ADV), articles and determinants (ART), cardinal numbers (CARD), conjunctions (CONJ), nouns (NN and NP), prepositions (PP), pronouns (PR) and verbs (V). An additional catch-all class (O for other) includes all words that could not be reliably classified by the POS-tagger, but we generally assume these to be lexicals (i.e. we treat them as nouns), and there is an additional class for punctuation (PUNCT) that was summarily deleted.
+    Note that the conflation procedure will impact most of the tokens classified as cardinals by the POS-tagger, but conflation was carried out with our own regular classifier rather than with the probabilistic classifier implemented by the tagger.
+    This aggregation strategy was taken from the tag-set abstraction procedure used by the DKPro suite. % [TODO:citation needed].
+    See \autoref{app:obo_proc} for additional details.
+}.
+
+Two token-type rules were tested: raw inflected words and lemmas.
+Combined with the choice of conflating generic lexical classes, this yields four possible lexical sets over the entire token stream, each of them associated with a given rate of token loss and total lexicon size shrinkage.
+There is an additional statistic that is relevant for the evaluation of different lexical sets: the number of highest frequency terms that need to be taken into account in order to cover a given percentage of the entire token stream to provide some indication of the skewness of their associated term frequency Zipfian pseudo-distributions.
+\autoref{tab:lexrules} presents these measures for the different lexical sets together with their cardinality and the corresponding length of their associated normalised token streams.
+
+\input{tables/c2_lexrules}
+
+These numbers clearly show the implacable effect of Zipf's law: Even though the full, raw, uncontrolled lexicon of the POB has over $320,000$ distinct elements, the $4,611$ highest frequency words account for $>95\%$ percent of the tokens in the full corpus, and half of the token stream is occupied by the top $51$ most common words.
+These numbers are even more extreme for any lexical rule that aggregates words, which in any case never fail to capture more than $0.05\%$ of the source token stream.
+
+These patterns can be further exploited to dramatically shrink the size of the lexical set while still maintaining a sufficient coverage over the entire corpus by simply excluding the lowest frequency words: eliminating all words with a total term frequency of less than 5 produces a $\sim75\%$ shrinkage of the different lexical sets while losing no more than $\sim0.3\%$ of tokens.
+
+With these considerations, the lexical set used in the rest of the analysis will correspond to the lemmatised, conflated and censored set indicated by the entry in bold typeface in \autoref{tab:lexrules}.
+Our resulting lexicon has a total cardinality of $77,610$ distinct words, accounting for $99.97\%$ of the raw token stream with a total word-length for the full POB corpus of $126,764,716$ tokens.
+\autoref{fig:freqrank} shows the shape of the lexical distribution of this lexicon in a log/log plot, indicating the rank position and total term frequency of the words for \term{prisoner} (the standard term to refer to defendants in all Old Bailey trials), \term{man}, \term{woman} and \term{kill}.
+Note the logarithmic scale used in both axis of this plot and how it produces the funny ladder-like structure at the end of the long tail of low frequency words.
+The horizontal component in each of the ``steps'' in that pattern corresponds to thousands of entries, while the vertical component corresponds to a decrease in term frequency of just one, such that the last two horizontal segments represent the $5,817$ and $7,830$ terms with a total term frequency of only six and five tokens, respectively.
+
+\begin{figure}
+    \centerfloat
+    \input{figures/c2_lexstats_fig1}
+    \caption{(log/log) Term frequency/rank distribution}
+    \label{fig:freqrank}
+\end{figure}
+
+Note that no stop-word lists have been used up to this point.
+This is one of the points at which the ``double dipping'' issue discussed in the previous chapter arises.
+Usually, stop-word lists are used to eliminate terms from the token stream that are expected to carry no semantic meaning; typically, this corresponds to words from ``closed'' linguistic classes that do not carry lexical information but merely serve functional syntactic roles (prepositions being the prime example).
+The reason for this is that since these words carry no lexical semantic content, they are not relevant \emph{observations}, in the sense that they are not basic units of meaning, but merely the linguistic scaffolding required by a language's grammar.
+However, the elimination of these words at this point would also eliminate them from consideration as \emph{features}, i.e. it would eliminate these grammatical markers from the distributional vectors of the words that do carry lexical semantic information, and it is very reasonable to expect that the semantic content of a word is given largely in part by the functional words in conjunction with which a language's grammar allows it to be used.
+
+This is also very relevant from the point of view of the theoretical framework proposed in the previous chapter.
+In brief, the central importance of words with lexical semantic content in most uses of lexicographic data for social scientific research is imposed, once again, by the central importance of the issue of topicality in most of these applications.
+I.e. the way in which different topics are captured in text ---which is in ultimate instance the underlying issue that we focus our attention to when we treat text as discourse and discourse as strategic action--- is given by the way in which different lexical elements are arranged in a text, typically nouns, with some secondary consideration given to adjectives, seldom any attention to verbs and never any consideration to to the linguistic scaffolding provided by functionals.
+But moving the focus of attention beyond discourse and out of the question for topicality demands consideration of these elements, because we are concerned with the way in which social facts are actualised in language through paradigmatic relations, and these are given to a large extent by the way in which words are similarly embedded in the structure determined by the grammatical scaffolding provided by functional words.
+
+In consequence, the definition of our lexicon does not exclude functional words.
+Actually, the construction of the lexicon does not consider the POS tag of words at all, beyond the needs of the NLP pipeline that requires knowledge of the POS for proper lemmatisation.
+Part of speech information is treated in a completely different way.
+
+\begin{figure}
+    \centerfloat
+    \input{figures/c2_lexstats_fig2}
+    \caption{POS distribution across tf rank classes}
+    \label{fig:posrank}
+\end{figure}
+
+Because of the way in which the lexicon was constructed, in which a token's POS is not taken into account to determine the identity of its type, all terms in the lexicon may appear in different combinations with all tags in the coarse POS class set.
+This allows us to illustrate the way in which functionals and lexicals tend to be distributed in normal language use.
+\autoref{fig:posrank} shows the relative distribution of POS classes across the entire lexical distribution in the POB, grouped into 100 ``rank classes'' of relatively similar size\footnote{
+    \label{foot:rankclasses}
+    I.e. the entire list of terms in the lexicon is sorted in descending total term frequency order and split into 100 groups such that each of the resulting groups contains more or less the same number of entries, but extremely different total group term frequency masses.
+    In the plot above, the width of bars is (somewhat arbitrarily) proportional to the square root of each class's total term frequency, in a more or less failed attempt to indicate the wide variation in total term frequency mass.
+} but widely differing total term frequency mass, given the heavily skewed distribution of frequencies in the lexicon.
+As can be appreciated in this plot, functional words (the lower green and blue bands) occupy a considerable chunk of the tokens corresponding to higher frequency words, while lexicals tend to increasingly dominate the long tail of lower frequency words, particularly nouns.
+This is relevant for our purposes because it moderates somewhat the opportunities available to exploit Zipf's law to create useful lexical samples, an element that will play a large part in the discussion of the following chapter.
+
+\begin{figure}
+    \centerfloat
+    \input{figures/c2_lexstats_fig3}
+    \caption{POS distribution across time}
+    \label{fig:postime}
+\end{figure}
+
+The unrestricted collection of POS classes for all terms in the lexicon also affords us the opportunity of taking a first glance at usage patterns in the POB across time, as shown in \autoref{fig:postime}.
+This offers an insight into a recurrent pattern in the POB: relative instability and variation in the early period, with a subsequent period of stabilisation of usage patterns after the 1729 expansion and 1778 regulation, which supports the characterisation of the POB provided by the historians' close reading of the archive:
+Text from the early POB corpus is characterised by the idiosyncrasies of the editorial and stylistic choices of individual authors, but as the representation of trials moved increasingly to a more accurate account of first hand witness testimony, the text style tended to stabilise into more regular aggregated usage patterns, lending credence to the idea that the text in this period was not dominated by the choices of the individual recorders, but by the direct spoken words of the multitude of participants in Old Bailey trials.
+
+However, it is possible to construct a much more convincing test of these claims if we incorporate provenance data to split the POB corpus into different samples.
+
+\section{Provenance and corpus sampling}
+\label{sec:docsampling}
+
+Using provenance data in the analysis of a corpus requires an indexing strategy in order to associate non-textual metadata to specific contexts $C$ across the entire token stream of a corpus, $T$\footnote{
+    \label{foot:segment}
+    Note that here I am referring to the first kind of context discussed in \autoref{chap:frame}, a ``segmentation'', such that $\bigcup_{i=1}^k C_{i} = T$ and $ C_i \cap C_j = \emptyset\ \forall i,j : i \neq j$.
+}.
+
+The main reason why \autoref{fig:textn} includes paragraph distributions in its second panel instead of, for example, word length distributions, is given by the fact that the primary indexing unit used in this work is the \emph{paragraph}.
+In terms of the discussion about indexing contexts from \autoref{chap:frame}, paragraphs, and not trials or POB issues, provide the primary segmentation of the token stream.
+There are two reasons for this.
+First, it is desirable that the primary segmentation of a corpus be determined by more or less ``natural'' breaks in the text, related more to language use than to editorial choices.
+Linguistic theory would indicate that sentences would provide the ideal segmentation for this purpose, as this is the lowest dis-aggregation level that still carries semantic information as a unit, but this is in-viable from a practical point of view because (1) sentence boundary detection is far from reliable in general, and particularly unreliable on historical corpora spanning centuries, due to the changing conventions about punctuation and sentence boundary markers that prevent application of the typical strategies for unsupervised sentence boundary detection and (2) because a sentence-level segmentation is too narrow, imposing a severe constraint on the range over which co-occurrence counts can be observed\footnote{
+    See \autoref{foot:sentences} in \autoref{chap:frame} for discussion about the problems of sentence boundary detection in historical corpora.
+    The narrowness of sentences for co-occurrence collection is given because sentences in general tend to be shorter than the moving windows usually defined for this purpose, and in particular in the POB, in which testimony is recorded mostly as simple sentences with no subordinate clauses.
+    Allowing windows to spill put of sentences counters to some extent the rather telegraphic style of reporting testimony in trial proceedings producing richer variation of observed contexts while still maintaining some granularity given by the paragraph, which we can still assume to be topically related, to some extent.
+}.
+Second, since our interest in the POB is given mostly by its content of witness testimonies, we need a sampling unit that allows for the discrimination of different corpus segments \emph{within} each trial, and the paragraph is the obvious choice for this exercise, given the general structure of trial accounts in the corpus (see \autoref{app:crouch}).
+
+Using paragraphs as the primary corpus segmentation implies that this is our primary sampling unit, and that it is at this level that provenance data is recorded\footnote{
+    \label{foot:indexdocs}
+    In terms of the terminology used in the context of the implementation of an indexing strategy, paragraphs constitute the ``documents'' that define the columns for this corpus' term-document matrix.
+    Since the concrete implementation of the term-document matrix is an inverted index, paragraphs are the contents of the references contained in the index's posting lists.
+    See \autoref{app:software} for details of the construction and exploitation of the inverted index as used in this work.
+}.
+Each paragraph inherits all attributes from any broader corpus segments that contain it, and from the legal entities (offences, verdicts, punishments) indicated by structured information annotations that are contained in it.
+We refer to the first as ``covering'' metadata; it includes the date of publication from the POB session and the type and identity of the sections in which they occur. Most sections are trial accounts\footnote{
+    \label{foot:pobsections}
+    I.e. the POB's sections overwhelmingly correspond to trial accounts, but there are other non-trial related sections: front-matter, closing summaries of judgements, etc.
+    Unless indicated otherwise, all analyses in this work exclude non-trial sections in the POB.
+}.
+We refer to the second as ``covered'' metadata; it consists of typed counts of the categories and subcategories of any legal entities (and legal entities only, see below) that occur in them.
+
+This strategy allows for the construction of a secondary sampling unit at the section level, used for grouping and selecting paragraphs sets based on section attributes.
+For trial accounts, this includes typed counts of the non-legal named entities that occur \emph{in other paragraphs in the same section}, associating the group of paragraphs in a given section with the category and subcategory of legal entities (offences, verdicts and punishments) inherited by any of the paragraphs in the section and with the number of personal names dis-aggregated by gender that occur anywhere in the section.
+
+This allows for the construction of several distinct paragraph samples for the POB corpus from their date, their occurrence within a section corresponding to trial accounts (this is the primary sample), their occurrence within trial accounts that contain criminal offences, verdicts or punishments of a given category or subcategory, or by the number of and/or gender associated to the personal names that are mentioned in the sections that contain them.
+In total, the POB contains $2,486,302$ paragraphs, of which $2,321,146$ make up our primary sample, corresponding to trial accounts.
+
+\subsection{Detecting witness testimony in the POB}
+
+This indexing strategy also allows for the construction of a proxy indicator for whether paragraphs correspond to spoken witness testimony or not.
+One possible strategy for this exercise is the one leveraged by the team at the University of Gliessen lead by \citeauthor{huber2007} for the construction of their ``Old Bailey Corpus'' (OBC), a version of the POB prepared for socio-linguistic research that contains mark-up annotations corresponding to what they could identify as direct speech and associates sociometric data to each speech chunk from whatever information is contained in the POB about the assumed speaker.
+
+Their procedure relies on the application of a set of regular expression filters exploiting the more or less standard structure of testimony paragraphs in the POB for the more stable parts of the corpus, and was applied with some success on a prior electronic edition of the POB that contained trials for the 1730-1834 period.
+There are, however, a number of problems with this strategy, particularly for analysis of the current, full version of the POB from the OBO project.
+First, it is not robust at all; the use of a regular classifier exploiting observed regularities in some direct speech segments in a particularly stable region of the corpus means that the only direct speech segments that are captured by this strategy are those that follow a very specific pattern of recording questions and answers in the POB, that only applies to a rather restricted corpus region and fails to capture the many instances of direct speech that do not follow this publisher's convention.
+Second, because of the way in which the regular expression rules used for detection of direct speech in the OBC were constructed, they are highly dependent on a number of idiosyncrasies of the specific electronic version of the POB used as primary source for the OBC project.
+Given the many inconsistencies present in the raw character stream of (different versions of) the POB\footnote{
+    \label{foot:charstream}
+    I.e. the problem of producing a fixed and stable character stream prior to any analysis, already mentioned in \autoref{foot:charoffsets} in \autoref{chap:frame} and discussed \textit{ad nauseam} in \autoref{app:obo_proc}.
+}, attempts at replicating this strategy consistently across different editions of the corpus turned out to be impractical due to appallingly low rates of precision and recall\footnote{
+    \label{foot:obcperlre}
+    Useful application of the information contained in the OBC for analysis of a more complete and exhaustive version of the POB like the one currently available from the OBO project would require one of two approaches:
+    Re-implementation of the regular classifier used for construction of the OBC from the incomplete and unmantained version of the POB originally used as primary source in a more robust and maintainable way; or production of a concordance between the OBC and OBO versions of the POB that is capable of compensating for differences in the character offsets in the character stream of both editions of the corpus, including changes induced by amendments and corrections to the transcribed text from the ``double key re-entry'' and optical character recognition processes used for production of newer versions of the POB from the OBO project.
+    Both approaches turned out to be impractical, though there are open avenues for collaboration on this problem with professor Huber's team at the University of Gliessen (personal communication with prof. Magnus Huber, December 19th 2014).
+    The original regular expression patterns used in the OBC were written in Perl by Sumithra Velupillai back in 2005 and kindly made available to me for re-implementation in Java as a UIMA analysis component that can be deployed as an additional part of the data acquisition pipeline used in this project.
+    I'm very grateful to both prof. Huber and dr. Velupillai for their kind disposition in answering my inquiries.
+    An initial attempt at implementation of a concordance between the OBC and the OBO was also produced as part of the same effort.
+    Neither of these components were finally used in production for this project, given the problems discussed above, but the source code for both (broken and incomplete) implementations is available together with the rest of software code produced for this project.
+}.
+
+However, given the different objectives pursued by the OBC and the analysis in this work, I decided on a much simpler strategy for detecting ``speech'', based on the more general aspects of the structure of trial accounts and on the more consistent parts of the structured information contained in the OBO version of the POB: all paragraphs that \emph{are contained} in a trial account and that \emph{do not contain} legal entities are considered to be ``testimony''.
+See \autoref{app:crouch} for appreciation of the reasonableness of this approach.
+
+More formally, using the notation from the discussion on context definitions in \autoref{sec:method}, \autopageref{subsec:index}, I defined three subsets of positions $C_{sample} \in T$ from the segmentation of the POB over paragraphs: $C_{trial}$, consisting of the token stream regions inside paragraphs contained in trial accounts, $C_{legal}$, consisting of the token stream regions inside paragraphs containing legal entities and $C_{testimony}$, consisting of the intersection of $C_{trial}$ and the complement of $C_{legal}$, $C_{testimony} = C_{trial} \cap \sim C_{legal}$.
+Using this much simpler strategy, $|C_{testimony}| = 1,868,083$ of the $2,321,146$ paragraphs in $C_{trial}$.
+
+Comparing between $C_{testimony}$ and its complement, we can produce a characterisation of spoken witness testimony in the POB, and an additional empirical assessment of the trends in its evolution discussed above.
+
+This exercise requires a more powerful strategy than the simple comparison between aggregated term frequencies presented above, by looking not at total counts, but at the empirical lexical distributions that can be constructed from a given corpus sample's term-vector, i.e. the vector containing the element-wise term frequencies for each word in the lexicon for each sample under comparison.
+This type of analysis can be understood in terms of the discussion of the first chapter as exploiting the \emph{marginals} of the values of a co-occurrence matrix $X$ for different corpus segments, since these term-vectors are equivalent to the row marginals of $X$ for the different regions under comparison\footnote{
+    \label{foot:xsymm}
+    And, when the same lexical set is used to determine co-occurrence contexts, as is most usually the case, also the column marginals, as $X$ is in this case square and, if constructed using symmetric co-occurrence windows, itself also symmetric.
+    See notes \ref{foot:contextset} and \ref{foot:symmwindows} in \autoref{chap:frame} for additional discussion.
+}.
+
+\subsection{Comparison of different corpus samples}
+
+The basic strategy for comparison between different corpus samples follows the general outline of the exercise carried out by \citet{rule2015} in their periodisation of the SOTU corpus: (1) determine different corpus regions using provenance data, (2) construct a term vector for each of the regions under comparison and (3) produce some measure of the similarity or dissimilarity of the empirical term frequency distributions contained in these term-vectors. These similarity or dissimilarity measures establish an \emph{endogenous} indicator of variation or continuity across different corpus regions, allowing for an empirical test of hypotheses about the evolution of an historical corpus (if the relevant regions are defined by time periods) or about the significance of some cross-sectional corpus split.
+
+The above implies that, after having defined a relevant corpus split, there are two relevant decisions to construct this kind of analysis: the function for computation of the term-vectors, and the choice of a suitable similarity/dissimilarity measure.
+Unlike other relevant decisions discussed in this work, these are sadly \emph{not} totally independent, because different similarity/dissimilarity measures are more or less robust (or sensitive) with respect to small variations induced by the specific strategy used for computation of the term vectors.
+A review of different similarity/dissimilarity functions and the requirements they impose over the construction of term vectors can be found in \autoref{app:simdiv}.
+
+There are basically two relevant considerations for construction of the term vectors, that will be more or less important depending on the chosen similarity/dissimilarity function used for their comparison.
+The first one has to do with control of the extreme skewness of the empirical term frequency distributions, and is mostly controlled by applying a weighting strategy over the entries in the empirical term vector in order to moderate the impact of extremely high and low frequency words.
+The second has to do with the avoidance of singularities in the final term vectors, usually components with a value of $0$ (but different measures will produce singularities on different values), a problem that arises because we are comparing term vectors defined over the entries for the lexicon derived from the entire corpus, but populated with counts derived from partial corpus segments that will not always include occurrences for every term in the lexicon
+% \footnote{
+%     [TODO: explain why I don't delete zeros and use only the intersection, as in Cointet]
+% }
+.
+This is of course aggravated by the level of granularity of the relevant corpus split: it is extremely unlikely that a bipartite split of the corpus around a sample and its complement will fail to contain tokens for every word in the lexicon, but it is very likely that a finer split ---like e.g. across the 240 splits defined by the year of publication in the POB--- will have many words that do not occur in every year\footnote{
+    \label{foot:lt240}
+    There are $69,024$ words in the POB's lexicon that have a total term frequency of less than $240$, and those that do have more than $240$ occurrences are not evenly distributed across the 240 years.
+    It wouldn't make any sense to compare their per-year counts if they did.
+}.
+
+Term frequency weighting usually follows some variation of the TF/IDF strategy \citep[ch. 6]{manning2008} that seeks to control for a term's ``specificity'' \citep{jones1973} by computing a term's score within a given corpus region as a product of some monotonic function of its term frequency within that region (the TF part) and some inversely monotonic function of the term's document frequency, the number of corpus regions in which it occurs at least once (the IDF part).
+This measure basically takes into account the amount of information or entropy associated to a given term's occurrences: terms that occur in most corpus regions will be less ``specific'' to a particular region and will thus be weighted down.
+Note that a term's TF value is specific to each region, while the IDF value is global across a given corpus.
+There are many variations for both the TF and IDF functions, as long as they satisfy the monotonicity and inverse monotonicity requirements\footnote{
+    \label{foot:tfidf_func}
+    The \code{wspaces} R package produced for this dissertation implements a parameterised and vectorised TF/IDF weighting function that supports most common versions of both weighting functions.
+    See \autoref{app:software}.
+}.
+The most common function for a term $w$'s TF component in document (region) $d$ is given by the normalised term frequency, $TF_{w,d} = tf_{w,d} / N$, where $tf_{w,d}$ is the raw occurrence count and $N$ is the total number of tokens in the document (the ``word length'').
+The most common function for a term $w$'s IDF component across the entire corpus is given by $IDF_{w} = log( 1 + ( D / df_w ) )$ where $D$ is the total number of documents (regions) in the corpus and $df_w$ is the term's document frequency.
+As with the $PMI$ function discussed in \autoref{sec:method}, there are many variations for both the TF and IDF functions.
+See \autoref{app:weighting} for a more thorough discussion.
+
+Avoiding singularities will in general be a secondary concern, as this is highly dependent on the details of the chosen measure, but in general there are two broad alternatives for this: either coarse-graining terms into groups in a broader classification (equivalent to broadening the bin-size in an histogram) \citep{dedeo2013} or transforming the empirical distribution in order to eliminate any possible singularities.
+In the case of $0$-valued singularities, this can be achieved by either smoothing the empirical distribution with a Bayesian prior or by taking its convex combination with some valid non-zero distribution.
+In practical terms, the standard Bayesian approach is to apply a Dirichlet prior (treating entries as a fraction $tf_w / N$ and replacing it with $tf_w + 1 / N + |L|$ where $|L|$ is the cardinality of the lexicon), which is mathematically equivalent to taking the convex combination of the empirical distribution with the uniform distribution given by $P(i) = 1 / |L|$ \citep{telgarsky2011}\footnote{
+    \label{foot:simdiv_func}
+    The \code{wspaces} R package produced for this dissertation allows for this strategy as an optional parameter in its similarity computation function when the chosen similarity function is vulnerable to singularities in 0-valued entries.
+    See \autoref{app:software}.
+}
+
+\section{Experiments}
+\label{sec:pob_experiments}
+
+Having established a procedure for splitting the corpus from its provenance data and a set of available similarity and dissimilarity measures that can be used to compare the different splits from their term frequency vectors, we can proceed to set up an empirical test of some of the trends suggested by the preliminary analysis of global term frequency counts and POS usage patterns presented in \autoref{sec:lexstats}.
+
+I will provide two different demonstrations of the way in which the endogenous similarity measures that can be constructed with the procedure outlined above can be used to provide empirical tests of claims about the evolution of a corpus, or about the way in which a corpus is purported to capture changes in social practices.
+
+The results in this section fundamentally reproduce the analyses carried out by \citet{rule2015} to detect endogenous historical periods in American political discourse using the SOTU corpus and by \citet{klingenstein2014} to provide empirical support for Norbert Elias's theory of the civilising process using the POB \citep{elias2000}.
+Both analyses differ fundamentally in two respects: the construction of their term vectors, and the direction of comparison.
+I will first follow \citeauthor{rule2015}'s approach to assess the trends about the evolution of the POB corpus and the suitability of my speech-detection strategy.
+I will then attempt to reproduce \citeauthor{klingenstein2014}'s results in order to show how some of their discretionary decisions turn out to be unnecessary, and in order to provide additional validation for the speech-detection strategy used in this work.
+
+\citeauthor{rule2015}'s term vectors are constructed using normalised TF/IDF frequency counts, but censoring their lexicon to the $1000$ highest frequency words.
+I will follow their procedure for construction of the term vectors, but instead of using the arbitrary censoring of the lexicon at the $1000$th term, I will exploit the statistical measure introduced in \autoref{tab:lexrules} in order to define a lexical sample including the highest frequency words necessary to account for $95\%$ percent of the token stream in the full corpus.
+This also demonstrates the general strategy for lexical sampling used in this work, discussed in more depth in the context of semantic network projections in \autoref{chap:semnet}.
+As indicated in \autoref{tab:lexrules} this yields a relevant lexical subset of $2,605$ words, meaning the vectors that will be constructed for comparison of the different corpus regions are of this dimensionality.
+
+Following the method used in the SOTU paper, the similarity measure used for comparison in this exercise is the cosine distance, which is nothing more than the cosine similarity, but inverted to indicate divergence; in the longitudinal results below, higher values indicate \emph{more} divergence.
+
+Regarding the \emph{direction} of comparison, while the analysis presented in \citeauthor['s]{rule2015} article consisted in an assessment of the internal similarity of the different time points of the SOTU corpus in order to produce an endogenous periodisation, my main result is related to a comparison between the two paragraph samples defined by $C_{testimony}$ and its complement, consisting in a row-wise comparison of the matrices containing the term-vectors for each year of publication in the POB as row-vectors.
+Using the cosine similarity as comparison measure, this produces a similarity \emph{vector} of dimensionality equal to the number of years covered by the POB, and not the square \emph{matrices} of similar dimensionality that result from an internal cross-comparison.
+This vector is interpreted as a time-series showing the extent to which the usage patterns found in the textual content of $C_{testimony}$ and its complement differ from each other or not.
+
+\autoref{fig:testimony_long} presents the results of this longitudinal comparison, together with the total term frequencies corresponding to both $C_{testimony}$ and its complement to illustrate their relative size.
+
+\begin{figure}
+    \centerfloat
+    \input{figures/c2_testimony_fig1}
+    \caption[$C_{testiomony}$ and its complement]{
+        Longitudinal comparison between $C_{testimony}$ and its complement for every year in the POB
+    }
+    \label{fig:testimony_long}
+\end{figure}
+
+As can be seen from this result, the construction of $C_{testimony}$ appears as a reasonable approximation of the purported direct-speech content in the POB, and the general trend corresponds to what we would expect given the knowledge about the production of the POB that we have available from traditional historical research.
+
+The upper panel in this figure provides ample evidence that $C_{testimony}$ actually captures direct speech, as the point in time in which its total term frequency overtakes that of its complement corresponds \emph{exactly} to the point in time at which traditional historical research tells us that the POB began to include witness testimony more systematically.
+
+The lower panel, on the other hand, confirms what we would expect about the evolution of the POB given its progressive transformation from edited selection of entertaining trials to faithful record of the dealings at court: the first period of the POB shows an erratic trend, mainly determined by the low frequency counts obtained from the pamphlet-style surviving issues from the late 17th century, but as we move into the 18th century we appreciate a decided trend of stabilisation though which $C_{testimony}$ becomes increasingly distinct from its complement, indicating a progressive separation between those segments of the trial accounts corresponding to legal paraphernalia and those assumed to contain witness testimony from our naive detection strategy.
+
+In addition to this longitudinal comparison across samples, we can also produce the same self-similarity matrices used in the analysis of the SOTU corpus in order to look at the evolution of each corpus sample on its own.
+\autoref{fig:testimony_inner} shows the raw cosine similarity (i.e. not inverted) for each sample side by side.
+
+\begin{figure}
+    \centerfloat
+    \input{figures/c2_testimony_fig2}
+    \caption[Cosine similarities for $C_{testimony}$ and complement]{
+        Cosine self-similarity for $C_{testimony}$ and its complement for every year in the POB
+    }
+    \label{fig:testimony_inner}
+\end{figure}
+
+As can be expected, we again observe the same general pattern: $C_{tetimony}$ initially shows a rather low level of self-similarity from year to year, reflecting its low occurrence in that region of the corpus, but also suggesting that whatever is contained in it for those early years is dominated by particular idiosyncrasies in language use, possibly because of a large role of the individual author in the composition of ``entertaining'' narratives of the most salacious trials.
+But starting in 1730, the content of $C_{testimony}$ becomes surprisingly stable.
+Again, this corresponds \emph{exactly} to the point in time in which the POB is supposed to have begun to include witness testimony in earnest, a fact that is strongly supported by this entirely endogenous indicator.
+Comparatively, this level of self-similarity (i.e. stability) is not achieved by any other split of the POB, not even the full corpus without any selection procedure, either when looking at the term vectors for the full lexicon, a version containing only lexicals or a version containing only functionals.
+
+$C_{testimony}$'s complement on the other hand, shows a much more happened history in which it is not easy to discern a general trend.
+There are clearly marked periods of substantial self-similarity in this region of the corpus, but it is not easy to interpret their meaning, particularly since they do not seem to align with either of the moments at which we know that administrative change was introduced, from which one could expect to observe some associated variations in the general usage patterns of the legal paraphernalia that we expect to make up most of $C_{testimony}$'s complement.
+
+\citet{klingenstein2014} carry out their analysis using a completely different strategy, both for construction of the term vectors and for the choice of a similarity measure.
+First, they do not use cosine similarities as measure of comparison, but the Jensen-Shannon divergence measure.
+In the context of the discussion in \autoref{app:simdiv}, this belongs to the ``probabilistic'' family of similarity functions, which treat the term-vector as a probability distribution and asses the amount of information loss in predictions about one of the distributions from information provided by the other.
+The JSD in particular is a symmetrised, reflective modification of the Kullback-Leibler divergence: it is the average KL divergence of both distributions from the linear combination of both\footnote{
+    $JSD_{P,Q} = \frac{1}{2} KL(P,M) + KL(Q,M) : M = \frac{1}{2} P + Q$.
+    See \autoref{app:simdiv} for details.
+}.
+
+Second, since the JSD produces singularities on $0$, in the original exercise they apply a coarsening procedure based on the synonym sets from Roget's Thesaurus, such that the term-vectors are not built over the elements in the lexicon directly, but over the frequencies of the synonym heads into which each term in the POB lexicon is classified by the thesaurus.
+This produces denser vectors of dimensionality equal to the cardinality of the thesaurus head-set: $1041$.
+It also operates as a censoring over the entire lexical sample, as not every term in the POB appears in Roget's.
+In the original work, based on the OBC edition of the POB, this censoring effect is not so large because the OBC lexicon is much smaller than the entire POB lexicon and most of the $\sim 15,000$ terms in the OBC do appear in the thesaurus.
+This is not the case for the OBO edition of the POB with its $77,610$ entries, though the final effect is more or less comparable to the information loss from using the $S95$ sample in terms of total token-stream coverage.
+There is a critical difference, however: using a thesaurus-based coarsening procedure imposes an exogenous structure over the empirical distributions, introducing an additional confounding factor, as using the aggregated head counts makes it impossible to ascertain if any observed trends are due to changes in the the social context that produces the observed usage patterns, or to changes on the meanings of words across different points in time, though this is a general limitation of term-frequency based comparisons; the introduction of additional structure just adds a second level of confusion\footnote{
+    \label{foot:semstat}
+    The comparison of term frequencies, with or without the imposition of an exogenous structure, relies on the assumption that a given word has semantic stability across the comparison, i.e. it ``means the same thing'', as frequency based comparisons offer no insight into the relationship between different words which the distributional hypothesis suggests to be determinant of its meaning.
+    Less \term{kill} may mean less actual killing, or it could mean that actual killings stop being called \term{kill} and start to be referred to as \term{murder}, etc.
+    The imposition of external structure adds on to this assumption, as it is based on the idea that the imposed structure (in this case, mr. Roget's beautiful attempt at categorising all of human knowledge in the second part of the nineteenth century) is equally valid at all points of the comparison.
+}.
+
+\begin{figure}
+    \centerfloat
+    \input{figures/c2_klingenstein_fig1}
+    \caption[Divergence measures for various $C$ and their complements]{
+        Jensen-Shannon divergences and Cosine distances for various $C$ and their complements
+    }
+    \label{fig:klingenstein}
+\end{figure}
+
+\autoref{fig:klingenstein} presents a comparison between the results obtained following \citeauthor{klingenstein2014}'s procedure for production of the term vectors and choice of the JSD as divergence measure and the results obtained from applying my chosen strategy of using raw frequencies in $S95$ for production of the term vectors and the (inverse) cosine similarity as divergence measure, across four complementary samples in the POB: $C_{corporal}$, consisting of paragraphs from trials that imposed a corporal punishment\footnote{
+    Any of the following subcategories from the catalogue of brutality in the early modern British criminal system:
+    branding (on the cheek or anywhere), drawn and quartered, the pillory, hanging in chains, burning at the stake, whipping (public or private), hanging, and death with dissection.
+}, $C_{women}$, including all trials with women\footnote{
+    Since a person's gender is sometimes not evident from the text, the POB includes several personal names of ``indeterminate'' gender.
+    After some tests, I decided to exclude these as missing data, meaning that ``gender'' in this work is equated with a categorical distinction between individuals identified as ``male'' and individuals identified as ``female''.
+    This is only due to the characteristics of the corpus and the available data, as this violates the ``anti-categorical imperative'', the principle in analytical sociology that postulates that categorical distinctions should never be imposed exogenously.
+} as defendant or victims, $C_{groups}$, including all trials with more than one defendant or victim\footnote{
+    And \emph{not} witnesses or other persons mentioned in the text; note that this imposes a few assumptions about the kind of interactions we expect to be captured in criminal trial proceedings that do not come into play when they are considered exclusively from the point of view of how the testimony included in them captures aspects of the social world at the time; i.e. without any attention to the fact that these are trials for alleged crimes with a victim and a defendant, which is how I treat them for most other methodological purposes.
+}, and most importantly for the purposes of comparison with \citeauthor{klingenstein2014}, $C_{violence}$, including all trials with violent criminal offences\footnote{
+    Any of the following subcategories from the catalogue of depravity in early modern British social relationships: murder, assault, wounding, rape, infanticide, petty treason, riot, kidnapping, man-slaughter, assault with intent, assault with sodomitical intent, threatening behaviour, indecent assault.
+}.
+
+These results show several things.
+First, they provide a baseline for comparison between different similarity measures, probabilistic and geometric: they tend to behave more or less the same in general, when care is taken to avoid their limitations (singularities, smoothing, etc.), though there are marked variations in their fluctuation.
+Second, the four samples show different general trends:
+$C_{corporal}$ shows increasing divergence, but this is mostly due to the virtual elimination of corporal punishments in the second half of the nineteenth century.
+$C_{women}$ shows decreasing divergence, which could indicate a progressive reduction of the disparities across gender roles in the considered period.
+$C_{groups}$ shows a virtually stable lack of distinction (note that number inflection is removed by the lemmatisers) across the considered period.
+I'll discuss $C_{violence}$ below.
+Third, they seem to indicate that the imposition of external structure in the form of coarsening does not offer much benefit over an endogenous censoring of the lexical sample and weighting, and is in the end driven by the necessities of probabilistic divergence measures.
+Providing an explanation for these results would require a more powerful analysis than the one that can be produced by simple comparison of term frequency vectors.
+
+With regards to $C_{violence}$, in the context of the replication of \citeauthor{klingenstein2014}'s original paper, the last panel is particularly interesting as most of the effect obtained using their procedure (JSD over coarse term-vectors) seems to vanish when measured using cosine similarity over raw term-vectors.
+Assessing the significance of the difference between the $0.0024$ slope for the JSD trend (comparable to the $0.0026$ in the original paper) and the $0.0008$ slope for the cosine using this approach would require the construction of additional statistical tests in order to establish inference intervals, etc. but considering the nature of text corpus data this seems like a rather futile attempt\footnote{
+    This is not a sample; we are looking at the entire population of ``trials in the Old Bailey'', give or take the few that were not reported in the POB, or were reported in lost issues of the POB.
+    Towards what population would this ``inference'' be?
+}: these are merely the \emph{marginals} of $X$, i.e. considering only one $77,000th$ of the information that we already have in the form of $X$ in full.
+
+In any case, these results are presented for illustrative purposes and to establish a baseline for comparison in the analysis of the POB, both for more sophisticated analyses like the ones presented in the following chapters, and for analyses that incorporate additional discretionary choices on the part of the analyst, particularly when they impose external structure over the raw textual data.
+
+\section{Summary}
+
+In this chapter I have established the requirements the proposed approach imposes on candidate primary sources by introducing the notion of narrative horizon as a general criteria to determine the usefulness of a textual source for the style of non-discursive analysis argued for in this dissertation.
+
+Following this general guideline, I introduced the Proceedings of the Old Bailey as a perfect candidate for analysis, not only because of its production as a progressively accurate record of a defined and stable population of social facts (criminal trials) that suggests a particularly short narrative horizon, but specially because of its recording of a particularly short-horizon form of first hand accounts of social practices in the form of spoken witness testimony.
+
+Taking the POB as our primary data source, this chapter has also illustrated the way in which the definition of corpus segments referred to in \autoref{sec:method} as a \emph{segmentation} is used as primary sampling unit for a textual corpus in order to take advantage of its provenance, the set of non-textual information that can reliably be associated to different segments in a corpus via exploitation of its internal structure.
+
+Having defined paragraphs as our primary segmentation unit, I introduced a particularly naive strategy for the identification of direct speech, in order to compensate for the impossibility of replicating more sophisticated but extremely fragile strategies used for the same purpose in the available literature.
+
+Validating this naive strategy afforded us the opportunity to illustrate the style of analysis that can be produced by looking at the marginals of the co-occurrence matrix in order to establish some general superficial facts about a corpus, both longitudinally and cross-sectionally.
+
+Having established the suitability of our speech-detection strategy, as well as some general trends about the evolution of corpus samples relevant for the analysis of more specific social facts, we can now move on to discuss the projection of $X$ into $S$, from which I argue it is possible to produce rich pictures of states of affairs that allow for a more detailed study of these general trends.
+
+In the following chapters, I'll demonstrate two radically different projections of the co-occurrence matrix $X$ into different forms of $S$, the semantic space.
+For this purposes, $X$ itself is constructed via the collection of co-occurrence counts in symmetric moving window contexts defined with $\delta_{lo} = \delta_{hi} = 10$, with harmonic positional weights equal to $\frac{1}{|pos( t_w ) - pos( t_c )|}$, following \citet{pennington2014} as explained in \autoref{chap:frame}.

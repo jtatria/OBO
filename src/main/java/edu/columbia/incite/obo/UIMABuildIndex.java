@@ -32,11 +32,10 @@ public class UIMABuildIndex {
         props.setProperty( Conf.PARAM_UIMA_AES, String.join( ",", 
             CorpusIndexer.class.getName()
         ) );
-        props.setProperty(CorpusIndexer.RES_INDEX_WRITER, LuceneIndexer.class.getName() );
-        props.setProperty(CorpusIndexer.RES_TOKENF_PROVIDER, OBOTokenFields.class.getName() );
-        props.setProperty(CorpusIndexer.RES_DOCF_PROVIDER, OBODocFields.class.getName() );
+        props.setProperty( CorpusIndexer.RES_INDEX_WRITER, LuceneIndexer.class.getName() );
+        props.setProperty( CorpusIndexer.RES_TOKENF_PROVIDER, OBOTokenFields.class.getName() );
+        props.setProperty( CorpusIndexer.RES_DOCF_PROVIDER, OBODocFields.class.getName() );
         
-        int i = 0;
         Conf conf = new Conf( Conf.DFLT_NS, props );
         CPERunner cper = new CPERunner( conf );
         cper.build();

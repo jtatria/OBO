@@ -12,21 +12,21 @@ make_data <- function() {
     X  <- read_cooccur( COOC_FILE, lxcn=cr$data$lxcn ) %>% weight_sample( cr$data$cooc )
     #X  <- read_cooccur( COOC_FILE, lxcn=cr$data$lxcn ) %>% weight_pmi( alpha=.75 )
     td <- cr$get_terms()
-    
+
     # term samples
     ls <- lexical_sample( td$tf, !is.na( td$pos ) & td$pos == 'NN', theta=ut$SAMPLE_THETA )
     fs <- lexical_sample( td$tf, theta=gr$FEATURE_THETA )
     ut$infof("Lexical sample for tetha %4.2f contains %d terms", ut$SAMPLE_THETA, sum( ls ) )
-    
+
     sn_func <- function( X, ls, fs, td, ... ) {
-        wspaces::graph_make( X, ls=ls, fs=fs, vertex.data=td, 
+        wspaces::graph_make( X, ls=ls, fs=fs, vertex.data=td,
             prune.tol=ut$PRUNE_TOLERANCE, verbose=TRUE, cluster.contribs=TRUE, ...
         )
     }
-    
+
     ppmi <- sn_func( X, ls, fs, td )
     difw <- sn_func( X, ls, fs, td, sim.func=HIGH_FUNC )
-    
+
     ppmi$G %>% gr$export( dir=ut$DIR_DATA_GRPH, file=sprintf( "%s_ppmi", PROJ_NAME ) )
     difw$G %>% gr$export( dir=ut$DIR_DATA_GRPH, file=sprintf( "%s_difw", PROJ_NAME ) )
 
@@ -43,7 +43,7 @@ ut$infof( "Loading data from %s", DATA_FILE )
 load( DATA_FILE )
 
 # s <- c( rep( "Direct coocc. netowrk", length( gr$V( ppmi$G ) ) ), rep( "Diff. weighted netowrk", length( gr$V( difw$G ) ) ) )
-# k <- c( gr$V( ppmi$G )$comm, gr$V( difw$G )$comm ) 
+# k <- c( gr$V( ppmi$G )$comm, gr$V( difw$G )$comm )
 # i <- 1; table( s, k ) %>% addmargins( 2, list( 'mod.'=function( ... ) {
 #     m <- if( i == 1 ) difw$K %>% igraph::modularity() else ppmi$K %>% igraph::modularity()
 #     i <<- i + 1

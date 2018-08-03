@@ -1,0 +1,97 @@
+\chapter{Software}
+\label{app:software}
+
+Work for production of this dissertation resulted in two software libraries that demonstrate the general methodological framework presented in this work.
+
+The first one is written in Java and called \code{Lector}.
+It is concerned with data acquisition and processing for the compilation of distributional information from a text corpus.
+\code{Lector} offers a bridge between the Java implementation of the UIMA\footnote{
+    \citet{ferrucci2004}.
+} standard for general analysis of unstructured information (i.e.  text) and the Lucene\footnote{
+    \citet{apacheluceneproject2015}.
+} search engine library for the construction of inverted indices.
+Licensed under the GNU General Public License v3.0 or later, \code{Lector} is free software and is available at \url{https://src.nomoi.org/jtatria/lector}.
+
+The second one is written in \R{} and \CPP{} and called \code{wspaces}.
+It is concerned with the analysis of co-occurrence matrices and their projection into graph and vector space based semantic models, as well as their analysis, manipulation and visualisation.
+Licensed under the GNU General Public License v3.0 or later, \code{wspaces} is free software and is available at \url{https://src.nomoi.org/jtatria/wspaces}.
+
+A general overview of both of these packages is provided below.
+Further details are found in each pacakge's documentation.
+Other software packages also developed and used for production of this work are described below in \autoref{sec:other_software}.
+
+Finally, all source code used for production of this dissertation is available at \url{} and licensed under the same Creative Commons ``Attribution-NonCommercial-NoDerivatives 4.0 International'' license used for publication of this document.
+This includes the \code{OBO} extension module to \code{Lector} described in \autoref{app:obo_proc}, all \R{} code used for production of the results reported above and the \LaTeX{} source that will produce this document.
+
+The document you are currently reading corresponds to version $1.0$ of this software distribution.
+
+\section{\code{Lector}}
+
+\code{Lector} offers mainly three areas of functionality:
+\begin{itemize}
+    \item A set of tools for the construction and design of UIMA analysis components and pipelines.
+    \item An interface between UIMA and Lucene for construction of inverted indices from arbitrary annotations.
+    \item A set of tools for construction and manipulation of a Lucene index for distributional semantic analysis.
+\end{itemize}
+
+UIMA tools include an I/O module offering a set of conventions and interfaces for writing arbitrary file readers and writers, facilities for serialising and de-serialising CAS data to XMI and the UIMA binary formats, and a particularly powerful and efficient XML collection reader with full XPath support and general character stream processing capabilities.
+They also include a base abstract class for constructing ``segmented'' processors, that analyse CAS data following the sequence of elements defining a corpus segmentation with facilities for indexing all covering and covered annotations in each segment.
+This has been built over the excellent utility classes included in the UIMA-FIT\footnote{
+    \citet{ogren2009}.
+} library.
+
+The library also provides a set of standard interfaces and base components to construct inverted indices from UIMA CAS data, including facilities for defining document-level metadata fields and general token stream fields.
+For now this is written against the Lucene search engine library, but support for other indexing back-ends is planned.
+The UIMA-Lucene bridge offered by this indexing module replaces the functionality previously offered by the now discontinued and unmantained Lucas UIMA add-on package.
+I expect this aspect of \code{Lector} to be of most interest to other users.
+
+Finally, the library provides a set of tools and interfaces for querying a Lucene index for distributional information.
+These are built around two ``worker'' modules that can read data from an index on a per-term or per-document basis, in parallel using all available processing units.
+Different workers will produce different data sets, like dis-aggregated frequency counts and co-occurrence matrices, and define their own formats and standards for easy serialisation either to disk or in memory for further analysis with external software.
+
+All of the above features make extensive use of a number of useful support classes and methods that offer easy to use access to Lucene's powerful high-performance data structures like automata, transducers and bit-sets, as well as simplified access to UIMA type systems, annotations and features.
+These are used extensively to implement term sets, document samples, etc.
+
+\section{\code{wspaces}}
+
+\code{wspaces} is an \R{} package offering mainly three areas of functionality:
+\begin{itemize}
+    \item I/O facilities to read and write corpus data either from files on disk or in-memory by connecting directly to a running \code{Lector} instance.
+    \item A number of common functions used in the analysis of distributional data, including term and document weighting functions and similarity measures.
+    \item Tools for parameterised construction, analysis and visualisation of semantic networks and vector spaces.
+\end{itemize}
+
+The first area of functionality revolves around the definition of a series of conventions and accessibility methods for dealing with historical corpus distributional data-sets represented through a standard format: four data sets, containing 1) a corpus lexical set, 2) its dis-aggregated term frequencies across corpus partitions, 3) its part of speech term distribution and 4) co-occurrence matrices.
+This is the same standard defined by \code{Lector}, and data can be read either from files on disk produced by that library, or from within \R{} user code by calling \code{Lector} through the rJava\footnote{
+    \citet{urbanek2018}.
+} \R{} package, but this is an optional dependency.
+
+The second area of functionality revolves around the parallelised computation of point-wise and vector-wise weighting and similarity functions.
+These have mostly been written in \CPP{} using the excellent Rcpp\footnote{
+    \citet{eddelbuettel2018}.
+} package and the Eigen\footnote{
+    \citet{guennebaud2010}.
+} linear algebra library, and optimised for speed.
+This allows for fast prototyping of different hyper-parameter specifications, as it allows for quick transformation of a co-occurrence matrix before projecting it into different semantic space representations.
+
+Functions related to semantic networks are named with a \code{graph\_} prefix, and include functions for stitching, pruning, clustering and plotting semantic networks built from co-occurrence matrices, as well as facilities for censoring and filtering both observations and features from the input data.
+Functions related to semantic vector space construction are named with a \code{wspace\_} prefix, and include functions for training, aligning, manipulating and querying vector spaces.
+
+At this moment, \code{wspaces} is usable but a bit clunky, with areas of functionality at different levels of maturity.
+I expect to have the opportunity of revising its general interface in future releases.
+Use at your own risk.
+
+\section{Supplementary software}
+\label{sec:other_software}
+
+Two other \R{} packages were written and used in production of this work, though they are not directly related to the methodological framework for computational text analysis discussed here.
+
+The first of them is a re-implementation in \CPP{} and \R{} of Gephi's \code{forceatlas2} force-based graph visualisation algorithm.
+Its current implementation is moderately fast, and it respects the spirit of the original in that it supports ``live'' optimisation of the algorithm so a user can observe the process of map construction directly.
+It has been designed with a focus on extensibility and I have plans to expand it into a more general library for development and testing of force-based network mapping algorithms.
+This library is published as \code{Rforceatlas} and it is available at \url{https://src.nomoi.org/jtatria/Rforceatlas}.
+
+The second is a small library of geometric primitives with a particular focus on 2D graphics and plot layout.
+It is mostly the result of my own frustration with the cumbersome facilities available in \R{} for even the simplest linear transformations of graphical objects, and my own linear algebraic and geometric education.
+It is written in pure \R{} with very few dependencies, but coded in such a way as to be easily ported to different storage and computing back-ends, mostly out of frustration with R's matrix storage conventions.
+It is pedantically named \code{euclid} and available at \url{https://src.nomoi.org/jtatria/euclid}.

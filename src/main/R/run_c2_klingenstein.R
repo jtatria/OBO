@@ -13,7 +13,7 @@ THES_COLC <- list( character = c( 1,7,8,13:20 ), integer = c( 2:6, 9:12 ) )
 SYMSET_ID <- c('class', 'section', 'subSecn', 'headNum', 'term' )
 SMOOTH_K  <- 2
 
-DEVICE <- 'internal'
+DEVICE <- 'tikz'
 
 divvec <- function( d0, d1, mode=4 ) {
     if( nrow( d0 ) != nrow( d1 ) && ncol( d0 ) != ncol( d1 ) ) {

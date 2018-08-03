@@ -9,7 +9,7 @@ source( 'inc/obo_util.R',  chdir=TRUE, local=( if( exists( 'ut' ) ) ut else ( ut
 
 PROJ_NAME <- 'c2_pobtrends'
 DATA_FILE <- file.path( ut$DIR_DATA_ROBJ, sprintf( "%s.RData", PROJ_NAME ) )
-DEVICE    <- 'internal'
+DEVICE    <- 'tikz'
 
 make_data <- function() {
     source( 'inc/obo_tables.R', chdir=TRUE, local=( if( exists( 'ta' ) ) ta else ( ta <- new.env() ) ) )

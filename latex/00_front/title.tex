@@ -1,0 +1,55 @@
+\pagestyle{empty}
+
+% Document wide values. Used in several places.
+\newcommand{\theTitle}{
+    Beyond Discourse
+}
+
+\newcommand{\theSubtitle}{
+    Computational Text Analysis and Material Historical Processes
+}
+
+\newcommand{\theAuthor}{
+    J. T. Atria
+}
+
+\newcommand{\theDegree}{
+    A dissertation submitted in partial fulfillment \\
+    of the requirements for the degree of \\
+    \textsc{Doctor of Philosophy} \\
+    in the Graduate School of Arts and Sciences
+}
+
+\newcommand{\theUniversity}{
+    Columbia University in the City of New York
+}
+
+% Layout the title page with values defined above
+\begingroup
+    %\drop=0.1\textheight
+    \vspace*{0.1\textheight}
+    \begin{center}
+        {\HUGE\bfseries
+            \theTitle
+        }
+        \par
+        {\Large\bfseries
+            \theSubtitle
+        }
+        \par
+        \vspace*{0.1\textheight}
+        {\Large
+            \theAuthor
+        }
+        \par
+        \vfill
+        \theDegree
+        \par
+        \vfill
+        \theUniversity
+        \par
+        \the\year
+    \end{center}
+\endgroup
+
+\clearpage
