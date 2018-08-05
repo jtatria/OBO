@@ -34,6 +34,7 @@
 \pgfplotsset{compat=1.14}
 \usepgfplotslibrary{external}
 \tikzexternalize[prefix=tikz_ext/]
+%\tikzset{external/system call={lualatex \tikzexternalcheckshellescape -halt-on-error -interaction=batchmode -jobname "\image" "\texsource"}}
 
 % We replace pfgimage with includegraphics because tikzDevice uses pgfimage for references, but pgfimage can't find relative paths.
 \renewcommand{\pgfimage}{\includegraphics}

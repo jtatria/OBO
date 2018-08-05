@@ -88,9 +88,9 @@ User-facing types (i.e. excluding abstract types), include the following:
     \item [Place]       Place names, mapped to \code{placeName} elements.
     \item [Date]        Crime dates, mapped to \code{rs} elements of type \code{crimeDate}.
     \item [Label]       Personal labels, mapped to \code{rs} elements of type \code{occupation}.
-    \item [Offence]     Offence descriptions, mapped to \code{rs} elements of type \code{offenceDescription}.
-    \item [Verdict]     Verdict descriptions, mapped to \code{rs} elements of type \code{verdictDescription}.
-    \item [Punishment]  Punishment descriptions, mapped to \code{rs} elements of type \code{punishmentDescription}.
+    \item [Offence]     Offences, mapped to \code{rs} elements of type \code{offenceDescription}.
+    \item [Verdict]     Verdicts, mapped to \code{rs} elements of type \code{verdictDescription}.
+    \item [Punishment]  Punishments, mapped to \code{rs} elements of type \code{punishmentDescription}.
     \item [Charge]      Criminal charges, created from \code{join} elements of type \code{criminalCharge}, having one Person, Offence and Verdict annotation as features and being themselves accessible only as features of TrialAccount annotations.
     \item [Paragraph]   Basic segmentation unit, created either from \code{p} annotations in most of the text, but also around dangling orphan text nodes found outside \code{p} elements in the original XML stream.
     The set of all \textbf{Paragraph} annotations constitute a proper segmentation of the corpus, as discussed in \autoref{chap:frame} and are used as primary indexing unit (see below).
