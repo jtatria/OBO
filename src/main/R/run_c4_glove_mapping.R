@@ -4,7 +4,7 @@ source( 'inc/obo_glove.R',  chdir=TRUE, local=( if( exists( 'gv' ) ) gv else ( g
 source( 'inc/obo_corpus.R', chdir=TRUE, local=( if( exists( 'cr' ) ) cr else ( cr <- new.env() ) ) )
 source( 'inc_c3_global_data.R', local=( c3 <- new.env() ) )
 
-PROJ_NAME <- 'c4_global'
+PROJ_NAME <- 'c4_glove'
 DEVICE    <- 'tikz'
 
 # Load global model
