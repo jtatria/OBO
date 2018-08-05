@@ -1,0 +1,27 @@
+
+\begin{table}
+    \begin{center}
+        \begin{tabular}{ r | c | c | c | c }
+                       & Raw, full   & Raw, conf.  & Lemma, full  & Lemma, conf.        \\
+            \hline
+            Size       & 329,353     & 310,967     & 315,072     & 296,684              \\
+            Tokens     & 127,146,394 & 127,146,394 & 127,089,005 & 127,089,005          \\
+            S50        & 51          & 44          & 33          & 29                   \\
+            S95        & 4,611       & 3,921       & 3,329       & 2,773                \\
+            Loss       & N/A         & N/A         & 0.04\%      & 0.05\%               \\
+            Shrink     & N/A         & 5.58\%      & 4.33\%      & 9.92\%               \\
+            \hline
+            & \multicolumn{4}{c}{ \footnotesize{excluding terms with tf < 5}}           \\
+            \hline
+            Size       & 90,247      & 85,134      & 82,693      & \textbf{77,610}      \\
+            Tokens     & 126,790,799 & 126,811,123 & 126,744,342 & \textbf{126,764,716} \\
+            S50        & 51          & 43          & 33          & \textbf{28}          \\
+            S95        & 4,314       & 3,685       & 3,116       & \textbf{2,605}       \\
+            Loss       & 0.28\%      & 0.26\%      & 0.32\%      & \textbf{0.30\%}      \\
+            Shrink     & 72.59\%     & 74.15\%     & 74.89\%     & \textbf{76.43\%}     \\
+            \hline
+        \end{tabular}
+    \end{center}
+    \caption{Cardinaliy of lexical sets under different lexical normalization rules}
+    \label{tab:lexrules}
+\end{table}
