@@ -41,7 +41,7 @@ public class UIMARunNLP {
         props.setProperty( StanfordSegmenter.PARAM_STRICT_ZONING, "true" );
         props.setProperty( Conf.PARAM_UIMA_CONS, BinaryWriter.class.getName() );
                 
-        Conf conf = new Conf( Conf.DFLT_NS, props );
+        Conf conf = new Conf( props );
         CPERunner cper = new CPERunner( conf );
         cper.build();
         cper.call();

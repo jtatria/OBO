@@ -17,7 +17,7 @@ import org.apache.uima.fit.descriptor.ConfigurationParameter;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.resource.ResourceSpecifier;
 
-import edu.columbia.incite.uima.index.CorpusIndexer.TokenFieldConf;
+import edu.columbia.incite.uima.index.CorpusIndexer.TokenSpec;
 import edu.columbia.incite.uima.index.DKProTokenizer;
 import edu.columbia.incite.uima.index.InciteTokenizer;
 import edu.columbia.incite.corpus.POSClass;
@@ -32,7 +32,7 @@ import static edu.columbia.incite.obo.corpus.OBOTermSets.*;
  * @author José Tomás Atria <jtatria at gmail.com>
  */
 public class OBOTokenFields extends Resource_ImplBase 
-    implements SimpleResource<Map<String,TokenFieldConf>> {
+    implements SimpleResource<Map<String,TokenSpec>> {
     
     public static final String PARAM_ADD_RAW_FULL = "addRawFull";
     @ConfigurationParameter( name = PARAM_ADD_RAW_FULL, mandatory = false, defaultValue = "true" )
@@ -137,7 +137,7 @@ public class OBOTokenFields extends Resource_ImplBase
         FIELD_TYPE_DOCS.setIndexOptions( IndexOptions.DOCS );
     }
 
-    private final Map<String,TokenFieldConf> STREAMS = new HashMap<>();
+    private final Map<String,TokenSpec> STREAMS = new HashMap<>();
     
     @Override
     public boolean initialize( ResourceSpecifier rs, Map<String,Object> paras )
@@ -145,31 +145,31 @@ public class OBOTokenFields extends Resource_ImplBase
         boolean ret = super.initialize( rs, paras );    
         
         if( addRawFull ) {
-            STREAMS.put(FIELD_RAW_FULL,  new TokenFieldConf( ANNTYPE_TOKENS, FIELD_TYPE_WITHTV,
+            STREAMS.put(FIELD_RAW_FULL,  new TokenSpec( ANNTYPE_TOKENS, FIELD_TYPE_WITHTV,
                 new POBTokenizer( false, TERM_DELETIONS, SUBTS_FULL )
             ) );
         }
 
         if( addLemmaFull ) {
-            STREAMS.put(FIELD_LEMMA_FULL, new TokenFieldConf( ANNTYPE_TOKENS, FIELD_TYPE_WITHTV, 
+            STREAMS.put(FIELD_LEMMA_FULL, new TokenSpec( ANNTYPE_TOKENS, FIELD_TYPE_WITHTV, 
                 new POBTokenizer( true, TERM_DELETIONS, SUBTS_FULL )
             ) );
         }
 
         if( addRawConflated ) {
-            STREAMS.put(FIELD_RAW_CONF,   new TokenFieldConf( ANNTYPE_TOKENS, FIELD_TYPE_WITHTV, 
+            STREAMS.put(FIELD_RAW_CONF,   new TokenSpec( ANNTYPE_TOKENS, FIELD_TYPE_WITHTV, 
                 new POBTokenizer( false, TERM_DELETIONS, SUBSTS_CONF )
             ) );
         }
 
         if( addLemmaConflated ) {
-            STREAMS.put(FIELD_LEMMA_CONF,  new TokenFieldConf( ANNTYPE_TOKENS, FIELD_TYPE_WITHTV, 
+            STREAMS.put(FIELD_LEMMA_CONF,  new TokenSpec( ANNTYPE_TOKENS, FIELD_TYPE_WITHTV, 
                 new POBTokenizer( true, TERM_DELETIONS, SUBSTS_CONF )
             ) );
         }
 
         if( addLegal ) {
-            STREAMS.put(FIELD_LEGAL,      new TokenFieldConf( ANNTYPE_LEGAL, FIELD_TYPE_DOCS,
+            STREAMS.put(FIELD_LEGAL,      new TokenSpec( ANNTYPE_LEGAL, FIELD_TYPE_DOCS,
                 new InciteTokenizer() ) 
             );
         }
@@ -178,7 +178,7 @@ public class OBOTokenFields extends Resource_ImplBase
     }
     
     @Override
-    public Map<String,TokenFieldConf> get() {
+    public Map<String,TokenSpec> get() {
         return STREAMS;
     }
     

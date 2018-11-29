@@ -48,7 +48,7 @@ public class UIMAReadTEI {
         props.setProperty( sck + "." + OBOSplitCheck.PARAM_MODEL_DIR, MODEL_DIR );
         props.setProperty( Conf.DFLT_NS + "." + Conf.PARAM_UIMA_CONS, uwr );
 
-        Conf conf = new Conf( Conf.DFLT_NS, props );
+        Conf conf = new Conf( props );
         CPERunner cper = new CPERunner( conf );
         cper.build();
         cper.call();

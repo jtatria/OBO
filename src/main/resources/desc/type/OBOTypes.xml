@@ -3,7 +3,8 @@
   <description>Types for TEI annotations in the Old Bailey Online Corpus</description>
   <version>1.0</version>
   <vendor>Incite - Columbia University</vendor>
-  <import location="/home/jta/src/local/incite/incite-lector/src/main/resources/desc/type/InciteTypes.xml"/>
+  <import name="desc.type.InciteTypes"/>
+<!--  <import location="/home/jta/src/local/incite/incite-lector/src/main/resources/desc/type/InciteTypes.xml"/>-->
   <types>
     <typeDescription>
       <name>edu.columbia.incite.uima.api.types.obo.OBOSpan</name>
