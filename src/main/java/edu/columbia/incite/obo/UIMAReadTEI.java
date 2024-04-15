@@ -35,7 +35,7 @@ public class UIMAReadTEI {
         String omp = OBOMappingProvider.class.getName();
         String chp = InciteTextFilter.class.getName();
         String sck = OBOSplitCheck.class.getName();
-        String uwr = BinaryReader.class.getName();
+        String uwr = BinaryWriter.class.getName();
         
         Properties props = new Properties();        
         
